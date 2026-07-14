@@ -49,3 +49,6 @@ class Customer(Base):
     orders: Mapped[list[Order]] = relationship(
         back_populates="customer", passive_deletes=True
     )
+    conversations: Mapped[list[Conversation]] = relationship(
+        back_populates="customer", passive_deletes=True
+    )

@@ -85,3 +85,6 @@ class Order(Base):
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
+    conversations: Mapped[list[Conversation]] = relationship(
+        back_populates="related_order", passive_deletes=True
+    )
