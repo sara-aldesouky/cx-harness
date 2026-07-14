@@ -82,3 +82,8 @@ class Conversation(Base):
         passive_deletes=True,
         order_by="Message.sequence_number",
     )
+    model_runs: Mapped[list[ModelRun]] = relationship(
+        back_populates="conversation",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
