@@ -1,1 +1,0 @@
-"""Fanar provider integration."""
