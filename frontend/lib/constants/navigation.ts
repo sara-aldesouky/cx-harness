@@ -27,7 +27,6 @@ export const navigationItems: NavigationItem[] = [
     label: "Order Items",
     href: "/order-items",
     icon: PackageOpen,
-    disabled: true,
   },
   {
     label: "Conversations",
