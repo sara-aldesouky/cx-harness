@@ -8,10 +8,24 @@ from sqlalchemy import event, func, select
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from app.database.models import Customer, Order, OrderItem
+from app.database.models import (
+    Conversation,
+    Customer,
+    Message,
+    ModelRun,
+    Order,
+    OrderItem,
+)
 
 
-READ_ONLY_TABLES = (Customer, Order, OrderItem)
+READ_ONLY_TABLES = (
+    Customer,
+    Order,
+    OrderItem,
+    Conversation,
+    Message,
+    ModelRun,
+)
 
 
 def table_counts(session: Session) -> dict[str, int]:
@@ -32,7 +46,14 @@ def repository_session(test_engine: Engine) -> Generator[Session, None, None]:
 
     with Session(test_engine) as verification_session:
         counts_before = table_counts(verification_session)
-    assert counts_before == {"customers": 0, "orders": 0, "order_items": 0}
+    assert counts_before == {
+        "customers": 0,
+        "orders": 0,
+        "order_items": 0,
+        "conversations": 0,
+        "messages": 0,
+        "model_runs": 0,
+    }
 
     connection = test_engine.connect()
     transaction = connection.begin()
