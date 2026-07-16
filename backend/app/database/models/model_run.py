@@ -103,3 +103,8 @@ class ModelRun(Base):
     )
 
     conversation: Mapped[Conversation] = relationship(back_populates="model_runs")
+    tool_calls: Mapped[list[ToolCall]] = relationship(
+        back_populates="model_run",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
