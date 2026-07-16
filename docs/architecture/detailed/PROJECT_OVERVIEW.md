@@ -1,5 +1,7 @@
 # CX Harness — Project Overview
 
+[Back to Architecture Overview](../README.md)
+
 CX Harness is a read-only customer-experience analytics system. It combines commerce data, support conversations, model execution telemetry, tool-call auditing, and evaluations in one dashboard.
 
 ## Documentation map
@@ -12,6 +14,8 @@ CX Harness is a read-only customer-experience analytics system. It combines comm
 - [AI pipeline](AI_PIPELINE.md)
 
 ## Diagram 1 — Technology stack
+
+![Technology stack](../diagrams/01-technology-stack.png)
 
 ```mermaid
 flowchart TB
@@ -88,3 +92,6 @@ Implemented today: database schema, migrations, repositories, response schemas, 
 
 Planned later: live provider adapters, harness orchestration, business-tool execution, automatic evaluation generation, deployment automation, and the remaining telemetry pages.
 
+---
+
+[Back to Architecture Overview](../README.md) · Previous: [Architecture Overview](../README.md) · Next: [System Architecture](SYSTEM_ARCHITECTURE.md)

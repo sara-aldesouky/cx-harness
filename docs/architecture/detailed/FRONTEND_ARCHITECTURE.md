@@ -1,8 +1,10 @@
 # Frontend Architecture
 
-[Project overview](PROJECT_OVERVIEW.md) · [System architecture](SYSTEM_ARCHITECTURE.md) · [Data flow](DATA_FLOW.md)
+[Back to Architecture Overview](../README.md) · [Project overview](PROJECT_OVERVIEW.md) · [System architecture](SYSTEM_ARCHITECTURE.md) · [Data flow](DATA_FLOW.md)
 
 ## Diagram 4 — Frontend composition
+
+![Frontend architecture](../diagrams/06-frontend-architecture.png)
 
 ```mermaid
 flowchart TB
@@ -68,3 +70,6 @@ Customers, Orders, Order Items, Conversations, and Messages share behavior but d
 | Layout | Persistent shell, sidebar, and top navigation |
 | Axios client | Central API base URL, headers, and timeout |
 
+---
+
+[Back to Architecture Overview](../README.md) · Previous: [Database Architecture](DATABASE_ARCHITECTURE.md) · Next: [AI Pipeline](AI_PIPELINE.md)

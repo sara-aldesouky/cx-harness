@@ -1,8 +1,10 @@
 # System Architecture
 
-[Project overview](PROJECT_OVERVIEW.md) · [Frontend](FRONTEND_ARCHITECTURE.md) · [Backend](BACKEND_ARCHITECTURE.md) · [Database](DATABASE_ARCHITECTURE.md)
+[Back to Architecture Overview](../README.md) · [Project overview](PROJECT_OVERVIEW.md) · [Frontend](FRONTEND_ARCHITECTURE.md) · [Backend](BACKEND_ARCHITECTURE.md) · [Database](DATABASE_ARCHITECTURE.md)
 
 ## Diagram 2 — High-level system
+
+![High-level system architecture](../diagrams/02-system-architecture.png)
 
 ```mermaid
 flowchart LR
@@ -61,6 +63,8 @@ The system uses conventional layers so each part can evolve independently. A das
 
 ## Diagram 3 — Development workflow
 
+![Development workflow](../diagrams/08-development-workflow.png)
+
 ```mermaid
 flowchart LR
   DEV[Developer] --> CODE[Scoped code or documentation]
@@ -96,3 +100,6 @@ Short feedback loops catch defects before shared branches receive them, while sm
 - Local checks consume time
 - Until CI is added, enforcement still depends partly on developer workflow
 
+---
+
+[Back to Architecture Overview](../README.md) · Previous: [Project Overview](PROJECT_OVERVIEW.md) · Next: [Data Flow](DATA_FLOW.md)

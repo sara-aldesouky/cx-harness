@@ -1,8 +1,10 @@
 # Data Flow
 
-[System architecture](SYSTEM_ARCHITECTURE.md) · [Frontend](FRONTEND_ARCHITECTURE.md) · [Backend](BACKEND_ARCHITECTURE.md)
+[Back to Architecture Overview](../README.md) · [System architecture](SYSTEM_ARCHITECTURE.md) · [Frontend](FRONTEND_ARCHITECTURE.md) · [Backend](BACKEND_ARCHITECTURE.md)
 
 ## Diagram 8 — API request flow
+
+![API request flow](../diagrams/03-api-request-flow.png)
 
 ```mermaid
 sequenceDiagram
@@ -58,6 +60,8 @@ The flow gives every layer one responsibility and makes loading, retry, error, p
 
 ## Diagram 9 — Testing architecture
 
+![Testing architecture](../diagrams/07-testing-architecture.png)
+
 ```mermaid
 flowchart TB
   PYTEST[pytest suite]
@@ -110,3 +114,6 @@ SQLite would not faithfully test PostgreSQL UUID, JSONB, constraint, and cascade
 - Integration tests are slower than pure unit tests
 - Test migrations must stay synchronized with local heads
 
+---
+
+[Back to Architecture Overview](../README.md) · Previous: [System Architecture](SYSTEM_ARCHITECTURE.md) · Next: [Backend Architecture](BACKEND_ARCHITECTURE.md)

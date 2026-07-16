@@ -1,8 +1,10 @@
 # Database Architecture
 
-[Project overview](PROJECT_OVERVIEW.md) · [Backend](BACKEND_ARCHITECTURE.md) · [AI pipeline](AI_PIPELINE.md)
+[Back to Architecture Overview](../README.md) · [Project overview](PROJECT_OVERVIEW.md) · [Backend](BACKEND_ARCHITECTURE.md) · [AI pipeline](AI_PIPELINE.md)
 
 ## Diagram 7 — Entity relationship model
+
+![Database entity relationship diagram](../diagrams/05-database-erd.png)
 
 ```mermaid
 erDiagram
@@ -109,3 +111,6 @@ The schema separates business truth (customers and orders), interaction history 
 
 Alembic is the only schema-change mechanism. The current chain is linear and culminates in the Evaluation migration. Both Render development PostgreSQL and the Docker test database use the same revisions; application code never calls `create_all`.
 
+---
+
+[Back to Architecture Overview](../README.md) · Previous: [Backend Architecture](BACKEND_ARCHITECTURE.md) · Next: [Frontend Architecture](FRONTEND_ARCHITECTURE.md)

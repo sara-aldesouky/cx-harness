@@ -1,10 +1,12 @@
 # AI Pipeline
 
-[Project overview](PROJECT_OVERVIEW.md) · [Database](DATABASE_ARCHITECTURE.md) · [System architecture](SYSTEM_ARCHITECTURE.md)
+[Back to Architecture Overview](../README.md) · [Project overview](PROJECT_OVERVIEW.md) · [Database](DATABASE_ARCHITECTURE.md) · [System architecture](SYSTEM_ARCHITECTURE.md)
 
 > Status: the database and read-only observability surfaces exist. Live provider calls, tool execution, harness orchestration, and automatic evaluation generation are future implementation work.
 
 ## Diagram 10 — End-to-end customer experience flow
+
+![Future AI pipeline](../diagrams/10-future-ai-pipeline.png)
 
 ```mermaid
 flowchart LR
@@ -58,3 +60,6 @@ Recording execution and evaluation separately from message history enables repro
 
 The future harness should depend on generic provider and business-tool interfaces. Provider-specific SDKs and adapters should be added only after deployment methods are selected. A Render-hosted backend cannot directly call an Ollama server running on a developer laptop; deployed open models require a reachable inference endpoint.
 
+---
+
+[Back to Architecture Overview](../README.md) · Previous: [Frontend Architecture](FRONTEND_ARCHITECTURE.md) · Next: [Architecture Overview](../README.md)

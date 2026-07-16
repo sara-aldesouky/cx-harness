@@ -1,8 +1,10 @@
 # Backend Architecture
 
-[Project overview](PROJECT_OVERVIEW.md) · [Database](DATABASE_ARCHITECTURE.md) · [Data flow](DATA_FLOW.md)
+[Back to Architecture Overview](../README.md) · [Project overview](PROJECT_OVERVIEW.md) · [Database](DATABASE_ARCHITECTURE.md) · [Data flow](DATA_FLOW.md)
 
 ## Diagram 5 — Backend layers
+
+![Backend architecture](../diagrams/04-backend-architecture.png)
 
 ```mermaid
 flowchart TB
@@ -59,6 +61,8 @@ Database models expose persistence details and relationships that should not aut
 
 ## Diagram 6 — Repository overview
 
+![Repository overview](../diagrams/09-repository-overview.png)
+
 ```mermaid
 flowchart LR
   API[FastAPI routes]
@@ -105,3 +109,6 @@ Table-focused repositories match the current read-only API and keep domain query
 - Cross-domain analytics may eventually need dedicated reporting repositories or services
 - A repository-per-aggregate adds files as the schema grows
 
+---
+
+[Back to Architecture Overview](../README.md) · Previous: [Data Flow](DATA_FLOW.md) · Next: [Database Architecture](DATABASE_ARCHITECTURE.md)
