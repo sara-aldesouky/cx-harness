@@ -7,6 +7,7 @@ from app.database.repositories.message_repository import MessageRepository
 from app.database.repositories.model_run_repository import ModelRunRepository
 from app.database.repositories.order_item_repository import OrderItemRepository
 from app.database.repositories.order_repository import OrderRepository
+from app.database.repositories.tool_call_repository import ToolCallRepository
 
 __all__ = [
     "ConversationRepository",
@@ -16,4 +17,5 @@ __all__ = [
     "OrderItemRepository",
     "OrderRepository",
     "RepositoryValidationError",
+    "ToolCallRepository",
 ]
