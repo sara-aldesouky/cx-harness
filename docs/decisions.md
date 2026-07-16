@@ -81,3 +81,26 @@ Creating provider-specific implementations now would introduce premature archite
 ### Consequences
 
 Provider adapters will be added only after their deployment and API methods are defined.
+
+## Decision 4 — Isolated local test database
+
+### Context
+
+Automated database tests must not read from or write to the shared Render development database.
+
+### Choice
+
+Run a disposable PostgreSQL 16 test database through Docker Compose on
+`127.0.0.1:5433`.
+
+### Reasoning
+
+A dedicated local instance keeps test transactions and future destructive
+constraint checks isolated from development data while remaining easy to
+recreate.
+
+### Consequences
+
+Database tests require Docker and an explicit `DATABASE_URL_TEST`. The test
+fixtures never fall back to `DATABASE_URL`, and the Docker volume can be
+removed when a completely fresh test database is needed.
