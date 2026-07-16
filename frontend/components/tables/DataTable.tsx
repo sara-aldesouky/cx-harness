@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   type ColumnDef,
@@ -38,10 +38,14 @@ import type { PaginatedResponse } from "@/types";
 export interface DataTableProps<TData extends RowData> {
   endpoint: string;
   columns: ColumnDef<TData, unknown>[];
-  title: string;
+  title?: string;
   initialPageSize?: number;
   getRowId?: (row: TData) => string;
+  onDataUpdatedAtChange?: (timestamp: number) => void;
 }
+
+export const dataTableQueryKey = (endpoint: string) =>
+  ["data-table", endpoint] as const;
 
 async function fetchPage<TData>(
   endpoint: string,
@@ -62,6 +66,7 @@ function DataTableComponent<TData extends RowData>({
   title,
   initialPageSize = 20,
   getRowId,
+  onDataUpdatedAtChange,
 }: DataTableProps<TData>) {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -74,7 +79,11 @@ function DataTableComponent<TData extends RowData>({
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const queryKey = useMemo(
-    () => ["data-table", endpoint, pagination.pageIndex, pagination.pageSize],
+    () => [
+      ...dataTableQueryKey(endpoint),
+      pagination.pageIndex,
+      pagination.pageSize,
+    ],
     [endpoint, pagination.pageIndex, pagination.pageSize],
   );
   const query = useQuery({
@@ -82,6 +91,12 @@ function DataTableComponent<TData extends RowData>({
     queryFn: () => fetchPage<TData>(endpoint, pagination),
     placeholderData: keepPreviousData,
   });
+
+  useEffect(() => {
+    if (query.dataUpdatedAt > 0) {
+      onDataUpdatedAtChange?.(query.dataUpdatedAt);
+    }
+  }, [onDataUpdatedAtChange, query.dataUpdatedAt]);
 
   const selectionColumn = useMemo<ColumnDef<TData, unknown>>(
     () => ({
@@ -152,18 +167,23 @@ function DataTableComponent<TData extends RowData>({
   const visibleColumnCount = table.getVisibleLeafColumns().length;
 
   return (
-    <section className="space-y-4" aria-labelledby="data-table-title">
-      <div>
-        <h1
-          id="data-table-title"
-          className="text-2xl font-semibold tracking-tight"
-        >
-          {title}
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Browse, sort, filter, and select records.
-        </p>
-      </div>
+    <section
+      className="space-y-4"
+      aria-labelledby={title ? "data-table-title" : undefined}
+    >
+      {title ? (
+        <div>
+          <h1
+            id="data-table-title"
+            className="text-2xl font-semibold tracking-tight"
+          >
+            {title}
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Browse, sort, filter, and select records.
+          </p>
+        </div>
+      ) : null}
 
       <DataTableToolbar
         table={table}

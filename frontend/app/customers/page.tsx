@@ -1,19 +1,16 @@
 "use client";
 
-import { DataTable } from "@/components/tables";
 import { customerColumns } from "@/app/customers/customer-columns";
-import { PageContainer } from "@/components/common/page-container";
+import { ResourcePage } from "@/components/resources";
 import type { CustomerSummary } from "@/types";
 
 export default function CustomersPage() {
   return (
-    <PageContainer>
-      <DataTable<CustomerSummary>
-        endpoint="/customers"
-        columns={customerColumns}
-        title="Customers"
-        getRowId={(customer) => customer.id}
-      />
-    </PageContainer>
+    <ResourcePage<CustomerSummary>
+      title="Customers"
+      endpoint="/customers"
+      columns={customerColumns}
+      description="View and search customers"
+    />
   );
 }
