@@ -12,6 +12,7 @@ from app.database.models import (
     ModelRun,
     Order,
     OrderItem,
+    ToolCall,
 )
 
 
@@ -132,3 +133,24 @@ def create_model_run(
     session.add(model_run)
     session.flush()
     return model_run
+
+
+def create_tool_call(
+    session: Session,
+    model_run: ModelRun,
+    **overrides: object,
+) -> ToolCall:
+    values = {
+        "model_run": model_run,
+        "tool_name": "get_order_status",
+        "status": "completed",
+        "input_json": {"order_id": "TEST-ORDER"},
+        "output_json": {"status": "preparing"},
+        "success": True,
+        "latency_ms": 25,
+    }
+    values.update(overrides)
+    tool_call = ToolCall(**values)
+    session.add(tool_call)
+    session.flush()
+    return tool_call

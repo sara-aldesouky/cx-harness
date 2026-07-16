@@ -15,6 +15,7 @@ from app.database.models import (
     ModelRun,
     Order,
     OrderItem,
+    ToolCall,
 )
 
 
@@ -25,6 +26,7 @@ READ_ONLY_TABLES = (
     Conversation,
     Message,
     ModelRun,
+    ToolCall,
 )
 
 
@@ -53,6 +55,7 @@ def repository_session(test_engine: Engine) -> Generator[Session, None, None]:
         "conversations": 0,
         "messages": 0,
         "model_runs": 0,
+        "tool_calls": 0,
     }
 
     connection = test_engine.connect()
