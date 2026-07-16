@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.database.models import (
     Conversation,
     Customer,
+    Evaluation,
     Message,
     ModelRun,
     Order,
@@ -154,3 +155,26 @@ def create_tool_call(
     session.add(tool_call)
     session.flush()
     return tool_call
+
+
+def create_evaluation(
+    session: Session,
+    model_run: ModelRun,
+    **overrides: object,
+) -> Evaluation:
+    number = next(_sequence)
+    values = {
+        "model_run": model_run,
+        "evaluator_type": "automatic",
+        "evaluator_name": f"rule_based_{number}",
+        "intent_score": Decimal("4.00"),
+        "tool_score": Decimal("4.00"),
+        "overall_score": Decimal("4.00"),
+        "passed": True,
+        "details_json": {"rule": "synthetic"},
+    }
+    values.update(overrides)
+    evaluation = Evaluation(**values)
+    session.add(evaluation)
+    session.flush()
+    return evaluation

@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.database.models import (
     Conversation,
     Customer,
+    Evaluation,
     Message,
     ModelRun,
     Order,
@@ -27,6 +28,7 @@ READ_ONLY_TABLES = (
     Message,
     ModelRun,
     ToolCall,
+    Evaluation,
 )
 
 
@@ -56,6 +58,7 @@ def repository_session(test_engine: Engine) -> Generator[Session, None, None]:
         "messages": 0,
         "model_runs": 0,
         "tool_calls": 0,
+        "evaluations": 0,
     }
 
     connection = test_engine.connect()
