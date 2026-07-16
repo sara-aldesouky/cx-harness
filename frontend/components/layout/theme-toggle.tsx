@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -11,8 +12,15 @@ const themes = [
   { value: "system", label: "System", icon: Laptop },
 ] as const;
 
+const subscribe = () => () => {};
+
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const isMounted = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
 
   return (
     <div className="bg-muted/50 flex items-center rounded-lg border p-1">
@@ -20,7 +28,7 @@ export function ThemeToggle() {
         <Button
           key={value}
           type="button"
-          variant={theme === value ? "default" : "ghost"}
+          variant={isMounted && theme === value ? "default" : "ghost"}
           size="sm"
           onClick={() => setTheme(value)}
           aria-label={`Use ${label.toLowerCase()} theme`}
