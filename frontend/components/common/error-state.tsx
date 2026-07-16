@@ -1,13 +1,17 @@
 import { CircleAlert } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+
 export interface ErrorStateProps {
   title?: string;
   message?: string;
+  onRetry?: () => void;
 }
 
 export function ErrorState({
   title = "Something went wrong",
   message = "The requested content could not be loaded.",
+  onRetry,
 }: ErrorStateProps) {
   return (
     <div
@@ -20,6 +24,16 @@ export function ErrorState({
       />
       <h2 className="font-medium">{title}</h2>
       <p className="text-muted-foreground mt-1 max-w-md text-sm">{message}</p>
+      {onRetry ? (
+        <Button
+          type="button"
+          variant="outline"
+          className="mt-4"
+          onClick={onRetry}
+        >
+          Try again
+        </Button>
+      ) : null}
     </div>
   );
 }
