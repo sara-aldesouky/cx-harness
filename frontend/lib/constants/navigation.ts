@@ -33,7 +33,7 @@ export const navigationItems: NavigationItem[] = [
     href: "/conversations",
     icon: MessagesSquare,
   },
-  { label: "Messages", href: "/messages", icon: Sparkles, disabled: true },
+  { label: "Messages", href: "/messages", icon: Sparkles },
   { label: "Model Runs", href: "/model-runs", icon: Play, disabled: true },
   { label: "Tool Calls", href: "/tool-calls", icon: Wrench, disabled: true },
   { label: "Evaluations", href: "/evaluations", icon: Boxes, disabled: true },
