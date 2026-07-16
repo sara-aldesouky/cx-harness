@@ -13,14 +13,14 @@ CX-Harness/
 │   ├── Alembic
 │   └── PostgreSQL
 ├── frontend/
-│   ├── Next.js (planned)
-│   ├── React (planned)
-│   └── TypeScript (planned)
+│   ├── Next.js
+│   ├── React
+│   └── TypeScript
 └── docs/
 ```
 
-The `frontend/` directory is currently an empty placeholder. The frontend
-framework and its dependencies will be initialized in a later milestone.
+The `frontend/` directory contains the Next.js application foundation. Feature
+pages and backend queries will be implemented in later milestones.
 
 ## Backend responsibilities
 
