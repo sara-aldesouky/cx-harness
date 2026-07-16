@@ -32,7 +32,6 @@ export const navigationItems: NavigationItem[] = [
     label: "Conversations",
     href: "/conversations",
     icon: MessagesSquare,
-    disabled: true,
   },
   { label: "Messages", href: "/messages", icon: Sparkles, disabled: true },
   { label: "Model Runs", href: "/model-runs", icon: Play, disabled: true },
