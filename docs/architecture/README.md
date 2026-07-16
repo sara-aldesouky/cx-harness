@@ -2,6 +2,16 @@
 
 A visual guide to how the CX Harness dashboard, API, database, tests, and future AI orchestration fit together.
 
+## Master engineering blueprint
+
+[![CX Harness master engineering blueprint](CX_HARNESS_MASTER_BLUEPRINT.svg)](CX_HARNESS_MASTER_BLUEPRINT.svg)
+
+This single large canvas is the primary architecture artifact for design reviews and stakeholder presentations. It shows the implemented frontend-to-database path, test and documentation boundaries, current AI observability data, and explicitly marked future orchestration expansion.
+
+- [Open editable SVG](CX_HARNESS_MASTER_BLUEPRINT.svg)
+- [Open high-resolution PNG](CX_HARNESS_MASTER_BLUEPRINT.png)
+- Continue below for the supporting diagrams and detailed explanations.
+
 ## Table of contents
 
 1. [Project purpose](#1-project-purpose)
