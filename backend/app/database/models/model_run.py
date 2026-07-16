@@ -108,3 +108,8 @@ class ModelRun(Base):
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
+    evaluations: Mapped[list[Evaluation]] = relationship(
+        back_populates="model_run",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
