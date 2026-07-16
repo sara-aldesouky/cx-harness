@@ -47,6 +47,12 @@ def test_order_item_filters(repository_session):
     assert repository.list_by_order_id(first_order.id) == [first, second]
     assert repository.list_by_status("missing") == [second]
     assert third not in repository.list_by_order_id(first_order.id)
+    assert repository.list_items(
+        order_id=first_order.id, item_status="missing"
+    ) == [second]
+    assert repository.count_items(
+        order_id=first_order.id, item_status="missing"
+    ) == 1
 
 
 def test_order_item_pagination_is_deterministic(repository_session):

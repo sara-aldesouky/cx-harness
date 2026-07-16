@@ -95,6 +95,12 @@ def test_combined_tool_call_filters(repository_session):
         model_run_id=first_run.id,
         success=False,
     ) == [requested]
+    assert repository.count_tool_calls(
+        model_run_id=first_run.id,
+        status="completed",
+        tool_name="get_order_status",
+        success=True,
+    ) == 1
 
 
 def test_success_and_status_groups(repository_session):

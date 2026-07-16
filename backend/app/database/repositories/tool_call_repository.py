@@ -31,6 +31,41 @@ class ToolCallRepository:
         tool_name: Optional[str] = None,
         success: Optional[bool] = None,
     ) -> list[ToolCall]:
+        criteria = self._build_filter_criteria(
+            model_run_id=model_run_id,
+            status=status,
+            tool_name=tool_name,
+            success=success,
+        )
+        return self._list_filtered(criteria, limit, offset)
+
+    def count_tool_calls(
+        self,
+        *,
+        model_run_id: Optional[UUID] = None,
+        status: Optional[str] = None,
+        tool_name: Optional[str] = None,
+        success: Optional[bool] = None,
+    ) -> int:
+        criteria = self._build_filter_criteria(
+            model_run_id=model_run_id,
+            status=status,
+            tool_name=tool_name,
+            success=success,
+        )
+        statement = select(func.count()).select_from(ToolCall)
+        if criteria:
+            statement = statement.where(*criteria)
+        return self._session.scalar(statement) or 0
+
+    @staticmethod
+    def _build_filter_criteria(
+        *,
+        model_run_id: Optional[UUID],
+        status: Optional[str],
+        tool_name: Optional[str],
+        success: Optional[bool],
+    ) -> list:
         if status is not None:
             validate_filter(status, TOOL_CALL_STATUSES, "tool-call status")
         criteria = []
@@ -42,10 +77,7 @@ class ToolCallRepository:
             criteria.append(ToolCall.tool_name == tool_name)
         if success is not None:
             criteria.append(ToolCall.success.is_(success))
-        return self._list_filtered(criteria, limit, offset)
-
-    def count_tool_calls(self) -> int:
-        return self._session.scalar(select(func.count()).select_from(ToolCall)) or 0
+        return criteria
 
     def get_by_id(self, tool_call_id: UUID) -> Optional[ToolCall]:
         return self._session.scalar(

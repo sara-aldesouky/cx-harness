@@ -34,19 +34,61 @@ class ConversationRepository:
         self._session = session
 
     def list_conversations(
-        self, limit: int = DEFAULT_LIMIT, offset: int = 0
+        self,
+        limit: int = DEFAULT_LIMIT,
+        offset: int = 0,
+        *,
+        customer_id: Optional[UUID] = None,
+        related_order_id: Optional[UUID] = None,
+        status: Optional[str] = None,
+        channel: Optional[str] = None,
     ) -> list[Conversation]:
-        return self._list_filtered(None, limit, offset)
+        criteria = self._build_filter_criteria(
+            customer_id=customer_id,
+            related_order_id=related_order_id,
+            status=status,
+            channel=channel,
+        )
+        return self._list_filtered(criteria, limit, offset)
 
     def get_by_id(self, conversation_id: UUID) -> Optional[Conversation]:
         return self._session.scalar(
             select(Conversation).where(Conversation.id == conversation_id)
         )
 
-    def count(self) -> int:
-        return (
-            self._session.scalar(select(func.count()).select_from(Conversation)) or 0
+    def count(
+        self,
+        *,
+        customer_id: Optional[UUID] = None,
+        related_order_id: Optional[UUID] = None,
+        status: Optional[str] = None,
+        channel: Optional[str] = None,
+    ) -> int:
+        return self.count_conversations(
+            customer_id=customer_id,
+            related_order_id=related_order_id,
+            status=status,
+            channel=channel,
         )
+
+    def count_conversations(
+        self,
+        *,
+        customer_id: Optional[UUID] = None,
+        related_order_id: Optional[UUID] = None,
+        status: Optional[str] = None,
+        channel: Optional[str] = None,
+    ) -> int:
+        criteria = self._build_filter_criteria(
+            customer_id=customer_id,
+            related_order_id=related_order_id,
+            status=status,
+            channel=channel,
+        )
+        statement = select(func.count()).select_from(Conversation)
+        if criteria:
+            statement = statement.where(*criteria)
+        return self._session.scalar(statement) or 0
 
     def list_by_customer_id(
         self,
@@ -54,9 +96,7 @@ class ConversationRepository:
         limit: int = DEFAULT_LIMIT,
         offset: int = 0,
     ) -> list[Conversation]:
-        return self._list_filtered(
-            Conversation.customer_id == customer_id, limit, offset
-        )
+        return self.list_conversations(limit, offset, customer_id=customer_id)
 
     def list_by_related_order_id(
         self,
@@ -64,34 +104,32 @@ class ConversationRepository:
         limit: int = DEFAULT_LIMIT,
         offset: int = 0,
     ) -> list[Conversation]:
-        return self._list_filtered(
-            Conversation.related_order_id == order_id, limit, offset
+        return self.list_conversations(
+            limit, offset, related_order_id=order_id
         )
 
     def list_by_status(
         self, status: str, limit: int = DEFAULT_LIMIT, offset: int = 0
     ) -> list[Conversation]:
-        validate_filter(status, CONVERSATION_STATUSES, "conversation status")
-        return self._list_filtered(Conversation.status == status, limit, offset)
+        return self.list_conversations(limit, offset, status=status)
 
     def list_by_channel(
         self, channel: str, limit: int = DEFAULT_LIMIT, offset: int = 0
     ) -> list[Conversation]:
-        validate_filter(channel, CONVERSATION_CHANNELS, "conversation channel")
-        return self._list_filtered(Conversation.channel == channel, limit, offset)
+        return self.list_conversations(limit, offset, channel=channel)
 
     def list_active(
         self, limit: int = DEFAULT_LIMIT, offset: int = 0
     ) -> list[Conversation]:
         return self._list_filtered(
-            Conversation.status.in_(ACTIVE_CONVERSATION_STATUSES), limit, offset
+            [Conversation.status.in_(ACTIVE_CONVERSATION_STATUSES)], limit, offset
         )
 
     def list_closed(
         self, limit: int = DEFAULT_LIMIT, offset: int = 0
     ) -> list[Conversation]:
         return self._list_filtered(
-            Conversation.status.in_(CLOSED_CONVERSATION_STATUSES), limit, offset
+            [Conversation.status.in_(CLOSED_CONVERSATION_STATUSES)], limit, offset
         )
 
     def get_with_details(
@@ -117,13 +155,36 @@ class ConversationRepository:
             )
         return conversation
 
+    @staticmethod
+    def _build_filter_criteria(
+        *,
+        customer_id: Optional[UUID],
+        related_order_id: Optional[UUID],
+        status: Optional[str],
+        channel: Optional[str],
+    ) -> list:
+        if status is not None:
+            validate_filter(status, CONVERSATION_STATUSES, "conversation status")
+        if channel is not None:
+            validate_filter(channel, CONVERSATION_CHANNELS, "conversation channel")
+        criteria = []
+        if customer_id is not None:
+            criteria.append(Conversation.customer_id == customer_id)
+        if related_order_id is not None:
+            criteria.append(Conversation.related_order_id == related_order_id)
+        if status is not None:
+            criteria.append(Conversation.status == status)
+        if channel is not None:
+            criteria.append(Conversation.channel == channel)
+        return criteria
+
     def _list_filtered(
-        self, criterion, limit: int, offset: int
+        self, criteria: list, limit: int, offset: int
     ) -> list[Conversation]:
         validate_pagination(limit, offset)
         statement = select(Conversation)
-        if criterion is not None:
-            statement = statement.where(criterion)
+        if criteria:
+            statement = statement.where(*criteria)
         statement = (
             statement.order_by(
                 Conversation.started_at.desc(), Conversation.id

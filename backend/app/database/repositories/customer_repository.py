@@ -62,11 +62,21 @@ class CustomerRepository:
         statement = (
             select(Customer)
             .where(Customer.id == customer_id)
-            .options(selectinload(Customer.orders))
+            .options(
+                selectinload(Customer.orders),
+                selectinload(Customer.conversations),
+            )
         )
         customer = self._session.scalar(statement)
         if customer is not None:
             customer.orders.sort(
                 key=lambda order: (order.created_at, order.order_number), reverse=True
+            )
+            customer.conversations.sort(
+                key=lambda conversation: (
+                    conversation.started_at,
+                    conversation.id,
+                ),
+                reverse=True,
             )
         return customer

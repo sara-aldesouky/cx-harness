@@ -96,8 +96,9 @@ def test_customer_orders_are_eager_loaded_without_n_plus_one(
         loaded = repository.get_with_orders(customer_id)
         assert len(loaded.orders) == 2
         assert [order.order_number for order in loaded.orders]
+        assert loaded.conversations == []
 
-    assert len(statements) == 2
+    assert len(statements) == 3
 
 
 def test_customer_repository_methods_are_read_only(repository_session):

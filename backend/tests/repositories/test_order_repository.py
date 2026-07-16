@@ -61,6 +61,16 @@ def test_order_filters(repository_session):
     assert repository.list_by_status("pending") == [pending]
     assert repository.list_by_payment_status("paid") == [delivered]
     assert other not in repository.list_by_customer_id(customer.id)
+    assert repository.list_orders(
+        customer_id=customer.id,
+        status="delivered",
+        payment_status="paid",
+    ) == [delivered]
+    assert repository.count_orders(
+        customer_id=customer.id,
+        status="delivered",
+        payment_status="paid",
+    ) == 1
 
 
 def test_order_pagination_is_deterministic(repository_session):
@@ -115,8 +125,9 @@ def test_order_customer_and_items_are_eager_loaded_without_n_plus_one(
         assert loaded.customer.email == customer_email
         assert len(loaded.items) == 2
         assert [item.product_name for item in loaded.items]
+        assert loaded.conversations == []
 
-    assert len(statements) == 2
+    assert len(statements) == 3
 
 
 def test_order_repository_methods_are_read_only(repository_session):

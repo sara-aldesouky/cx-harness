@@ -22,16 +22,17 @@ class OrderItemRepository:
         self._session = session
 
     def list_items(
-        self, limit: int = DEFAULT_LIMIT, offset: int = 0
+        self,
+        limit: int = DEFAULT_LIMIT,
+        offset: int = 0,
+        *,
+        order_id: Optional[UUID] = None,
+        item_status: Optional[str] = None,
     ) -> list[OrderItem]:
-        validate_pagination(limit, offset)
-        statement = (
-            select(OrderItem)
-            .order_by(OrderItem.created_at, OrderItem.id)
-            .offset(offset)
-            .limit(limit)
+        criteria = self._build_filter_criteria(
+            order_id=order_id, item_status=item_status
         )
-        return list(self._session.scalars(statement).all())
+        return self._list_filtered(criteria, limit, offset)
 
     def get_by_id(self, item_id: UUID) -> Optional[OrderItem]:
         return self._session.scalar(select(OrderItem).where(OrderItem.id == item_id))
@@ -42,25 +43,57 @@ class OrderItemRepository:
         limit: int = DEFAULT_LIMIT,
         offset: int = 0,
     ) -> list[OrderItem]:
-        return self._list_filtered(OrderItem.order_id == order_id, limit, offset)
+        return self.list_items(limit, offset, order_id=order_id)
 
     def list_by_status(
         self, item_status: str, limit: int = DEFAULT_LIMIT, offset: int = 0
     ) -> list[OrderItem]:
-        validate_filter(item_status, ITEM_STATUSES, "item status")
-        return self._list_filtered(
-            OrderItem.item_status == item_status, limit, offset
+        return self.list_items(limit, offset, item_status=item_status)
+
+    def count(
+        self,
+        *,
+        order_id: Optional[UUID] = None,
+        item_status: Optional[str] = None,
+    ) -> int:
+        return self.count_items(order_id=order_id, item_status=item_status)
+
+    def count_items(
+        self,
+        *,
+        order_id: Optional[UUID] = None,
+        item_status: Optional[str] = None,
+    ) -> int:
+        criteria = self._build_filter_criteria(
+            order_id=order_id, item_status=item_status
         )
+        statement = select(func.count()).select_from(OrderItem)
+        if criteria:
+            statement = statement.where(*criteria)
+        return self._session.scalar(statement) or 0
 
-    def count(self) -> int:
-        return self._session.scalar(select(func.count()).select_from(OrderItem)) or 0
+    @staticmethod
+    def _build_filter_criteria(
+        *, order_id: Optional[UUID], item_status: Optional[str]
+    ) -> list:
+        if item_status is not None:
+            validate_filter(item_status, ITEM_STATUSES, "item status")
+        criteria = []
+        if order_id is not None:
+            criteria.append(OrderItem.order_id == order_id)
+        if item_status is not None:
+            criteria.append(OrderItem.item_status == item_status)
+        return criteria
 
-    def _list_filtered(self, criterion, limit: int, offset: int) -> list[OrderItem]:
+    def _list_filtered(
+        self, criteria: list, limit: int, offset: int
+    ) -> list[OrderItem]:
         validate_pagination(limit, offset)
+        statement = select(OrderItem)
+        if criteria:
+            statement = statement.where(*criteria)
         statement = (
-            select(OrderItem)
-            .where(criterion)
-            .order_by(OrderItem.created_at, OrderItem.id)
+            statement.order_by(OrderItem.created_at, OrderItem.id)
             .offset(offset)
             .limit(limit)
         )

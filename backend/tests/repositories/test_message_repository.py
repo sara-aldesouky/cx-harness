@@ -77,6 +77,16 @@ def test_message_conversation_role_and_language_filters(repository_session):
     assert third in repository.list_by_conversation_id(conversation.id)
     assert third not in repository.list_by_language("unknown")
     assert other not in repository.list_by_conversation_id(conversation.id)
+    assert repository.list_messages(
+        conversation_id=conversation.id,
+        role="assistant",
+        language="mixed",
+    ) == [second]
+    assert repository.count_messages(
+        conversation_id=conversation.id,
+        role="assistant",
+        language="mixed",
+    ) == 1
 
 
 def test_latest_earliest_and_ordered_history(repository_session):

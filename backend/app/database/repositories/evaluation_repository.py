@@ -35,6 +35,49 @@ class EvaluationRepository:
         minimum_overall_score: Optional[Decimal] = None,
         maximum_overall_score: Optional[Decimal] = None,
     ) -> list[Evaluation]:
+        criteria = self._build_filter_criteria(
+            model_run_id=model_run_id,
+            evaluator_type=evaluator_type,
+            evaluator_name=evaluator_name,
+            passed=passed,
+            minimum_overall_score=minimum_overall_score,
+            maximum_overall_score=maximum_overall_score,
+        )
+        return self._list_filtered(criteria, limit, offset)
+
+    def count_evaluations(
+        self,
+        *,
+        model_run_id: Optional[UUID] = None,
+        evaluator_type: Optional[str] = None,
+        evaluator_name: Optional[str] = None,
+        passed: Optional[bool] = None,
+        minimum_overall_score: Optional[Decimal] = None,
+        maximum_overall_score: Optional[Decimal] = None,
+    ) -> int:
+        criteria = self._build_filter_criteria(
+            model_run_id=model_run_id,
+            evaluator_type=evaluator_type,
+            evaluator_name=evaluator_name,
+            passed=passed,
+            minimum_overall_score=minimum_overall_score,
+            maximum_overall_score=maximum_overall_score,
+        )
+        statement = select(func.count()).select_from(Evaluation)
+        if criteria:
+            statement = statement.where(*criteria)
+        return self._session.scalar(statement) or 0
+
+    def _build_filter_criteria(
+        self,
+        *,
+        model_run_id: Optional[UUID],
+        evaluator_type: Optional[str],
+        evaluator_name: Optional[str],
+        passed: Optional[bool],
+        minimum_overall_score: Optional[Decimal],
+        maximum_overall_score: Optional[Decimal],
+    ) -> list:
         if evaluator_type is not None:
             validate_filter(
                 evaluator_type, EVALUATOR_TYPES, "evaluation evaluator type"
@@ -55,10 +98,7 @@ class EvaluationRepository:
             criteria.append(Evaluation.overall_score >= minimum)
         if maximum is not None:
             criteria.append(Evaluation.overall_score <= maximum)
-        return self._list_filtered(criteria, limit, offset)
-
-    def count_evaluations(self) -> int:
-        return self._session.scalar(select(func.count()).select_from(Evaluation)) or 0
+        return criteria
 
     def get_by_id(self, evaluation_id: UUID) -> Optional[Evaluation]:
         return self._session.scalar(

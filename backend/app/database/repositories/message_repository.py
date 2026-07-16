@@ -22,22 +22,47 @@ class MessageRepository:
         self._session = session
 
     def list_messages(
-        self, limit: int = DEFAULT_LIMIT, offset: int = 0
+        self,
+        limit: int = DEFAULT_LIMIT,
+        offset: int = 0,
+        *,
+        conversation_id: Optional[UUID] = None,
+        role: Optional[str] = None,
+        language: Optional[str] = None,
     ) -> list[Message]:
-        validate_pagination(limit, offset)
-        statement = (
-            select(Message)
-            .order_by(Message.created_at, Message.id)
-            .offset(offset)
-            .limit(limit)
+        criteria = self._build_filter_criteria(
+            conversation_id=conversation_id, role=role, language=language
         )
-        return list(self._session.scalars(statement).all())
+        return self._list_filtered(criteria, limit, offset)
 
     def get_by_id(self, message_id: UUID) -> Optional[Message]:
         return self._session.scalar(select(Message).where(Message.id == message_id))
 
-    def count(self) -> int:
-        return self._session.scalar(select(func.count()).select_from(Message)) or 0
+    def count(
+        self,
+        *,
+        conversation_id: Optional[UUID] = None,
+        role: Optional[str] = None,
+        language: Optional[str] = None,
+    ) -> int:
+        return self.count_messages(
+            conversation_id=conversation_id, role=role, language=language
+        )
+
+    def count_messages(
+        self,
+        *,
+        conversation_id: Optional[UUID] = None,
+        role: Optional[str] = None,
+        language: Optional[str] = None,
+    ) -> int:
+        criteria = self._build_filter_criteria(
+            conversation_id=conversation_id, role=role, language=language
+        )
+        statement = select(func.count()).select_from(Message)
+        if criteria:
+            statement = statement.where(*criteria)
+        return self._session.scalar(statement) or 0
 
     def list_by_conversation_id(
         self,
@@ -46,26 +71,23 @@ class MessageRepository:
         offset: int = 0,
     ) -> list[Message]:
         validate_pagination(limit, offset)
-        statement = (
-            select(Message)
-            .where(Message.conversation_id == conversation_id)
-            .order_by(Message.sequence_number, Message.id)
-            .offset(offset)
-            .limit(limit)
+        statement = select(Message).where(
+            Message.conversation_id == conversation_id
         )
+        statement = statement.order_by(
+            Message.sequence_number, Message.id
+        ).offset(offset).limit(limit)
         return list(self._session.scalars(statement).all())
 
     def list_by_role(
         self, role: str, limit: int = DEFAULT_LIMIT, offset: int = 0
     ) -> list[Message]:
-        validate_filter(role, MESSAGE_ROLES, "message role")
-        return self._list_filtered(Message.role == role, limit, offset)
+        return self.list_messages(limit, offset, role=role)
 
     def list_by_language(
         self, language: str, limit: int = DEFAULT_LIMIT, offset: int = 0
     ) -> list[Message]:
-        validate_filter(language, MESSAGE_LANGUAGES, "message language")
-        return self._list_filtered(Message.language == language, limit, offset)
+        return self.list_messages(limit, offset, language=language)
 
     def get_latest_in_conversation(
         self, conversation_id: UUID
@@ -97,12 +119,33 @@ class MessageRepository:
     ) -> list[Message]:
         return self.list_by_conversation_id(conversation_id, limit, offset)
 
-    def _list_filtered(self, criterion, limit: int, offset: int) -> list[Message]:
+    @staticmethod
+    def _build_filter_criteria(
+        *,
+        conversation_id: Optional[UUID],
+        role: Optional[str],
+        language: Optional[str],
+    ) -> list:
+        if role is not None:
+            validate_filter(role, MESSAGE_ROLES, "message role")
+        if language is not None:
+            validate_filter(language, MESSAGE_LANGUAGES, "message language")
+        criteria = []
+        if conversation_id is not None:
+            criteria.append(Message.conversation_id == conversation_id)
+        if role is not None:
+            criteria.append(Message.role == role)
+        if language is not None:
+            criteria.append(Message.language == language)
+        return criteria
+
+    def _list_filtered(self, criteria: list, limit: int, offset: int) -> list[Message]:
         validate_pagination(limit, offset)
+        statement = select(Message)
+        if criteria:
+            statement = statement.where(*criteria)
         statement = (
-            select(Message)
-            .where(criterion)
-            .order_by(Message.created_at, Message.id)
+            statement.order_by(Message.created_at, Message.id)
             .offset(offset)
             .limit(limit)
         )

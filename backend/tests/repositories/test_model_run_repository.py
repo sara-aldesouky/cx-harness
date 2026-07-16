@@ -70,6 +70,20 @@ def test_model_run_filters(repository_session):
     assert repository.list_by_provider("gemini") == [gemini]
     assert repository.list_by_model("qwen-test") == [qwen]
     assert repository.list_by_status("completed") == [fanar, gemini]
+    assert repository.list_model_runs(
+        conversation_id=conversation.id,
+        provider="gemini",
+        model_name="gemini-test",
+        status="completed",
+        success=True,
+    ) == [gemini]
+    assert repository.count_model_runs(
+        conversation_id=conversation.id,
+        provider="gemini",
+        model_name="gemini-test",
+        status="completed",
+        success=True,
+    ) == 1
 
 
 def test_latest_successful_and_failed_model_runs(repository_session):

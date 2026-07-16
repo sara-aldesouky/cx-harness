@@ -70,6 +70,18 @@ def test_conversation_filters(repository_session):
     assert repository.list_by_status("open") == [active]
     assert repository.list_by_channel("whatsapp") == [waiting]
     assert closed not in repository.list_by_customer_id(customer.id)
+    assert repository.list_conversations(
+        customer_id=customer.id,
+        related_order_id=order.id,
+        status="open",
+        channel="web",
+    ) == [active]
+    assert repository.count_conversations(
+        customer_id=customer.id,
+        related_order_id=order.id,
+        status="open",
+        channel="web",
+    ) == 1
 
 
 def test_active_and_closed_conversation_groups(repository_session):

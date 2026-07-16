@@ -153,6 +153,11 @@ def test_combined_evaluation_filters(repository_session):
         passed=False,
         minimum_overall_score=Decimal("2"),
     ) == [low]
+    assert repository.count_evaluations(
+        evaluator_name="manager_review",
+        minimum_overall_score=Decimal("4"),
+        maximum_overall_score=Decimal("4"),
+    ) == 1
 
 
 def test_evaluation_pagination_and_deterministic_order(repository_session):
