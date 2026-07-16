@@ -5,6 +5,7 @@ import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 import type { ColumnDef, RowData } from "@tanstack/react-table";
 
 import { PageContainer } from "@/components/common/page-container";
+import type { ServerFilterDefinition } from "@/components/tables/DataTableFilters";
 import { DataTable, dataTableQueryKey } from "@/components/tables/DataTable";
 import { ResourceActions } from "@/components/resources/ResourceActions";
 import { ResourceHeader } from "@/components/resources/ResourceHeader";
@@ -15,6 +16,7 @@ export interface ResourcePageProps<TData extends RowData> {
   endpoint: string;
   columns: ColumnDef<TData, unknown>[];
   description?: string;
+  filters?: ServerFilterDefinition[];
 }
 
 export function ResourcePage<TData extends RowData>({
@@ -22,6 +24,7 @@ export function ResourcePage<TData extends RowData>({
   endpoint,
   columns,
   description,
+  filters,
 }: ResourcePageProps<TData>) {
   const queryClient = useQueryClient();
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
@@ -56,6 +59,7 @@ export function ResourcePage<TData extends RowData>({
         <DataTable<TData>
           endpoint={endpoint}
           columns={columns}
+          serverFilters={filters}
           onDataUpdatedAtChange={handleDataUpdatedAtChange}
         />
       </ResourceToolbar>

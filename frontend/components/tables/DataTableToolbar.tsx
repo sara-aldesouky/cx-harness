@@ -4,6 +4,7 @@ import type { Table } from "@tanstack/react-table";
 import { Columns3 } from "lucide-react";
 
 import { DataTableFilters } from "@/components/tables/DataTableFilters";
+import type { ServerFilterDefinition } from "@/components/tables/DataTableFilters";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,6 +20,9 @@ interface DataTableToolbarProps<TData> {
   onGlobalFilterChange: (value: string) => void;
   selectedColumn: string;
   onSelectedColumnChange: (columnId: string) => void;
+  serverFilters?: ServerFilterDefinition[];
+  serverFilterValues?: Record<string, string>;
+  onServerFilterChange?: (key: string, value: string) => void;
 }
 
 export function DataTableToolbar<TData>({
@@ -27,6 +31,9 @@ export function DataTableToolbar<TData>({
   onGlobalFilterChange,
   selectedColumn,
   onSelectedColumnChange,
+  serverFilters,
+  serverFilterValues,
+  onServerFilterChange,
 }: DataTableToolbarProps<TData>) {
   return (
     <div className="flex flex-col gap-3">
@@ -69,6 +76,9 @@ export function DataTableToolbar<TData>({
         table={table}
         selectedColumn={selectedColumn}
         onSelectedColumnChange={onSelectedColumnChange}
+        serverFilters={serverFilters}
+        serverFilterValues={serverFilterValues}
+        onServerFilterChange={onServerFilterChange}
       />
     </div>
   );

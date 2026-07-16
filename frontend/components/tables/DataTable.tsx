@@ -20,6 +20,7 @@ import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 
 import { DataTableEmpty } from "@/components/tables/DataTableEmpty";
 import { DataTableError } from "@/components/tables/DataTableError";
+import type { ServerFilterDefinition } from "@/components/tables/DataTableFilters";
 import { DataTableLoading } from "@/components/tables/DataTableLoading";
 import { DataTablePagination } from "@/components/tables/DataTablePagination";
 import { DataTableToolbar } from "@/components/tables/DataTableToolbar";
@@ -42,6 +43,7 @@ export interface DataTableProps<TData extends RowData> {
   initialPageSize?: number;
   getRowId?: (row: TData) => string;
   onDataUpdatedAtChange?: (timestamp: number) => void;
+  serverFilters?: ServerFilterDefinition[];
 }
 
 export const dataTableQueryKey = (endpoint: string) =>
@@ -50,11 +52,16 @@ export const dataTableQueryKey = (endpoint: string) =>
 async function fetchPage<TData>(
   endpoint: string,
   pagination: PaginationState,
+  filters: Record<string, string>,
 ): Promise<PaginatedResponse<TData>> {
+  const activeFilters = Object.fromEntries(
+    Object.entries(filters).filter(([, value]) => value !== ""),
+  );
   const response = await apiClient.get<PaginatedResponse<TData>>(endpoint, {
     params: {
       limit: pagination.pageSize,
       offset: pagination.pageIndex * pagination.pageSize,
+      ...activeFilters,
     },
   });
   return response.data;
@@ -67,6 +74,7 @@ function DataTableComponent<TData extends RowData>({
   initialPageSize = 20,
   getRowId,
   onDataUpdatedAtChange,
+  serverFilters = [],
 }: DataTableProps<TData>) {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -77,18 +85,22 @@ function DataTableComponent<TData extends RowData>({
   const [globalFilter, setGlobalFilter] = useState("");
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [serverFilterValues, setServerFilterValues] = useState<
+    Record<string, string>
+  >({});
 
   const queryKey = useMemo(
     () => [
       ...dataTableQueryKey(endpoint),
       pagination.pageIndex,
       pagination.pageSize,
+      serverFilterValues,
     ],
-    [endpoint, pagination.pageIndex, pagination.pageSize],
+    [endpoint, pagination.pageIndex, pagination.pageSize, serverFilterValues],
   );
   const query = useQuery({
     queryKey,
-    queryFn: () => fetchPage<TData>(endpoint, pagination),
+    queryFn: () => fetchPage<TData>(endpoint, pagination, serverFilterValues),
     placeholderData: keepPreviousData,
   });
 
@@ -165,6 +177,10 @@ function DataTableComponent<TData extends RowData>({
     "";
   const [selectedColumn, setSelectedColumn] = useState(firstFilterableColumn);
   const visibleColumnCount = table.getVisibleLeafColumns().length;
+  const handleServerFilterChange = (key: string, value: string) => {
+    setServerFilterValues((current) => ({ ...current, [key]: value }));
+    setPagination((current) => ({ ...current, pageIndex: 0 }));
+  };
 
   return (
     <section
@@ -191,6 +207,9 @@ function DataTableComponent<TData extends RowData>({
         onGlobalFilterChange={setGlobalFilter}
         selectedColumn={selectedColumn || firstFilterableColumn}
         onSelectedColumnChange={setSelectedColumn}
+        serverFilters={serverFilters}
+        serverFilterValues={serverFilterValues}
+        onServerFilterChange={handleServerFilterChange}
       />
 
       {query.isError ? (
