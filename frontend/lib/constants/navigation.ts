@@ -21,7 +21,7 @@ export interface NavigationItem {
 
 export const navigationItems: NavigationItem[] = [
   { label: "Overview", href: "/", icon: Gauge },
-  { label: "Customers", href: "/customers", icon: Users, disabled: true },
+  { label: "Customers", href: "/customers", icon: Users },
   { label: "Orders", href: "/orders", icon: Package, disabled: true },
   {
     label: "Order Items",
