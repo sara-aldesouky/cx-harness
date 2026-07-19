@@ -3,7 +3,7 @@
   <desc id="desc">An executive blueprint showing the live request path from user to PostgreSQL and back, protected by isolated testing, with progress and future AI expansion.</desc>
   <defs>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="6" stdDeviation="9" flood-color="#0f172a" flood-opacity=".10"/></filter>
-    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#2563eb"/></marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#2563eb"/></marker>
     <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#16a34a"/></marker>
     <marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#64748b"/></marker>
     <marker id="arrowPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#7c3aed"/></marker>
@@ -112,22 +112,22 @@
   <text x="1623" y="458" class="body">Constraints</text>
 
   <!-- postgres -->
-  <rect x="1770" y="275" width="202" height="274" rx="18" class="green" filter="url(#shadow)"/>
-  <ellipse cx="1871" cy="318" rx="62" ry="19" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5"/>
-  <path d="M1809 318v44c0 10 28 19 62 19s62-9 62-19v-44" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5"/>
-  <text x="1871" y="420" class="boxTitle" text-anchor="middle" font-size="22">PostgreSQL</text>
-  <text x="1871" y="450" class="body" text-anchor="middle">Render development DB</text>
-  <text x="1871" y="476" class="body" text-anchor="middle">8 connected tables</text>
-  <text x="1871" y="513" class="pill" text-anchor="middle" fill="#15803d">SCHEMA COMPLETE</text>
+  <rect x="1790" y="275" width="182" height="274" rx="18" class="green" filter="url(#shadow)"/>
+  <ellipse cx="1881" cy="318" rx="58" ry="19" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5"/>
+  <path d="M1823 318v44c0 10 26 19 58 19s58-9 58-19v-44" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5"/>
+  <text x="1881" y="420" class="boxTitle" text-anchor="middle" font-size="22">PostgreSQL</text>
+  <text x="1881" y="450" class="body" text-anchor="middle">Render development DB</text>
+  <text x="1881" y="476" class="body" text-anchor="middle">8 connected tables</text>
+  <text x="1881" y="513" class="pill" text-anchor="middle" fill="#15803d">SCHEMA COMPLETE</text>
 
   <!-- dominant arrows -->
-  <path d="M234 412h36M556 412h36M767 412h36M943 412h36M1227 412h36M1563 412h36M1764 412h6" class="flow"/>
+  <path d="M234 412h36M556 412h36M767 412h36M943 412h36M1227 412h36M1563 412h36M1764 412h26" class="flow"/>
   <text x="247" y="392" class="flowLabel">OPEN</text><text x="565" y="392" class="flowLabel">STATE</text><text x="777" y="392" class="flowLabel">CLIENT</text>
-  <text x="948" y="392" class="flowLabel">REQUEST</text><text x="1230" y="392" class="flowLabel">CALL</text><text x="1568" y="392" class="flowLabel">QUERY</text><text x="1740" y="392" class="flowLabel">SQL</text>
+  <text x="948" y="392" class="flowLabel">REQUEST</text><text x="1230" y="392" class="flowLabel">CALL</text><text x="1568" y="392" class="flowLabel">QUERY</text><text x="1762" y="380" class="flowLabel">SQL</text>
 
   <!-- return path -->
-  <path d="M1871 549v79H413v-92" class="return"/>
-  <text x="1871" y="584" class="pill" fill="#15803d" text-anchor="middle">DATA RETURNS</text>
+  <path d="M1881 549v79H413v-92" class="return"/>
+  <text x="1881" y="584" class="pill" fill="#15803d" text-anchor="middle">DATA RETURNS</text>
   <g>
     <rect x="1578" y="606" width="170" height="42" rx="21" fill="#f1fcf5" stroke="#22c55e"/><text x="1663" y="632" class="pill" fill="#15803d" text-anchor="middle">SQLALCHEMY</text>
     <rect x="1336" y="606" width="198" height="42" rx="21" fill="#f1fcf5" stroke="#22c55e"/><text x="1435" y="632" class="pill" fill="#15803d" text-anchor="middle">BUSINESS DATA</text>
