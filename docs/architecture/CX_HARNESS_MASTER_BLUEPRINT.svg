@@ -176,7 +176,7 @@
 
   <!-- progress -->
   <rect x="1660" y="890" width="685" height="342" rx="18" class="zone"/>
-  <text x="1683" y="920" class="zoneTitle">MANAGER PROGRESS SUMMARY</text>
+  <text x="1683" y="920" class="zoneTitle">PROGRESS SUMMARY</text>
   <rect x="1687" y="946" width="202" height="250" rx="14" class="green"/>
   <text x="1707" y="976" class="boxTitle">✓ Completed</text>
   <text x="1707" y="1005" class="small">PostgreSQL schema</text><text x="1707" y="1027" class="small">8 models + migrations</text>
