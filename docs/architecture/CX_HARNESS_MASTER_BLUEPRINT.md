@@ -30,4 +30,4 @@ CX Harness is a read-only operational and AI-observability platform. Its impleme
 
 **Next phase:** implement provider-neutral AI orchestration, model adapters, controlled business-tool execution, runtime telemetry, and automated evaluation. These capabilities are not represented as currently live.
 
-The editable source is [CX_HARNESS_MASTER_BLUEPRINT.svg](CX_HARNESS_MASTER_BLUEPRINT.svg). Supporting diagrams and detailed technical guides remain available in the [Architecture Overview](README.md).
+The editable source is [CX_HARNESS_MASTER_BLUEPRINT.svg](CX_HARNESS_MASTER_BLUEPRINT.svg). The earlier dark [master engineering blueprint](CX_HARNESS_MASTER_ENGINEERING_BLUEPRINT.svg) is preserved as a complementary design-review artifact. Supporting diagrams and detailed technical guides remain available in the [Architecture Overview](README.md).

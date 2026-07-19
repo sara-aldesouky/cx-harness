@@ -6,10 +6,10 @@ A visual guide to how the CX Harness dashboard, API, database, tests, and future
 
 [![CX Harness master engineering blueprint](CX_HARNESS_MASTER_BLUEPRINT.svg)](CX_HARNESS_MASTER_BLUEPRINT.svg)
 
-This single large canvas is the primary architecture artifact for design reviews and stakeholder presentations. It shows the implemented frontend-to-database path, test and documentation boundaries, current AI observability data, and explicitly marked future orchestration expansion.
+The light progress-update canvas is the primary manager-facing artifact. The original dark engineering blueprint is preserved as a complementary design-review view.
 
-- [Open editable SVG](CX_HARNESS_MASTER_BLUEPRINT.svg)
-- [Open high-resolution PNG](CX_HARNESS_MASTER_BLUEPRINT.png)
+- **Manager progress update:** [editable SVG](CX_HARNESS_MASTER_BLUEPRINT.svg) · [high-resolution PNG](CX_HARNESS_MASTER_BLUEPRINT.png)
+- **Original engineering blueprint:** [editable SVG](CX_HARNESS_MASTER_ENGINEERING_BLUEPRINT.svg) · [high-resolution PNG](CX_HARNESS_MASTER_ENGINEERING_BLUEPRINT.png)
 - [Read the blueprint legend and executive summary](CX_HARNESS_MASTER_BLUEPRINT.md)
 - Continue below for the supporting diagrams and detailed explanations.
 
