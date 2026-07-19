@@ -10,6 +10,7 @@ This single large canvas is the primary architecture artifact for design reviews
 
 - [Open editable SVG](CX_HARNESS_MASTER_BLUEPRINT.svg)
 - [Open high-resolution PNG](CX_HARNESS_MASTER_BLUEPRINT.png)
+- [Read the blueprint legend and executive summary](CX_HARNESS_MASTER_BLUEPRINT.md)
 - Continue below for the supporting diagrams and detailed explanations.
 
 ## Table of contents

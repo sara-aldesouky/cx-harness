@@ -1,266 +1,252 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1200" viewBox="0 0 1920 1200" role="img" aria-labelledby="title desc">
-  <title id="title">CX Harness Master Engineering Blueprint</title>
-  <desc id="desc">A layered architecture blueprint showing the frontend, API, repositories, database, testing, documentation, and future AI pipeline.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500" role="img" aria-labelledby="title desc">
+  <title id="title">CX Harness — Infrastructure &amp; Architecture Progress Update</title>
+  <desc id="desc">Manager-facing blueprint of the implemented dashboard, API, repositories, models, PostgreSQL, testing, development workflow, and future AI harness.</desc>
   <defs>
-    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#07111f"/>
-      <stop offset="1" stop-color="#101b31"/>
-    </linearGradient>
-    <linearGradient id="future" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#172554"/>
-      <stop offset="1" stop-color="#312e81"/>
-    </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity=".28"/>
-    </filter>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#60a5fa"/>
-    </marker>
-    <marker id="arrowFuture" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#c084fc"/>
-    </marker>
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity=".10"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#2563eb"/></marker>
+    <marker id="purpleArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#7c3aed"/></marker>
+    <marker id="grayArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#64748b"/></marker>
     <style>
-      .title{font:700 38px Inter,Arial,sans-serif;fill:#f8fafc}
-      .subtitle{font:400 17px Inter,Arial,sans-serif;fill:#94a3b8}
-      .layerTitle{font:700 17px Inter,Arial,sans-serif;letter-spacing:1.4px;fill:#e2e8f0}
-      .boxTitle{font:700 16px Inter,Arial,sans-serif;fill:#f8fafc}
-      .boxText{font:400 12px Inter,Arial,sans-serif;fill:#cbd5e1}
-      .small{font:500 11px Inter,Arial,sans-serif;fill:#94a3b8}
-      .pill{font:600 10px Inter,Arial,sans-serif;fill:#dbeafe}
-      .current{font:700 11px Inter,Arial,sans-serif;fill:#86efac;letter-spacing:1px}
-      .planned{font:700 11px Inter,Arial,sans-serif;fill:#d8b4fe;letter-spacing:1px}
-      .layer{fill:#0f1d32;stroke:#263a58;stroke-width:1.5}
-      .card{fill:#14243d;stroke:#3b82f6;stroke-width:1.4;filter:url(#shadow)}
-      .cardGreen{fill:#102b2a;stroke:#34d399;stroke-width:1.4;filter:url(#shadow)}
-      .cardAmber{fill:#302515;stroke:#f59e0b;stroke-width:1.4;filter:url(#shadow)}
-      .cardPurple{fill:#241b42;stroke:#a78bfa;stroke-width:1.4;filter:url(#shadow)}
-      .db{fill:#172036;stroke:#22d3ee;stroke-width:1.4}
-      .line{stroke:#60a5fa;stroke-width:2;fill:none;marker-end:url(#arrow)}
-      .lineSoft{stroke:#475569;stroke-width:1.4;fill:none}
-      .futureLine{stroke:#c084fc;stroke-width:2;stroke-dasharray:7 6;fill:none;marker-end:url(#arrowFuture)}
-      .divider{stroke:#334155;stroke-width:1}
+      text{font-family:Inter,Segoe UI,Arial,sans-serif;fill:#172033}
+      .title{font-size:40px;font-weight:800;letter-spacing:-.8px}.subtitle{font-size:18px;fill:#526077}
+      .zone{fill:#fff;stroke:#cbd5e1;stroke-width:1.5;filter:url(#shadow)}.zoneTitle{font-size:15px;font-weight:800;letter-spacing:1.3px;fill:#334155}
+      .card{fill:#f8fbff;stroke:#60a5fa;stroke-width:1.5}.green{fill:#f0fdf4;stroke:#22c55e}.purple{fill:#faf5ff;stroke:#8b5cf6}.orange{fill:#fff7ed;stroke:#f97316}.future{fill:#f8fafc;stroke:#94a3b8;stroke-width:2;stroke-dasharray:9 7}
+      .boxTitle{font-size:17px;font-weight:750}.body{font-size:13px;fill:#475569}.small{font-size:11.5px;fill:#64748b}.micro{font-size:10.5px;fill:#64748b}
+      .status{font-size:10.5px;font-weight:800;letter-spacing:.8px}.greenText{fill:#15803d}.blueText{fill:#1d4ed8}.orangeText{fill:#c2410c}.purpleText{fill:#6d28d9}.grayText{fill:#475569}
+      .flow{fill:none;stroke:#2563eb;stroke-width:3;marker-end:url(#arrow)}.flowThin{fill:none;stroke:#2563eb;stroke-width:1.8;marker-end:url(#arrow)}
+      .support{fill:none;stroke:#7c3aed;stroke-width:2.2;marker-end:url(#purpleArrow)}.futureFlow{fill:none;stroke:#64748b;stroke-width:2;stroke-dasharray:7 6;marker-end:url(#grayArrow)}
+      .divider{stroke:#dbe3ee}.number{fill:#2563eb}.numberText{fill:#fff;font-size:11px;font-weight:800;text-anchor:middle}
     </style>
   </defs>
+  <rect width="2400" height="1500" fill="#f4f7fb"/>
+  <rect x="0" y="0" width="2400" height="105" fill="#fff"/>
+  <rect x="0" y="102" width="2400" height="3" fill="#2563eb"/>
+  <text x="55" y="52" class="title">CX Harness — Infrastructure &amp; Architecture Progress Update</text>
+  <text x="57" y="82" class="subtitle">Current implementation, data flow, testing architecture, and future AI orchestration</text>
+  <text x="2030" y="44" class="small">PROJECT PROGRESS • JULY 2026</text>
+  <text x="2030" y="72" class="status greenText">● BACKEND STABLE</text>
 
-  <rect width="1920" height="1200" fill="url(#background)"/>
-  <circle cx="1730" cy="90" r="180" fill="#1d4ed8" opacity=".08"/>
-  <circle cx="1650" cy="1080" r="260" fill="#7c3aed" opacity=".08"/>
+  <!-- legend -->
+  <rect x="55" y="125" width="2290" height="44" rx="12" fill="#fff" stroke="#dbe3ee"/>
+  <text x="78" y="152" class="small" font-weight="700">STATUS</text>
+  <rect x="145" y="138" width="12" height="12" rx="3" fill="#22c55e"/><text x="166" y="149" class="small">Implemented + tested</text>
+  <rect x="330" y="138" width="12" height="12" rx="3" fill="#3b82f6"/><text x="351" y="149" class="small">Implemented infrastructure</text>
+  <rect x="555" y="138" width="12" height="12" rx="3" fill="#f97316"/><text x="576" y="149" class="small">Current work</text>
+  <rect x="695" y="138" width="12" height="12" rx="3" fill="#94a3b8"/><text x="716" y="149" class="small">Dashed = future</text>
+  <rect x="865" y="138" width="12" height="12" rx="3" fill="#8b5cf6"/><text x="886" y="149" class="small">Testing + tooling</text>
+  <text x="1570" y="149" class="small">PRIMARY LIVE FLOW</text><path d="M1710 145h160" class="flow"/>
+  <text x="1915" y="149" class="small">Support / lifecycle</text><path d="M2040 145h130" class="support"/>
 
-  <text x="60" y="62" class="title">CX HARNESS — MASTER ENGINEERING BLUEPRINT</text>
-  <text x="60" y="92" class="subtitle">Read-only CX analytics today • provider-neutral model evaluation platform tomorrow</text>
-  <text x="1605" y="56" class="current">IMPLEMENTED</text>
-  <rect x="1580" y="68" width="122" height="5" rx="2" fill="#22c55e"/>
-  <text x="1740" y="56" class="planned">PLANNED</text>
-  <rect x="1725" y="68" width="122" height="5" rx="2" fill="#a855f7"/>
+  <!-- main architecture -->
+  <rect x="55" y="195" width="270" height="670" rx="18" class="zone"/>
+  <text x="78" y="225" class="zoneTitle">01  USER</text><text x="255" y="225" class="status greenText">IMPLEMENTED</text>
+  <rect x="82" y="255" width="216" height="115" rx="14" class="green"/>
+  <text x="104" y="287" class="boxTitle">User / Manager</text>
+  <text x="104" y="313" class="body">Views live operational data</text><text x="104" y="335" class="body">and project progress</text>
+  <text x="104" y="355" class="small">Browser interaction</text>
+  <rect x="82" y="400" width="216" height="132" rx="14" class="card"/>
+  <text x="104" y="432" class="boxTitle">Primary experience</text>
+  <text x="104" y="458" class="body">Overview dashboard</text><text x="104" y="480" class="body">Live resource tables</text>
+  <text x="104" y="502" class="body">Light / dark theme</text>
+  <rect x="82" y="562" width="216" height="260" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="104" y="594" class="boxTitle">Manager outcome</text>
+  <text x="104" y="622" class="body">One read-only view of:</text>
+  <text x="104" y="650" class="body">• Commerce activity</text><text x="104" y="674" class="body">• CX conversations</text>
+  <text x="104" y="698" class="body">• Model telemetry</text><text x="104" y="722" class="body">• Tool execution records</text>
+  <text x="104" y="746" class="body">• Evaluation results</text>
+  <line x1="104" y1="770" x2="274" y2="770" class="divider"/>
+  <text x="104" y="796" class="small">No write operations</text>
 
-  <!-- Frontend -->
-  <rect x="50" y="125" width="1820" height="180" rx="18" class="layer"/>
-  <text x="72" y="153" class="layerTitle">01  FRONTEND EXPERIENCE</text>
-  <text x="1665" y="153" class="current">LIVE</text>
+  <rect x="350" y="195" width="430" height="670" rx="18" class="zone"/>
+  <text x="373" y="225" class="zoneTitle">02  FRONTEND — NEXT.JS</text><text x="656" y="225" class="status greenText">IMPLEMENTED</text>
+  <rect x="377" y="250" width="376" height="142" rx="14" class="green"/>
+  <text x="399" y="280" class="boxTitle">Live Dashboard Surfaces</text>
+  <text x="399" y="306" class="body">Overview • Customers • Orders • Order Items</text>
+  <text x="399" y="329" class="body">Conversations • Messages</text>
+  <text x="399" y="354" class="status orangeText">CURRENT: MODEL RUNS • TOOL CALLS • EVALUATIONS</text>
+  <text x="399" y="376" class="small">Sidebar placeholders remain visible</text>
+  <rect x="377" y="416" width="376" height="204" rx="14" class="card"/>
+  <text x="399" y="446" class="boxTitle">Reusable UI pipeline</text>
+  <text x="399" y="478" class="body">Pages</text><path d="M450 474h35" class="flowThin"/>
+  <text x="495" y="478" class="body">ResourcePage</text><path d="M594 474h35" class="flowThin"/>
+  <text x="639" y="478" class="body">DataTable</text>
+  <text x="399" y="516" class="body">TanStack Query</text><path d="M507 512h35" class="flowThin"/>
+  <text x="552" y="516" class="body">Axios</text>
+  <text x="399" y="548" class="small">Search • filters • sorting • pagination</text>
+  <text x="399" y="570" class="small">Refresh • loading • empty • error states</text>
+  <text x="399" y="596" class="status blueText">LIVE READ-ONLY DATA</text>
+  <rect x="377" y="644" width="376" height="178" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="399" y="674" class="boxTitle">Technology</text>
+  <text x="399" y="704" class="body">Next.js 16 • React 19 • TypeScript</text>
+  <text x="399" y="728" class="body">Tailwind CSS • shadcn/ui • Lucide</text>
+  <text x="399" y="752" class="body">TanStack Query + Table • Axios</text>
+  <text x="399" y="776" class="body">next-themes • ESLint • Prettier</text>
+  <text x="399" y="802" class="small">Responsive application shell</text>
 
-  <rect x="80" y="174" width="205" height="100" rx="14" class="card"/>
-  <text x="100" y="202" class="boxTitle">Next.js App Router</text>
-  <text x="100" y="224" class="boxText">Overview + resource pages</text>
-  <text x="100" y="244" class="boxText">/customers → /messages</text>
-  <text x="100" y="263" class="pill">React 19 • TypeScript</text>
+  <rect x="805" y="195" width="390" height="670" rx="18" class="zone"/>
+  <text x="828" y="225" class="zoneTitle">03  API — FASTAPI</text><text x="1068" y="225" class="status greenText">TESTED</text>
+  <rect x="832" y="250" width="336" height="164" rx="14" class="green"/>
+  <text x="854" y="280" class="boxTitle">REST API • /api/v1</text>
+  <text x="854" y="308" class="body">21 read-only GET endpoints</text>
+  <text x="854" y="332" class="body">Pagination + combined filters</text>
+  <text x="854" y="356" class="body">Dependency-injected DB sessions</text>
+  <text x="854" y="380" class="body">Safe 404 + 422 responses</text>
+  <text x="854" y="400" class="small">CORS: http://localhost:3000</text>
+  <rect x="832" y="438" width="336" height="142" rx="14" class="card"/>
+  <text x="854" y="468" class="boxTitle">Pydantic Response Schemas</text>
+  <text x="854" y="496" class="body">Validate + serialize public JSON</text>
+  <text x="854" y="520" class="body">Keep ORM models private</text>
+  <text x="854" y="548" class="small">Typed, stable API contracts</text>
+  <rect x="832" y="604" width="336" height="218" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="854" y="634" class="boxTitle">Generated API documentation</text>
+  <text x="854" y="666" class="body">Swagger UI  /docs</text>
+  <text x="854" y="692" class="body">ReDoc  /redoc</text>
+  <text x="854" y="718" class="body">OpenAPI  /openapi.json</text>
+  <line x1="854" y1="740" x2="1144" y2="740" class="divider"/>
+  <text x="854" y="766" class="small">Contracts derive from routes</text>
+  <text x="854" y="788" class="small">and Pydantic schemas</text>
 
-  <rect x="315" y="174" width="205" height="100" rx="14" class="card"/>
-  <text x="335" y="202" class="boxTitle">Application Shell</text>
-  <text x="335" y="224" class="boxText">Sidebar • top navigation</text>
-  <text x="335" y="244" class="boxText">Light • dark • system</text>
-  <text x="335" y="263" class="pill">Tailwind • shadcn/ui</text>
+  <rect x="1220" y="195" width="440" height="670" rx="18" class="zone"/>
+  <text x="1243" y="225" class="zoneTitle">04  DATA ACCESS</text><text x="1480" y="225" class="status greenText">FULLY TESTED</text>
+  <rect x="1247" y="250" width="386" height="315" rx="14" class="green"/>
+  <text x="1269" y="280" class="boxTitle">Read-only Repository Layer</text>
+  <text x="1269" y="312" class="body">CustomerRepository</text><text x="1452" y="312" class="body">OrderRepository</text>
+  <text x="1269" y="338" class="body">OrderItemRepository</text><text x="1452" y="338" class="body">ConversationRepository</text>
+  <text x="1269" y="364" class="body">MessageRepository</text><text x="1452" y="364" class="body">ModelRunRepository</text>
+  <text x="1269" y="390" class="body">ToolCallRepository</text><text x="1452" y="390" class="body">EvaluationRepository</text>
+  <line x1="1269" y1="412" x2="1611" y2="412" class="divider"/>
+  <text x="1269" y="438" class="small">Filters • pagination • counts</text>
+  <text x="1269" y="460" class="small">Deterministic ordering • eager loading</text>
+  <text x="1269" y="482" class="small">FastAPI never queries PostgreSQL directly</text>
+  <text x="1269" y="528" class="status greenText">SELECT ONLY • NO INSERT / UPDATE / DELETE</text>
+  <rect x="1247" y="590" width="386" height="232" rx="14" class="card"/>
+  <text x="1269" y="620" class="boxTitle">SQLAlchemy ORM — 8 Models</text>
+  <text x="1269" y="650" class="body">Customer • Order • OrderItem</text>
+  <text x="1269" y="676" class="body">Conversation • Message • ModelRun</text>
+  <text x="1269" y="702" class="body">ToolCall • Evaluation</text>
+  <line x1="1269" y1="724" x2="1611" y2="724" class="divider"/>
+  <text x="1269" y="750" class="boxTitle">Alembic</text>
+  <text x="1269" y="776" class="small">Tracks and applies safe schema changes</text>
+  <text x="1269" y="798" class="status blueText">IMPLEMENTED</text>
 
-  <rect x="550" y="174" width="215" height="100" rx="14" class="card"/>
-  <text x="570" y="202" class="boxTitle">ResourcePage&lt;T&gt;</text>
-  <text x="570" y="224" class="boxText">Header • refresh • timestamp</text>
-  <text x="570" y="244" class="boxText">Shared page composition</text>
-  <text x="570" y="263" class="pill">Reusable architecture</text>
+  <rect x="1685" y="195" width="660" height="670" rx="18" class="zone"/>
+  <text x="1708" y="225" class="zoneTitle">05  POSTGRESQL DATA LAYER</text><text x="2190" y="225" class="status greenText">SCHEMA COMPLETE</text>
+  <rect x="1712" y="250" width="606" height="376" rx="14" class="card"/>
+  <text x="1734" y="280" class="boxTitle">Render PostgreSQL — Development</text>
+  <text x="1734" y="304" class="small">Persistent business truth, CX history, and AI telemetry</text>
+  <rect x="1734" y="330" width="132" height="66" rx="10" class="green"/><text x="1750" y="355" class="body" font-weight="700">Customers  20</text><text x="1750" y="379" class="micro">1 → many</text>
+  <rect x="1890" y="330" width="132" height="66" rx="10" class="green"/><text x="1906" y="355" class="body" font-weight="700">Orders  50</text><text x="1906" y="379" class="micro">1 → many items</text>
+  <rect x="2046" y="330" width="160" height="66" rx="10" class="green"/><text x="2062" y="355" class="body" font-weight="700">Order Items  199</text><text x="2062" y="379" class="micro">Order child</text>
+  <rect x="1734" y="430" width="160" height="66" rx="10" class="green"/><text x="1750" y="455" class="body" font-weight="700">Conversations  30</text><text x="1750" y="479" class="micro">Customer / order</text>
+  <rect x="1918" y="430" width="132" height="66" rx="10" class="green"/><text x="1934" y="455" class="body" font-weight="700">Messages  150</text><text x="1934" y="479" class="micro">Ordered history</text>
+  <rect x="2074" y="430" width="132" height="66" rx="10" class="green"/><text x="2090" y="455" class="body" font-weight="700">Model Runs  60</text><text x="2090" y="479" class="micro">AI telemetry</text>
+  <rect x="1820" y="530" width="150" height="66" rx="10" class="card"/><text x="1836" y="555" class="body" font-weight="700">Tool Calls  0</text><text x="1836" y="579" class="micro">Runtime-created</text>
+  <rect x="1994" y="530" width="150" height="66" rx="10" class="card"/><text x="2010" y="555" class="body" font-weight="700">Evaluations  0</text><text x="2010" y="579" class="micro">Runtime-created</text>
+  <path d="M1866 363h24M2022 363h24M1800 396v34M1894 463h24M2050 463h24M2140 496v34M2074 496c0 20-155 14-155 34" class="flowThin"/>
+  <rect x="1712" y="650" width="606" height="172" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="1734" y="680" class="boxTitle">Relationship map</text>
+  <text x="1734" y="708" class="body">Customer → Orders → Order Items</text>
+  <text x="1734" y="734" class="body">Customer → Conversations → Messages</text>
+  <text x="1734" y="760" class="body">Conversation → Model Runs → Tool Calls + Evaluations</text>
+  <text x="1734" y="792" class="small">Tool Calls and Evaluations are created by runtime AI</text>
+  <text x="1734" y="812" class="small">workflows—not manually seeded.</text>
 
-  <rect x="795" y="174" width="245" height="100" rx="14" class="card"/>
-  <text x="815" y="202" class="boxTitle">DataTable&lt;T&gt;</text>
-  <text x="815" y="224" class="boxText">Search • filters • sorting • selection</text>
-  <text x="815" y="244" class="boxText">Pagination • loading • empty • error</text>
-  <text x="815" y="263" class="pill">TanStack Table</text>
+  <!-- main highlighted flow -->
+  <path d="M325 315h25M780 315h25M1195 315h25M1660 315h25" class="flow"/>
+  <circle cx="338" cy="297" r="12" class="number"/><text x="338" y="301" class="numberText">1</text>
+  <circle cx="793" cy="297" r="12" class="number"/><text x="793" y="301" class="numberText">2</text>
+  <circle cx="1208" cy="297" r="12" class="number"/><text x="1208" y="301" class="numberText">4</text>
+  <circle cx="1673" cy="297" r="12" class="number"/><text x="1673" y="301" class="numberText">6</text>
 
-  <rect x="1070" y="174" width="220" height="100" rx="14" class="card"/>
-  <text x="1090" y="202" class="boxTitle">TanStack Query</text>
-  <text x="1090" y="224" class="boxText">Cache • retry • stale time</text>
-  <text x="1090" y="244" class="boxText">Query-key scoped refresh</text>
-  <text x="1090" y="263" class="pill">Request lifecycle</text>
+  <!-- request story -->
+  <rect x="55" y="890" width="1580" height="158" rx="18" class="zone"/>
+  <text x="78" y="920" class="zoneTitle">CURRENT END-TO-END REQUEST — ORDERS EXAMPLE</text>
+  <text x="78" y="949" class="small">The emphasized path above and numbered sequence below describe the live round trip.</text>
+  <g>
+    <circle cx="104" cy="991" r="13" class="number"/><text x="104" y="995" class="numberText">1</text><text x="125" y="996" class="small">Click Orders</text>
+    <circle cx="260" cy="991" r="13" class="number"/><text x="260" y="995" class="numberText">2</text><text x="281" y="996" class="small">Next.js /orders</text>
+    <circle cx="442" cy="991" r="13" class="number"/><text x="442" y="995" class="numberText">3</text><text x="463" y="996" class="small">Axios GET</text>
+    <circle cx="577" cy="991" r="13" class="number"/><text x="577" y="995" class="numberText">4</text><text x="598" y="996" class="small">FastAPI validates</text>
+    <circle cx="760" cy="991" r="13" class="number"/><text x="760" y="995" class="numberText">5</text><text x="781" y="996" class="small">Repository query</text>
+    <circle cx="940" cy="991" r="13" class="number"/><text x="940" y="995" class="numberText">6</text><text x="961" y="996" class="small">PostgreSQL rows</text>
+    <circle cx="1128" cy="991" r="13" class="number"/><text x="1128" y="995" class="numberText">7</text><text x="1149" y="996" class="small">Pydantic JSON</text>
+    <circle cx="1305" cy="991" r="13" class="number"/><text x="1305" y="995" class="numberText">8</text><text x="1326" y="996" class="small">Query caches</text>
+    <circle cx="1475" cy="991" r="13" class="number"/><text x="1475" y="995" class="numberText">9</text><text x="1496" y="996" class="small">Table displays</text>
+  </g>
 
-  <rect x="1320" y="174" width="200" height="100" rx="14" class="card"/>
-  <text x="1340" y="202" class="boxTitle">Axios Client</text>
-  <text x="1340" y="224" class="boxText">Central base URL</text>
-  <text x="1340" y="244" class="boxText">Timeout + JSON headers</text>
-  <text x="1340" y="263" class="pill">HTTP transport</text>
+  <!-- progress -->
+  <rect x="1660" y="890" width="685" height="342" rx="18" class="zone"/>
+  <text x="1683" y="920" class="zoneTitle">MANAGER PROGRESS SUMMARY</text>
+  <rect x="1687" y="946" width="202" height="250" rx="14" class="green"/>
+  <text x="1707" y="976" class="boxTitle">✓ Completed</text>
+  <text x="1707" y="1005" class="small">PostgreSQL schema</text><text x="1707" y="1027" class="small">8 models + migrations</text>
+  <text x="1707" y="1049" class="small">8 repositories</text><text x="1707" y="1071" class="small">Pydantic schemas</text>
+  <text x="1707" y="1093" class="small">21 GET endpoints</text><text x="1707" y="1115" class="small">Swagger / OpenAPI</text>
+  <text x="1707" y="1137" class="small">Docker test system</text><text x="1707" y="1159" class="small">192 tests • 99%</text>
+  <text x="1707" y="1181" class="small">Live dashboard + tables</text>
+  <rect x="1906" y="946" width="194" height="250" rx="14" class="orange"/>
+  <text x="1926" y="976" class="boxTitle">↻ Current work</text>
+  <text x="1926" y="1005" class="small">Activate remaining</text><text x="1926" y="1027" class="small">live dashboard pages:</text>
+  <text x="1926" y="1059" class="small">• Model Runs</text><text x="1926" y="1081" class="small">• Tool Calls</text>
+  <text x="1926" y="1103" class="small">• Evaluations</text>
+  <rect x="2117" y="946" width="201" height="250" rx="14" class="future"/>
+  <text x="2137" y="976" class="boxTitle">→ Next phase</text>
+  <text x="2137" y="1005" class="small">AI orchestration</text><text x="2137" y="1027" class="small">Model integration</text>
+  <text x="2137" y="1049" class="small">Business tools</text><text x="2137" y="1071" class="small">Runtime telemetry</text>
+  <text x="2137" y="1093" class="small">Evaluation runner</text>
 
-  <rect x="1550" y="174" width="285" height="100" rx="14" class="cardGreen"/>
-  <text x="1570" y="202" class="boxTitle">Live dashboard surfaces</text>
-  <text x="1570" y="224" class="boxText">Overview • Customers • Orders</text>
-  <text x="1570" y="244" class="boxText">Order Items • Conversations • Messages</text>
-  <text x="1570" y="263" class="pill">Responsive + accessible</text>
+  <!-- supporting systems -->
+  <rect x="55" y="1072" width="780" height="360" rx="18" class="zone"/>
+  <text x="78" y="1102" class="zoneTitle">06  TESTING &amp; QUALITY</text><text x="650" y="1102" class="status purpleText">PASSING</text>
+  <rect x="82" y="1128" width="220" height="125" rx="14" class="purple"/>
+  <text x="104" y="1158" class="boxTitle">Developer → pytest</text>
+  <text x="104" y="1186" class="body">192 automated tests</text><text x="104" y="1208" class="body">99% backend coverage</text>
+  <text x="104" y="1234" class="small">Models • constraints • repos • API</text>
+  <rect x="330" y="1128" width="220" height="125" rx="14" class="purple"/>
+  <text x="352" y="1158" class="boxTitle">Safety boundary</text>
+  <text x="352" y="1186" class="body">DATABASE_URL_TEST only</text><text x="352" y="1208" class="body">Render blocked in tests</text>
+  <text x="352" y="1234" class="small">Transaction rollback</text>
+  <rect x="578" y="1128" width="220" height="125" rx="14" class="purple"/>
+  <text x="600" y="1158" class="boxTitle">Docker PostgreSQL</text>
+  <text x="600" y="1186" class="body">Disposable test DB</text><text x="600" y="1208" class="body">Alembic verified</text>
+  <text x="600" y="1234" class="small">No Render access</text>
+  <path d="M302 1190h28M550 1190h28" class="support"/>
+  <text x="82" y="1290" class="body">Coverage: relationships • checks • cascades • pagination • eager loading</text>
+  <text x="82" y="1318" class="body">API contracts • filtering • errors • rollback isolation</text>
+  <text x="82" y="1362" class="status greenText">IMPLEMENTED AND PASSING</text>
+  <text x="82" y="1390" class="small">Test DB mirrors schema; test data disappears after each test.</text>
 
-  <path d="M285 224 H315 M520 224 H550 M765 224 H795 M1040 224 H1070 M1290 224 H1320 M1520 224 H1550" class="line"/>
+  <rect x="860" y="1072" width="775" height="360" rx="18" class="zone"/>
+  <text x="883" y="1102" class="zoneTitle">07  DEVELOPMENT &amp; VERSION CONTROL</text>
+  <rect x="887" y="1128" width="214" height="125" rx="14" class="purple"/>
+  <text x="909" y="1158" class="boxTitle">Developer</text>
+  <text x="909" y="1186" class="body">Engineering ownership</text><text x="909" y="1208" class="body">VS Code + coding agent</text>
+  <text x="909" y="1234" class="small">Agent = assistance only</text>
+  <rect x="1127" y="1128" width="214" height="125" rx="14" class="purple"/>
+  <text x="1149" y="1158" class="boxTitle">Local verification</text>
+  <text x="1149" y="1186" class="body">Python venv</text><text x="1149" y="1208" class="body">Docker Desktop</text>
+  <text x="1149" y="1234" class="small">pytest • lint • build</text>
+  <rect x="1367" y="1128" width="214" height="125" rx="14" class="purple"/>
+  <text x="1389" y="1158" class="boxTitle">Git → GitHub</text>
+  <text x="1389" y="1186" class="body">Reviewed commits</text><text x="1389" y="1208" class="body">Version history</text>
+  <text x="1389" y="1234" class="small">Remote collaboration</text>
+  <path d="M1101 1190h26M1341 1190h26" class="support"/>
+  <rect x="887" y="1280" width="694" height="112" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="909" y="1310" class="boxTitle">Monorepo</text>
+  <text x="909" y="1340" class="body">backend/  FastAPI + database + tests</text>
+  <text x="1160" y="1340" class="body">frontend/  Next.js dashboard</text>
+  <text x="1390" y="1340" class="body">docs/  architecture</text>
+  <text x="909" y="1370" class="small">Documentation: this blueprint • supporting diagrams • detailed guides • engineering decisions</text>
 
-  <!-- API -->
-  <rect x="50" y="330" width="1820" height="160" rx="18" class="layer"/>
-  <text x="72" y="358" class="layerTitle">02  API &amp; CONTRACT LAYER</text>
-  <text x="1665" y="358" class="current">LIVE</text>
+  <!-- future -->
+  <rect x="1660" y="1256" width="685" height="176" rx="18" class="future"/>
+  <text x="1683" y="1286" class="zoneTitle">08  FUTURE AI HARNESS</text><text x="2152" y="1286" class="status grayText">NOT IMPLEMENTED</text>
+  <text x="1683" y="1318" class="small">Customer message → Orchestrator → Provider selection (Gemini / Qwen / Fanar)</text>
+  <text x="1683" y="1342" class="small">→ Business tools → ToolCall → Response → Evaluation runner → Evaluation → Dashboard</text>
+  <text x="1683" y="1372" class="micro">Tools: order status • order items • refund • missing item • human escalation</text>
+  <path d="M1683 1397h620" class="futureFlow"/>
+  <text x="1683" y="1422" class="micro">Expansion boundary: provider adapters, orchestration, execution, telemetry generation, model comparison</text>
 
-  <rect x="115" y="382" width="250" height="80" rx="14" class="card"/>
-  <text x="135" y="410" class="boxTitle">FastAPI /api/v1</text>
-  <text x="135" y="432" class="boxText">21 read-only GET endpoints</text>
-  <text x="135" y="451" class="pill">CORS: localhost:3000</text>
-
-  <rect x="410" y="382" width="250" height="80" rx="14" class="card"/>
-  <text x="430" y="410" class="boxTitle">Routers + Dependencies</text>
-  <text x="430" y="432" class="boxText">HTTP parameters • session lifecycle</text>
-  <text x="430" y="451" class="pill">Thin route functions</text>
-
-  <rect x="705" y="382" width="250" height="80" rx="14" class="card"/>
-  <text x="725" y="410" class="boxTitle">Pydantic Schemas</text>
-  <text x="725" y="432" class="boxText">Public response contracts</text>
-  <text x="725" y="451" class="pill">UUID • Decimal • datetime</text>
-
-  <rect x="1000" y="382" width="270" height="80" rx="14" class="cardAmber"/>
-  <text x="1020" y="410" class="boxTitle">Validation + Error Boundary</text>
-  <text x="1020" y="432" class="boxText">422 filter feedback • safe 404s</text>
-  <text x="1020" y="451" class="pill">RepositoryValidationError</text>
-
-  <rect x="1315" y="382" width="420" height="80" rx="14" class="cardGreen"/>
-  <text x="1335" y="410" class="boxTitle">OpenAPI Documentation</text>
-  <text x="1335" y="432" class="boxText">Swagger /docs • ReDoc /redoc • /openapi.json</text>
-  <text x="1335" y="451" class="pill">Generated from routes + Pydantic</text>
-
-  <path d="M365 422 H410 M660 422 H705 M955 422 H1000 M1270 422 H1315" class="line"/>
-  <path d="M1420 274 V330" class="line"/>
-
-  <!-- Repository -->
-  <rect x="50" y="515" width="1820" height="170" rx="18" class="layer"/>
-  <text x="72" y="543" class="layerTitle">03  REPOSITORY &amp; DOMAIN QUERY LAYER</text>
-  <text x="1665" y="543" class="current">LIVE</text>
-
-  <rect x="90" y="565" width="220" height="90" rx="14" class="card"/>
-  <text x="110" y="593" class="boxTitle">Commerce</text>
-  <text x="110" y="616" class="boxText">CustomerRepository</text>
-  <text x="110" y="635" class="boxText">Order + OrderItem repositories</text>
-
-  <rect x="340" y="565" width="220" height="90" rx="14" class="card"/>
-  <text x="360" y="593" class="boxTitle">Customer Experience</text>
-  <text x="360" y="616" class="boxText">ConversationRepository</text>
-  <text x="360" y="635" class="boxText">MessageRepository</text>
-
-  <rect x="590" y="565" width="260" height="90" rx="14" class="card"/>
-  <text x="610" y="593" class="boxTitle">AI Observability</text>
-  <text x="610" y="616" class="boxText">ModelRun • ToolCall</text>
-  <text x="610" y="635" class="boxText">Evaluation repositories</text>
-
-  <rect x="900" y="565" width="250" height="90" rx="14" class="cardGreen"/>
-  <text x="920" y="593" class="boxTitle">Shared Query Controls</text>
-  <text x="920" y="616" class="boxText">Validation • pagination • filters</text>
-  <text x="920" y="635" class="boxText">Deterministic ordering</text>
-
-  <rect x="1180" y="565" width="250" height="90" rx="14" class="cardGreen"/>
-  <text x="1200" y="593" class="boxTitle">Performance</text>
-  <text x="1200" y="616" class="boxText">Eager loading • N+1 protection</text>
-  <text x="1200" y="635" class="boxText">Efficient SELECT queries</text>
-
-  <rect x="1460" y="565" width="340" height="90" rx="14" class="cardAmber"/>
-  <text x="1480" y="593" class="boxTitle">Read-only safety boundary</text>
-  <text x="1480" y="616" class="boxText">No create • update • delete</text>
-  <text x="1480" y="635" class="boxText">No commit • flush • merge</text>
-
-  <path d="M535 462 V515" class="line"/>
-  <path d="M310 610 H340 M560 610 H590 M850 610 H900 M1150 610 H1180 M1430 610 H1460" class="lineSoft"/>
-
-  <!-- Database -->
-  <rect x="50" y="710" width="1270" height="260" rx="18" class="layer"/>
-  <text x="72" y="738" class="layerTitle">04  DATABASE &amp; MIGRATION LAYER</text>
-  <text x="1115" y="738" class="current">LIVE</text>
-
-  <rect x="80" y="765" width="1180" height="165" rx="16" class="db"/>
-  <text x="105" y="794" class="boxTitle">PostgreSQL — business truth + CX history + AI telemetry</text>
-  <text x="105" y="817" class="small">Render development database • Docker test database • same Alembic revision chain</text>
-  <line x1="105" y1="834" x2="1235" y2="834" class="divider"/>
-
-  <rect x="105" y="850" width="125" height="54" rx="10" class="cardGreen"/>
-  <text x="125" y="873" class="boxTitle">Customers</text><text x="125" y="892" class="small">1 → many Orders</text>
-  <rect x="245" y="850" width="125" height="54" rx="10" class="cardGreen"/>
-  <text x="265" y="873" class="boxTitle">Orders</text><text x="265" y="892" class="small">Customer orders</text>
-  <rect x="385" y="850" width="125" height="54" rx="10" class="cardGreen"/>
-  <text x="405" y="873" class="boxTitle">Order Items</text><text x="405" y="892" class="small">CASCADE child</text>
-  <rect x="525" y="850" width="125" height="54" rx="10" class="card"/>
-  <text x="545" y="873" class="boxTitle">Conversations</text><text x="545" y="892" class="small">CX aggregate</text>
-  <rect x="665" y="850" width="125" height="54" rx="10" class="card"/>
-  <text x="685" y="873" class="boxTitle">Messages</text><text x="685" y="892" class="small">Ordered history</text>
-  <rect x="805" y="850" width="125" height="54" rx="10" class="cardPurple"/>
-  <text x="825" y="873" class="boxTitle">Model Runs</text><text x="825" y="892" class="small">Telemetry</text>
-  <rect x="945" y="850" width="125" height="54" rx="10" class="cardPurple"/>
-  <text x="965" y="873" class="boxTitle">Tool Calls</text><text x="965" y="892" class="small">Audit trail</text>
-  <rect x="1085" y="850" width="140" height="54" rx="10" class="cardPurple"/>
-  <text x="1105" y="873" class="boxTitle">Evaluations</text><text x="1105" y="892" class="small">Scores + pass/fail</text>
-
-  <path d="M230 877 H245 M370 877 H385 M230 877 C350 925 465 925 525 877 M510 877 H525 M650 877 H665 M790 877 H805 M930 877 H945 M930 877 C990 925 1085 925 1155 904" class="line"/>
-
-  <rect x="80" y="938" width="1180" height="0" fill="none"/>
-  <text x="105" y="950" class="small">Alembic owns schema history • SQLAlchemy owns mappings • constraints enforce keys, statuses, ranges, uniqueness, and deletion behavior</text>
-  <path d="M720 655 V710" class="line"/>
-
-  <!-- Testing + docs -->
-  <rect x="1350" y="710" width="520" height="260" rx="18" class="layer"/>
-  <text x="1372" y="738" class="layerTitle">05  QUALITY, TESTING &amp; DOCUMENTATION</text>
-
-  <rect x="1380" y="765" width="215" height="82" rx="14" class="cardGreen"/>
-  <text x="1400" y="793" class="boxTitle">pytest Integration Suite</text>
-  <text x="1400" y="815" class="boxText">Models • schemas • repositories</text>
-  <text x="1400" y="834" class="boxText">API • constraints • cascades</text>
-
-  <rect x="1620" y="765" width="215" height="82" rx="14" class="cardGreen"/>
-  <text x="1640" y="793" class="boxTitle">Docker PostgreSQL</text>
-  <text x="1640" y="815" class="boxText">127.0.0.1:5433</text>
-  <text x="1640" y="834" class="boxText">DATABASE_URL_TEST only</text>
-
-  <rect x="1380" y="868" width="215" height="72" rx="14" class="cardAmber"/>
-  <text x="1400" y="896" class="boxTitle">Isolation Controls</text>
-  <text x="1400" y="918" class="boxText">Transactions • rollback • guards</text>
-
-  <rect x="1620" y="868" width="215" height="72" rx="14" class="card"/>
-  <text x="1640" y="896" class="boxTitle">Engineering Docs</text>
-  <text x="1640" y="918" class="boxText">OpenAPI • Mermaid • GitHub</text>
-
-  <path d="M1595 806 H1620" class="line"/>
-  <path d="M1487 847 V868 M1727 847 V868" class="lineSoft"/>
-
-  <!-- Future -->
-  <rect x="50" y="995" width="1820" height="155" rx="18" fill="url(#future)" stroke="#7c3aed" stroke-width="1.5"/>
-  <text x="72" y="1024" class="layerTitle">06  FUTURE AI ORCHESTRATION &amp; EXPANSION</text>
-  <text x="1665" y="1024" class="planned">PLANNED</text>
-
-  <rect x="85" y="1048" width="190" height="72" rx="14" class="cardPurple"/>
-  <text x="105" y="1076" class="boxTitle">Customer Message</text>
-  <text x="105" y="1098" class="boxText">Conversation context</text>
-  <rect x="310" y="1048" width="210" height="72" rx="14" class="cardPurple"/>
-  <text x="330" y="1076" class="boxTitle">CX Harness</text>
-  <text x="330" y="1098" class="boxText">Prompts • orchestration</text>
-  <rect x="555" y="1048" width="250" height="72" rx="14" class="cardPurple"/>
-  <text x="575" y="1076" class="boxTitle">Provider Adapters</text>
-  <text x="575" y="1098" class="boxText">Gemini • Qwen • Fanar</text>
-  <rect x="840" y="1048" width="210" height="72" rx="14" class="cardPurple"/>
-  <text x="860" y="1076" class="boxTitle">Model Run</text>
-  <text x="860" y="1098" class="boxText">Tokens • latency • cost</text>
-  <rect x="1085" y="1048" width="210" height="72" rx="14" class="cardPurple"/>
-  <text x="1105" y="1076" class="boxTitle">Business Tools</text>
-  <text x="1105" y="1098" class="boxText">Orders • refunds • tickets</text>
-  <rect x="1330" y="1048" width="210" height="72" rx="14" class="cardPurple"/>
-  <text x="1350" y="1076" class="boxTitle">Evaluation Runner</text>
-  <text x="1350" y="1098" class="boxText">Scores • judge • pass/fail</text>
-  <rect x="1575" y="1048" width="250" height="72" rx="14" class="cardPurple"/>
-  <text x="1595" y="1076" class="boxTitle">Comparison Dashboard</text>
-  <text x="1595" y="1098" class="boxText">Quality • cost • speed • safety</text>
-
-  <path d="M275 1084 H310 M520 1084 H555 M805 1084 H840 M1050 1084 H1085 M1295 1084 H1330 M1540 1084 H1575" class="futureLine"/>
-  <path d="M945 1048 C945 990 900 960 868 904" class="futureLine"/>
-
-  <text x="60" y="1180" class="small">Primary flow: UI → API → repositories → PostgreSQL • Safety flow: pytest → Docker PostgreSQL • Future flow: message → harness → model/tools → evaluation</text>
-  <text x="1685" y="1180" class="small">Architecture snapshot • July 2026</text>
+  <text x="55" y="1472" class="micro">CX Harness architecture snapshot • Counts reflect seeded Render development data • No credentials or confidential URLs shown</text>
+  <text x="2260" y="1472" class="micro" text-anchor="end">Primary artifact: editable SVG</text>
 </svg>
