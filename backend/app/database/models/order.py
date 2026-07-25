@@ -88,3 +88,20 @@ class Order(Base):
     conversations: Mapped[list[Conversation]] = relationship(
         back_populates="related_order", passive_deletes=True
     )
+    delivery: Mapped[Optional[Delivery]] = relationship(
+        back_populates="order",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        uselist=False,
+    )
+    payments: Mapped[list[Payment]] = relationship(
+        back_populates="order",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    refund_eligibility: Mapped[Optional[RefundEligibility]] = relationship(
+        back_populates="order",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        uselist=False,
+    )

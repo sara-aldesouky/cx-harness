@@ -38,18 +38,18 @@ def test_repository_validation_errors_are_safe_422_responses(api_client):
         assert "SELECT " not in response.text
 
 
-def test_openapi_and_docs_expose_exact_read_only_surface(api_client):
+def test_openapi_and_docs_expose_expected_versioned_surface(api_client):
     docs = api_client.get("/docs")
     openapi = api_client.get("/openapi.json")
 
     assert docs.status_code == openapi.status_code == 200
     schema = openapi.json()
-    assert len(schema["paths"]) == 21
+    assert len(schema["paths"]) == 22
     assert {
         method
         for operations in schema["paths"].values()
         for method in operations
-    } == {"get"}
+    } == {"get", "post"}
     assert {
         tag
         for operations in schema["paths"].values()
@@ -65,6 +65,8 @@ def test_openapi_and_docs_expose_exact_read_only_surface(api_client):
         "Tool Calls",
         "Evaluations",
         "Overview",
+        "Model Invocation",
     }
     assert "/api/v1/orders/by-number/{order_number}" in schema["paths"]
+    assert "/api/v1/model/invoke" in schema["paths"]
     assert f"/api/v1/customers/{uuid4()}" not in schema["paths"]

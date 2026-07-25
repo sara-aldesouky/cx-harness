@@ -64,7 +64,9 @@ def test_list_count_lookup_and_missing_tool_call(repository_session):
     assert repository.count_tool_calls() == 3
     assert repository.list_tool_calls() == [failed, completed, requested]
     assert repository.get_by_id(completed.id) == completed
+    assert repository.get_by_execution_id(completed.execution_id) == completed
     assert repository.get_by_id(uuid4()) is None
+    assert repository.get_by_execution_id(uuid4()) is None
 
 
 def test_tool_call_filters(repository_session):
@@ -191,6 +193,7 @@ def test_tool_call_repository_methods_are_read_only(repository_session):
     repository.list_tool_calls()
     repository.count_tool_calls()
     repository.get_by_id(completed.id)
+    repository.get_by_execution_id(completed.execution_id)
     repository.get_with_model_run(completed.id)
     repository.list_by_model_run(first_run.id)
     repository.list_by_status("completed")

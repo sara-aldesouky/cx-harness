@@ -73,6 +73,17 @@ def test_order_filters(repository_session):
     ) == 1
 
 
+def test_current_and_history_queries_are_customer_scoped(repository_session):
+    customer, _, pending, delivered, other = create_order_set(repository_session)
+    repository = OrderRepository(repository_session)
+
+    assert repository.list_current_by_customer_id(customer.id) == [pending]
+    assert repository.count_current_by_customer_id(customer.id) == 1
+    assert repository.list_history_by_customer_id(customer.id) == [delivered]
+    assert repository.count_history_by_customer_id(customer.id) == 1
+    assert other not in repository.list_history_by_customer_id(customer.id)
+
+
 def test_order_pagination_is_deterministic(repository_session):
     _, _, pending, delivered, other = create_order_set(repository_session)
     repository = OrderRepository(repository_session)
@@ -141,6 +152,10 @@ def test_order_repository_methods_are_read_only(repository_session):
     repository.get_by_id(pending.id)
     repository.get_by_order_number(pending.order_number)
     repository.list_by_customer_id(customer.id)
+    repository.list_current_by_customer_id(customer.id)
+    repository.count_current_by_customer_id(customer.id)
+    repository.list_history_by_customer_id(customer.id)
+    repository.count_history_by_customer_id(customer.id)
     repository.list_by_status("pending")
     repository.list_by_payment_status("pending")
     repository.get_with_customer_and_items(pending.id)

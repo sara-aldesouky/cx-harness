@@ -47,3 +47,12 @@ class PaginatedResponse(BaseModel, Generic[ItemT]):
 
 class CountResponse(BaseModel):
     count: int = Field(ge=0)
+
+
+class APIErrorResponse(BaseModel):
+    """Minimal immutable machine-readable error returned by public APIs."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    code: str
+    message: str

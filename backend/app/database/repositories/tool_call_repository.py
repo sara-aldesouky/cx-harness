@@ -84,6 +84,11 @@ class ToolCallRepository:
             select(ToolCall).where(ToolCall.id == tool_call_id)
         )
 
+    def get_by_execution_id(self, execution_id: UUID) -> Optional[ToolCall]:
+        return self._session.scalar(
+            select(ToolCall).where(ToolCall.execution_id == execution_id)
+        )
+
     def get_with_model_run(self, tool_call_id: UUID) -> Optional[ToolCall]:
         statement = (
             select(ToolCall)

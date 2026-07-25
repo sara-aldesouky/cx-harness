@@ -1,5 +1,6 @@
 """Small factories for model integration tests."""
 
+from datetime import datetime, timezone
 from decimal import Decimal
 from itertools import count
 
@@ -8,11 +9,20 @@ from sqlalchemy.orm import Session
 from app.database.models import (
     Conversation,
     Customer,
+    Delivery,
+    DeliveryEvent,
     Evaluation,
     Message,
+    KnowledgeArticle,
+    KnowledgeArticleVersion,
     ModelRun,
     Order,
     OrderItem,
+    Payment,
+    PaymentEvent,
+    Refund,
+    RefundEligibility,
+    RefundEvent,
     ToolCall,
 )
 
@@ -34,6 +44,17 @@ def create_customer(session: Session, **overrides: object) -> Customer:
     session.add(customer)
     session.flush()
     return customer
+
+
+def create_knowledge_article(session: Session, **overrides: object) -> KnowledgeArticle:
+    number = next(_sequence)
+    values = {"slug": f"faq-{number}", "category": "faq", "language": "en", "is_active": True}
+    values.update(overrides); article = KnowledgeArticle(**values); session.add(article); session.flush(); return article
+
+
+def create_knowledge_version(session: Session, article: KnowledgeArticle, **overrides: object) -> KnowledgeArticleVersion:
+    values = {"article": article, "version": "1.0", "title": "Approved FAQ", "content": "This is approved customer guidance.", "is_published": True, "published_at": datetime(2026, 7, 25, 9, tzinfo=timezone.utc)}
+    values.update(overrides); version = KnowledgeArticleVersion(**values); session.add(version); session.flush(); return version
 
 
 def create_order(
@@ -70,6 +91,119 @@ def create_order_item(
     session.add(item)
     session.flush()
     return item
+
+
+def create_delivery(
+    session: Session, order: Order, **overrides: object
+) -> Delivery:
+    values = {
+        "order": order,
+        "status": "scheduled",
+        "estimated_delivery_time": datetime(2026, 7, 25, 14, tzinfo=timezone.utc),
+        "window_start": datetime(2026, 7, 25, 13, tzinfo=timezone.utc),
+        "window_end": datetime(2026, 7, 25, 15, tzinfo=timezone.utc),
+    }
+    values.update(overrides)
+    delivery = Delivery(**values)
+    session.add(delivery)
+    session.flush()
+    return delivery
+
+
+def create_delivery_event(
+    session: Session, delivery: Delivery, **overrides: object
+) -> DeliveryEvent:
+    values = {
+        "delivery": delivery,
+        "event_type": "scheduled",
+        "public_description": "Your delivery has been scheduled.",
+        "occurred_at": datetime(2026, 7, 25, 10, tzinfo=timezone.utc),
+    }
+    values.update(overrides)
+    event = DeliveryEvent(**values)
+    session.add(event)
+    session.flush()
+    return event
+
+
+def create_payment(
+    session: Session, order: Order, **overrides: object
+) -> Payment:
+    values = {
+        "order": order,
+        "status": "succeeded",
+        "method_type": "card",
+        "amount": Decimal("25.00"),
+        "currency": "EGP",
+    }
+    values.update(overrides)
+    payment = Payment(**values)
+    session.add(payment)
+    session.flush()
+    return payment
+
+
+def create_payment_event(
+    session: Session, payment: Payment, **overrides: object
+) -> PaymentEvent:
+    values = {
+        "payment": payment,
+        "event_type": "captured",
+        "public_description": "Your payment was successful.",
+        "occurred_at": datetime(2026, 7, 25, 10, tzinfo=timezone.utc),
+    }
+    values.update(overrides)
+    event = PaymentEvent(**values)
+    session.add(event)
+    session.flush()
+    return event
+
+
+def create_refund(session: Session, payment: Payment, **overrides: object) -> Refund:
+    values = {
+        "payment": payment,
+        "status": "completed",
+        "amount": Decimal("25.00"),
+        "currency": "EGP",
+        "public_reason": "Refund completed.",
+        "requested_at": datetime(2026, 7, 25, 11, tzinfo=timezone.utc),
+        "processed_at": datetime(2026, 7, 25, 12, tzinfo=timezone.utc),
+    }
+    values.update(overrides)
+    refund = Refund(**values)
+    session.add(refund)
+    session.flush()
+    return refund
+
+
+def create_refund_event(session: Session, refund: Refund, **overrides: object) -> RefundEvent:
+    values = {
+        "refund": refund,
+        "event_type": "completed",
+        "public_description": "Your refund was completed.",
+        "occurred_at": datetime(2026, 7, 25, 12, tzinfo=timezone.utc),
+    }
+    values.update(overrides)
+    event = RefundEvent(**values)
+    session.add(event)
+    session.flush()
+    return event
+
+
+def create_refund_eligibility(
+    session: Session, order: Order, **overrides: object
+) -> RefundEligibility:
+    values = {
+        "order": order,
+        "status": "eligible",
+        "public_reason": "This order is within the refund eligibility window.",
+        "assessed_at": datetime(2026, 7, 25, 13, tzinfo=timezone.utc),
+    }
+    values.update(overrides)
+    assessment = RefundEligibility(**values)
+    session.add(assessment)
+    session.flush()
+    return assessment
 
 
 def create_conversation(

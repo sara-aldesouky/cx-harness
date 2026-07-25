@@ -47,3 +47,12 @@ def get_database_session() -> Generator[Session, None, None]:
         yield session
     finally:
         session.close()
+
+
+def close_database_resources() -> None:
+    """Dispose the cached engine during graceful application shutdown."""
+
+    if get_engine.cache_info().currsize:
+        get_engine().dispose()
+    get_session_factory.cache_clear()
+    get_engine.cache_clear()

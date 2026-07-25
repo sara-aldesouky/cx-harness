@@ -7,6 +7,7 @@ from app.api.routes import (
     customers,
     evaluations,
     messages,
+    model_invocation,
     model_runs,
     order_items,
     orders,
@@ -21,6 +22,7 @@ api_router.include_router(orders.router)
 api_router.include_router(order_items.router)
 api_router.include_router(conversations.router)
 api_router.include_router(messages.router)
+api_router.include_router(model_invocation.router)
 api_router.include_router(model_runs.router)
 api_router.include_router(tool_calls.router)
 api_router.include_router(evaluations.router)

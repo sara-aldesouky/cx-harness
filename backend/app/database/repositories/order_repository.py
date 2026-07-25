@@ -15,6 +15,12 @@ from app.database.repositories._common import (
 )
 
 
+CURRENT_ORDER_STATUSES = tuple(
+    status for status in ORDER_STATUSES if status not in {"delivered", "cancelled"}
+)
+HISTORICAL_ORDER_STATUSES = ("delivered", "cancelled")
+
+
 class OrderRepository:
     """Provide read-only access to orders and related records."""
 
@@ -85,6 +91,60 @@ class OrderRepository:
             limit, offset, customer_id=customer_id
         )
 
+    def list_current_by_customer_id(
+        self,
+        customer_id: UUID,
+        limit: int = DEFAULT_LIMIT,
+        offset: int = 0,
+    ) -> list[Order]:
+        """List non-terminal orders for one customer deterministically."""
+
+        return self._list_filtered(
+            [
+                Order.customer_id == customer_id,
+                Order.status.in_(CURRENT_ORDER_STATUSES),
+            ],
+            limit,
+            offset,
+        )
+
+    def count_current_by_customer_id(self, customer_id: UUID) -> int:
+        """Count non-terminal orders for one customer."""
+
+        return self._count_filtered(
+            [
+                Order.customer_id == customer_id,
+                Order.status.in_(CURRENT_ORDER_STATUSES),
+            ]
+        )
+
+    def list_history_by_customer_id(
+        self,
+        customer_id: UUID,
+        limit: int = DEFAULT_LIMIT,
+        offset: int = 0,
+    ) -> list[Order]:
+        """List delivered or cancelled orders for one customer."""
+
+        return self._list_filtered(
+            [
+                Order.customer_id == customer_id,
+                Order.status.in_(HISTORICAL_ORDER_STATUSES),
+            ],
+            limit,
+            offset,
+        )
+
+    def count_history_by_customer_id(self, customer_id: UUID) -> int:
+        """Count delivered or cancelled orders for one customer."""
+
+        return self._count_filtered(
+            [
+                Order.customer_id == customer_id,
+                Order.status.in_(HISTORICAL_ORDER_STATUSES),
+            ]
+        )
+
     def list_by_status(
         self, status: str, limit: int = DEFAULT_LIMIT, offset: int = 0
     ) -> list[Order]:
@@ -148,3 +208,9 @@ class OrderRepository:
             .limit(limit)
         )
         return list(self._session.scalars(statement).all())
+
+    def _count_filtered(self, criteria: list) -> int:
+        statement = select(func.count()).select_from(Order)
+        if criteria:
+            statement = statement.where(*criteria)
+        return self._session.scalar(statement) or 0
