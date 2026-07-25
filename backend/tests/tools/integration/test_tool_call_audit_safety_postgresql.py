@@ -141,8 +141,8 @@ def test_persisted_payloads_are_recursively_redacted(audit_environment) -> None:
     audit = load_audit(audit_environment, context.execution_id)
     assert audit.input_json["password"] == REDACTED_MARKER
     assert audit.input_json["nested"]["Email"] == REDACTED_MARKER
-    assert audit.input_json["nested"]["customer_id"] == "safe-id"
-    assert audit.input_json["order_id"] == "safe-order-id"
+    assert audit.input_json["nested"]["customer_id"] == REDACTED_MARKER
+    assert audit.input_json["order_id"] == REDACTED_MARKER
     assert audit.output_json["data"]["access_token"] == REDACTED_MARKER
     assert audit.input_truncated is False
     assert audit.output_truncated is False

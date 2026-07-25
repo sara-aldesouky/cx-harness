@@ -4,8 +4,18 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-from app.api.dependencies import get_model_invocation_mapper
+from app.api.dependencies import (
+    get_authenticated_customer_identity,
+    get_model_invocation_mapper,
+)
 from app.api.model_invocation import ModelInvocationMapper
+from app.authentication import TrustedCustomerIdentity
+from app.authorization import AuthorizationError, AuthorizationFailureCode
+from app.role_policy import RolePolicyError, RolePolicyFailureCode
+from app.tool_authorization import (
+    ToolAuthorizationFailureCode,
+    ToolAuthorizationPolicyError,
+)
 from app.harness.model_pipeline import ModelRunPersistenceError
 from app.harness.runtime import ModelPipelineStartupError
 from app.harness.tool_loop_runtime import ModelToolLoopStartupError
@@ -31,6 +41,8 @@ router = APIRouter(prefix="/model", tags=["Model Invocation"])
 
 
 ERROR_RESPONSES = {
+    401: {"model": APIErrorResponse, "description": "Authentication required"},
+    403: {"model": APIErrorResponse, "description": "Access denied"},
     400: {"model": APIErrorResponse, "description": "Invalid application input"},
     500: {"model": APIErrorResponse, "description": "Internal invocation failure"},
     502: {"model": APIErrorResponse, "description": "Invalid model response"},
@@ -49,12 +61,57 @@ ERROR_RESPONSES = {
 )
 def invoke_model(
     request: ModelInvocationRequest,
+    identity: TrustedCustomerIdentity = Depends(
+        get_authenticated_customer_identity
+    ),
     mapper: ModelInvocationMapper = Depends(get_model_invocation_mapper),
 ):
     """Invoke the existing application boundary exactly once."""
 
     try:
-        return mapper.invoke(request)
+        return mapper.invoke(request, identity)
+    except AuthorizationError as error:
+        if error.code in {
+            AuthorizationFailureCode.RESOURCE_OWNERSHIP_MISMATCH,
+            AuthorizationFailureCode.UNAUTHORIZED_RESOURCE,
+            AuthorizationFailureCode.RESOURCE_NOT_FOUND,
+        }:
+            return _error(
+                404,
+                "resource_not_found",
+                "The requested resource was not found.",
+            )
+        return _error(
+            503
+            if error.code is AuthorizationFailureCode.AUTHORIZATION_UNAVAILABLE
+            else 403,
+            error.code.value,
+            error.public_message,
+        )
+    except RolePolicyError as error:
+        return _error(
+            503
+            if error.code
+            in {
+                RolePolicyFailureCode.POLICY_UNAVAILABLE,
+                RolePolicyFailureCode.POLICY_EVALUATION_FAILURE,
+            }
+            else 403,
+            error.code.value,
+            error.public_message,
+        )
+    except ToolAuthorizationPolicyError as error:
+        if error.code is ToolAuthorizationFailureCode.UNKNOWN_TOOL:
+            status_code = 400
+        elif error.code is ToolAuthorizationFailureCode.TOOL_NOT_PERMITTED:
+            status_code = 403
+        else:
+            status_code = 503
+        return _error(
+            status_code,
+            error.code.value,
+            error.public_message,
+        )
     except (ModelPipelineServiceInputError, ValidationError):
         return _error(
             400,

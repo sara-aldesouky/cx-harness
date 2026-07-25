@@ -4,27 +4,10 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import Any
+from app.data_protection import ProtectionMode, privacy_service
 
 
-REDACTED_MARKER = "[REDACTED]"
-SENSITIVE_KEYS = frozenset(
-    {
-        "password",
-        "password_hash",
-        "token",
-        "access_token",
-        "refresh_token",
-        "authorization",
-        "api_key",
-        "secret",
-        "card_number",
-        "cvv",
-        "phone",
-        "email",
-        "address",
-    }
-)
+REDACTED_MARKER = privacy_service.rules.redacted_marker
 
 
 @dataclass(frozen=True)
@@ -44,7 +27,9 @@ def sanitize_audit_payload(
     if max_bytes <= 0:
         raise ValueError("max_bytes must be positive")
 
-    redacted = _redact(payload)
+    redacted = privacy_service.protect_mapping(
+        payload, mode=ProtectionMode.REDACT
+    )
     serialized = json.dumps(
         redacted,
         sort_keys=True,
@@ -62,18 +47,3 @@ def sanitize_audit_payload(
         True,
         size,
     )
-
-
-def _redact(value: Any) -> Any:
-    if isinstance(value, dict):
-        return {
-            key: (
-                REDACTED_MARKER
-                if str(key).casefold() in SENSITIVE_KEYS
-                else _redact(item)
-            )
-            for key, item in value.items()
-        }
-    if isinstance(value, (list, tuple)):
-        return [_redact(item) for item in value]
-    return value

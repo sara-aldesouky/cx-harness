@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections import deque
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import json
 from uuid import uuid4
@@ -19,8 +19,11 @@ import app.tools.payment_capabilities as payment_capabilities
 import app.tools.knowledge_capabilities as knowledge_capabilities
 import app.tools.refund_capabilities as refund_capabilities
 from app.config.settings import Settings
+from app.authentication import TrustedCustomerIdentity
+from app.authorization import AuthorizationError, AuthorizationFailureCode
 from app.database.models import (
     Customer,
+    Conversation,
     Delivery,
     DeliveryEvent,
     Order,
@@ -40,9 +43,12 @@ from app.harness.tool_loop_runtime import (
     build_model_tool_loop,
 )
 from app.services.model_tool_loop_service import ModelToolLoopTermination
+from app.services.model_tool_loop_service import ModelToolLoopApplicationService
+from app.services.orchestration_runtime_gate import OrchestrationRuntimeGate
 from app.tools.context import ExecutionContext
 from tests.models.factories import (
     create_customer,
+    create_conversation,
     create_delivery,
     create_delivery_event,
     create_order,
@@ -657,7 +663,7 @@ def test_cross_domain_customer_journeys_are_grounded_and_deterministic(
                 ("get_policy", {"slug": "order-cancellation", "language": "en"}),
             ),
             1,
-            "order_not_found",
+            "resource_not_found",
         ),
         (
             "Has my refund for order ORD-99999 been approved? How long will it take?",
@@ -666,7 +672,7 @@ def test_cross_domain_customer_journeys_are_grounded_and_deterministic(
                 ("get_policy", {"slug": "refund-processing-time", "language": "en"}),
             ),
             1,
-            "refund_not_found",
+            "resource_not_found",
         ),
         (
             "Under the missing policy, has my refund for order ORD-10025 been approved?",
@@ -768,6 +774,7 @@ def test_unregistered_tool_never_executes(
     finally:
         loop.close()
 
+
     assert result.termination_reason is ModelToolLoopTermination.INVALID_TOOL_CALL
     assert result.tools_executed == 0
     assert business_counts(test_session_factory) == before
@@ -780,3 +787,116 @@ def test_unregistered_tool_never_executes(
             )
             == 0
         )
+
+
+def test_authenticated_application_boundary_preserves_stage10_behavior(
+    monkeypatch,
+    test_database_url,
+    test_session_factory,
+    business_records,
+) -> None:
+    """Prove verified identity reaches one unchanged PostgreSQL-backed tool."""
+
+    monkeypatch.setattr(
+        customer_capabilities,
+        "get_session_factory",
+        lambda: test_session_factory,
+    )
+    client, _ = build_http_client("get_customer_summary", {"request": "summary"})
+    gate = OrchestrationRuntimeGate()
+    gate.start()
+    service = ModelToolLoopApplicationService(
+        loop_factory=lambda: build_model_tool_loop(
+            app_settings=Settings(database_url=test_database_url),
+            database_session_factory=test_session_factory,
+            ollama_client=client,
+        ),
+        runtime_gate=gate,
+    )
+    now = datetime.now(timezone.utc)
+    before = business_counts(test_session_factory)
+    with test_session_factory.begin() as session:
+        customer = session.get(Customer, business_records["customer_id"])
+        conversation = create_conversation(session, customer)
+        conversation_id = conversation.id
+
+    try:
+        result = service.invoke(
+            conversation_id=conversation_id,
+            current_user_message="Show my customer account summary.",
+            system_instructions="Use registered business tools.",
+            trusted_identity=TrustedCustomerIdentity(
+                customer_id=business_records["customer_id"],
+                authenticated_at=now,
+                expires_at=now + timedelta(hours=1),
+                authentication_method="integration_test",
+            ),
+        )
+    finally:
+        with test_session_factory.begin() as session:
+            session.execute(
+                delete(Conversation).where(Conversation.id == conversation_id)
+            )
+
+    assert result.content == "The requested information was verified."
+    assert business_counts(test_session_factory) == before
+
+
+def test_authenticated_customer_cannot_execute_tool_for_another_customers_order(
+    test_database_url,
+    test_session_factory,
+    business_records,
+) -> None:
+    """Deny ownership mismatch before tool execution or audit persistence."""
+
+    with test_session_factory.begin() as session:
+        other = create_customer(session)
+        other_order = create_order(
+            session,
+            other,
+            order_number=f"ORD-{uuid4().int % 10**12:012d}",
+        )
+        other_customer_id = other.id
+        other_order_id = other_order.id
+        other_order_number = other_order.order_number
+    client, _ = build_http_client(
+        "get_order_status", {"order_id": other_order_number}
+    )
+    gate = OrchestrationRuntimeGate()
+    gate.start()
+    service = ModelToolLoopApplicationService(
+        loop_factory=lambda: build_model_tool_loop(
+            app_settings=Settings(database_url=test_database_url),
+            database_session_factory=test_session_factory,
+            ollama_client=client,
+        ),
+        runtime_gate=gate,
+    )
+    now = datetime.now(timezone.utc)
+    try:
+        with pytest.raises(AuthorizationError) as caught:
+            service.invoke(
+                conversation_id=uuid4(),
+                current_user_message=f"Where is {other_order_number}?",
+                system_instructions="Use registered business tools.",
+                trusted_identity=TrustedCustomerIdentity(
+                    customer_id=business_records["customer_id"],
+                    authenticated_at=now,
+                    expires_at=now + timedelta(hours=1),
+                    authentication_method="integration_test",
+                ),
+            )
+        assert caught.value.code is AuthorizationFailureCode.RESOURCE_NOT_FOUND
+        assert caught.value.public_message == "The requested resource was not found."
+        with test_session_factory() as session:
+            assert session.scalar(
+                select(func.count())
+                .select_from(ToolCall)
+                .where(ToolCall.customer_id == business_records["customer_id"])
+            ) == 0
+    finally:
+        with test_session_factory.begin() as session:
+            session.execute(delete(Order).where(Order.id == other_order_id))
+            session.execute(
+                delete(Customer).where(Customer.id == other_customer_id)
+            )

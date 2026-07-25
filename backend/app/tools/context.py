@@ -25,11 +25,12 @@ class ExecutionContext(BaseModel):
     conversation_id: Optional[UUID] = None
     model_run_id: Optional[UUID] = None
     customer_id: Optional[UUID] = None
+    principal_role: Optional[str] = "customer"
     model_name: Optional[str] = None
     experiment_id: Optional[str] = None
     use_case_id: Optional[str] = None
 
-    @field_validator("model_name", "experiment_id", "use_case_id")
+    @field_validator("model_name", "experiment_id", "use_case_id", "principal_role")
     @classmethod
     def normalize_optional_identifier(cls, value: Optional[str]) -> Optional[str]:
         """Normalize optional labels and reject labels without content."""

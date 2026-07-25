@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from uuid import UUID, uuid4
 
 import pytest
 from pydantic import ValidationError
 
+from app.authentication import TrustedCustomerIdentity
 from app.harness import ConversationMessage
 from app.providers import ModelResponse
 from app.services import (
@@ -49,11 +51,18 @@ def invoke(
     conversation_history=(),
     system_instructions: str = "Be helpful.",
 ) -> ModelPipelineServiceResult:
+    now = datetime.now(timezone.utc)
     return service.invoke(
         conversation_id=conversation_id or uuid4(),
         current_user_message=current_user_message,
         conversation_history=conversation_history,
         system_instructions=system_instructions,
+        trusted_identity=TrustedCustomerIdentity(
+            customer_id=uuid4(),
+            authenticated_at=now,
+            expires_at=now + timedelta(hours=1),
+            authentication_method="test",
+        ),
     )
 
 
@@ -154,6 +163,27 @@ def test_invalid_conversation_identity_is_rejected(
             conversation_id=conversation_id,  # type: ignore[arg-type]
             current_user_message="hello",
             system_instructions="instructions",
+            trusted_identity=_identity(),
+        )
+
+
+def _identity() -> TrustedCustomerIdentity:
+    now = datetime.now(timezone.utc)
+    return TrustedCustomerIdentity(
+        customer_id=uuid4(),
+        authenticated_at=now,
+        expires_at=now + timedelta(hours=1),
+        authentication_method="test",
+    )
+
+
+def test_unauthenticated_service_invocation_is_rejected() -> None:
+    with pytest.raises(ModelPipelineServiceInputError, match="authenticated"):
+        ModelPipelineService(pipeline=FakePipeline()).invoke(
+            conversation_id=uuid4(),
+            current_user_message="hello",
+            system_instructions="instructions",
+            trusted_identity=None,  # type: ignore[arg-type]
         )
 
 

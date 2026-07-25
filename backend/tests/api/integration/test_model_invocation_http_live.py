@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,8 +11,10 @@ from sqlalchemy import func, select
 
 from app.api.dependencies import (
     DEFAULT_MODEL_SYSTEM_INSTRUCTIONS,
+    get_authenticated_customer_identity,
     get_model_invocation_mapper,
 )
+from app.authentication import TrustedCustomerIdentity
 from app.api.model_invocation import ModelInvocationMapper
 from app.config.settings import Settings
 from app.database.models import Conversation, Customer, ModelRun
@@ -73,6 +76,14 @@ def test_real_model_invocation_endpoint_persists_exactly_one_run(
         default_system_instructions=DEFAULT_MODEL_SYSTEM_INSTRUCTIONS,
     )
     app.dependency_overrides[get_model_invocation_mapper] = lambda: mapper
+    app.dependency_overrides[get_authenticated_customer_identity] = lambda: (
+        TrustedCustomerIdentity(
+            customer_id=customer_id,
+            authenticated_at=datetime.now(timezone.utc),
+            expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
+            authentication_method="live_test",
+        )
+    )
     model_run_id = None
 
     try:
@@ -143,6 +154,7 @@ def test_real_model_invocation_endpoint_persists_exactly_one_run(
             )
     finally:
         app.dependency_overrides.pop(get_model_invocation_mapper, None)
+        app.dependency_overrides.pop(get_authenticated_customer_identity, None)
         with test_session_factory.begin() as session:
             conversation = session.get(Conversation, conversation_id)
             if conversation is not None:

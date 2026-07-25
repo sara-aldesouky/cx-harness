@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from uuid import UUID, uuid4
 
@@ -10,6 +11,7 @@ import pytest
 from pydantic import ValidationError
 
 from app.api.model_invocation import ModelInvocationMapper
+from app.authentication import TrustedCustomerIdentity
 from app.harness import ConversationMessage
 from app.schemas import (
     ModelInvocationHistoryMessage,
@@ -46,6 +48,16 @@ def make_request(**overrides: object) -> ModelInvocationRequest:
     }
     values.update(overrides)
     return ModelInvocationRequest(**values)
+
+
+def identity() -> TrustedCustomerIdentity:
+    now = datetime.now(timezone.utc)
+    return TrustedCustomerIdentity(
+        customer_id=uuid4(),
+        authenticated_at=now,
+        expires_at=now + timedelta(hours=1),
+        authentication_method="test",
+    )
 
 
 def test_valid_request_parsing_normalization_and_ordering() -> None:
@@ -117,13 +129,14 @@ def test_request_to_service_mapping_preserves_all_supported_inputs() -> None:
     response = ModelInvocationMapper(
         service=service,
         default_system_instructions="Default instructions",
-    ).invoke(request)
+    ).invoke(request, identity())
 
     assert len(service.calls) == 1
     call = service.calls[0]
     assert call["conversation_id"] == conversation_id
     assert call["current_user_message"] == "Current question"
     assert call["system_instructions"] == "Custom instructions"
+    assert isinstance(call["trusted_identity"], TrustedCustomerIdentity)
     history = call["conversation_history"]
     assert isinstance(history, tuple)
     assert all(isinstance(message, ConversationMessage) for message in history)
@@ -141,7 +154,7 @@ def test_optional_instructions_use_injected_default() -> None:
     ModelInvocationMapper(
         service=service,
         default_system_instructions=" Configured default ",
-    ).invoke(make_request())
+    ).invoke(make_request(), identity())
 
     assert service.calls[0]["system_instructions"] == "Configured default"
 
@@ -183,7 +196,7 @@ def test_application_service_exception_is_preserved() -> None:
     )
 
     with pytest.raises(RuntimeError) as captured:
-        mapper.invoke(make_request())
+        mapper.invoke(make_request(), identity())
 
     assert captured.value is expected
 
@@ -202,7 +215,9 @@ def test_mapper_rejects_invalid_dependencies_and_contract_types() -> None:
         service=FakeService(), default_system_instructions="instructions"
     )
     with pytest.raises(TypeError, match="ModelInvocationRequest"):
-        mapper.invoke({})  # type: ignore[arg-type]
+        mapper.invoke({}, identity())  # type: ignore[arg-type]
+    with pytest.raises(TypeError, match="TrustedCustomerIdentity"):
+        mapper.invoke(make_request(), object())  # type: ignore[arg-type]
     with pytest.raises(TypeError, match="ModelPipelineServiceResult"):
         mapper.to_response(object())  # type: ignore[arg-type]
 

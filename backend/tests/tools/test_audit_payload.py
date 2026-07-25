@@ -22,10 +22,10 @@ def test_redacts_sensitive_keys_recursively_without_mutating_input() -> None:
     assert result.payload["password"] == REDACTED_MARKER
     assert result.payload["nested"]["Email"] == REDACTED_MARKER
     assert result.payload["nested"]["items"][0]["API_KEY"] == REDACTED_MARKER
-    assert result.payload["nested"]["items"][0]["order_id"] == "safe-order"
-    assert result.payload["customer_id"] == "safe-customer"
-    assert result.payload["conversation_id"] == "safe-conversation"
-    assert result.payload["execution_id"] == "safe-execution"
+    assert result.payload["nested"]["items"][0]["order_id"] == REDACTED_MARKER
+    assert result.payload["customer_id"] == REDACTED_MARKER
+    assert result.payload["conversation_id"] == REDACTED_MARKER
+    assert result.payload["execution_id"] == REDACTED_MARKER
     assert original["password"] == "top-secret"
     assert original["nested"]["Email"] == "person@example.test"
 

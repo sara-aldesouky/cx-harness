@@ -12,6 +12,12 @@ from app.api.dependencies import (
     get_model_invocation_mapper,
 )
 from app.api.model_invocation import ModelInvocationMapper
+from app.authorization import AuthorizationError, AuthorizationFailureCode
+from app.role_policy import RolePolicyError, RolePolicyFailureCode
+from app.tool_authorization import (
+    ToolAuthorizationFailureCode,
+    ToolAuthorizationPolicyError,
+)
 from app.harness import ModelRunPersistenceError, ModelPipelineStartupError
 from app.main import app
 from app.providers.ollama_qwen import (
@@ -31,8 +37,8 @@ class FakeMapper:
         self.error = error
         self.calls = []
 
-    def invoke(self, request):
-        self.calls.append(request)
+    def invoke(self, request, identity):
+        self.calls.append((request, identity))
         if self.error is not None:
             raise self.error
         return ModelInvocationResponse(
@@ -89,9 +95,10 @@ def test_success_response_and_mapper_invoked_exactly_once(api_client) -> None:
         "model_name": "qwen3:8b",
     }
     assert len(mapper.calls) == 1
-    request = mapper.calls[0]
+    request, identity = mapper.calls[0]
     assert request.conversation_id == conversation_id
     assert request.current_user_message == "Where is my order?"
+    assert identity.customer_id is not None
     assert tuple(message.content for message in request.conversation_history) == (
         "Previous question",
         "Previous answer",
@@ -144,6 +151,69 @@ def test_pydantic_request_validation_returns_422(api_client, payload) -> None:
 @pytest.mark.parametrize(
     ("error", "status", "code", "message"),
     [
+        (
+            AuthorizationError(
+                AuthorizationFailureCode.UNAUTHORIZED_RESOURCE,
+                "You do not have access to that resource.",
+            ),
+            404,
+            "resource_not_found",
+            "The requested resource was not found.",
+        ),
+        (
+            RolePolicyError(
+                RolePolicyFailureCode.INSUFFICIENT_ROLE,
+                "Your role does not permit this operation.",
+            ),
+            403,
+            "insufficient_role",
+            "Your role does not permit this operation.",
+        ),
+        (
+            ToolAuthorizationPolicyError(
+                ToolAuthorizationFailureCode.TOOL_NOT_PERMITTED,
+                "This tool is not available to your role.",
+            ),
+            403,
+            "tool_not_permitted",
+            "This tool is not available to your role.",
+        ),
+        (
+            ToolAuthorizationPolicyError(
+                ToolAuthorizationFailureCode.UNKNOWN_TOOL,
+                "The requested tool is not recognized.",
+            ),
+            400,
+            "unknown_tool",
+            "The requested tool is not recognized.",
+        ),
+        (
+            ToolAuthorizationPolicyError(
+                ToolAuthorizationFailureCode.UNKNOWN_POLICY,
+                "Tool access policy is temporarily unavailable.",
+            ),
+            503,
+            "unknown_tool_policy",
+            "Tool access policy is temporarily unavailable.",
+        ),
+        (
+            RolePolicyError(
+                RolePolicyFailureCode.POLICY_UNAVAILABLE,
+                "Access policy is temporarily unavailable.",
+            ),
+            503,
+            "policy_unavailable",
+            "Access policy is temporarily unavailable.",
+        ),
+        (
+            AuthorizationError(
+                AuthorizationFailureCode.AUTHORIZATION_UNAVAILABLE,
+                "Authorization is temporarily unavailable.",
+            ),
+            503,
+            "authorization_unavailable",
+            "Authorization is temporarily unavailable.",
+        ),
         (
             ModelPipelineServiceInputError("invalid conversation"),
             400,
@@ -226,7 +296,7 @@ def test_openapi_registers_request_response_and_documented_errors(api_client) ->
     assert operation["responses"]["200"]["content"]["application/json"][
         "schema"
     ] == {"$ref": "#/components/schemas/ModelInvocationResponse"}
-    assert {"400", "422", "500", "502", "503"}.issubset(
+    assert {"400", "401", "403", "422", "500", "502", "503"}.issubset(
         operation["responses"]
     )
     assert operation["responses"]["503"]["content"]["application/json"][

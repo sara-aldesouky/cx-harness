@@ -11,7 +11,17 @@ from app.config.settings import settings
 from app.database.repositories import RepositoryValidationError
 from app.database.session import close_database_resources
 from app.services.orchestration_runtime_gate import orchestration_runtime_gate
-from app.api.dependencies import get_model_invocation_mapper
+from app.schemas.common import APIErrorResponse
+from app.api.dependencies import (
+    get_customer_authenticator,
+    get_model_invocation_mapper,
+)
+from app.authentication import AuthenticationError, AuthenticationFailureCode
+from app.data_protection import (
+    install_privacy_log_filters,
+    remove_privacy_log_filters,
+)
+from app.security_audit import security_audit_recorder
 
 
 @asynccontextmanager
@@ -19,12 +29,23 @@ async def lifespan(_app: FastAPI):
     """Open admission on startup and release runtime resources on shutdown."""
 
     orchestration_runtime_gate.start()
+    privacy_filters = install_privacy_log_filters()
+    audit_key = settings.security_audit_pseudonym_key
+    if audit_key is None:
+        security_audit_recorder.configuration_problem()
+    else:
+        try:
+            security_audit_recorder.configure_key(audit_key.get_secret_value())
+        except Exception:
+            security_audit_recorder.configuration_problem()
     try:
         yield
     finally:
         orchestration_runtime_gate.begin_shutdown()
         get_model_invocation_mapper.cache_clear()
+        get_customer_authenticator.cache_clear()
         close_database_resources()
+        remove_privacy_log_filters(privacy_filters)
 
 
 app = FastAPI(
@@ -37,9 +58,28 @@ app.add_middleware(
     allow_origins=["http://localhost:3000"],
     allow_credentials=False,
     allow_methods=["GET", "POST"],
-    allow_headers=["Accept", "Content-Type"],
+    allow_headers=["Accept", "Authorization", "Content-Type"],
 )
 app.include_router(api_router)
+
+
+@app.exception_handler(AuthenticationError)
+async def authentication_error_handler(
+    request: Request, exc: AuthenticationError
+) -> JSONResponse:
+    """Return stable failures without exposing credentials or verifier details."""
+
+    status_code = (
+        503
+        if exc.code in {
+            AuthenticationFailureCode.AUTHENTICATION_UNAVAILABLE,
+            AuthenticationFailureCode.REPLAY_PROTECTION_UNAVAILABLE,
+            AuthenticationFailureCode.SIGNING_KEY_UNAVAILABLE,
+        }
+        else 401
+    )
+    body = APIErrorResponse(code=exc.code.value, message=exc.public_message)
+    return JSONResponse(status_code=status_code, content=body.model_dump(mode="json"))
 
 
 @app.exception_handler(RepositoryValidationError)

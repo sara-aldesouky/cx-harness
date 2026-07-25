@@ -9,6 +9,15 @@ import httpx
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.config.settings import Settings, settings
+from app.authorization import (
+    OwnershipAuthorizationService,
+    SQLAlchemyBusinessResourceOwnershipResolver,
+)
+from app.role_policy import CapabilityRolePolicyService
+from app.tool_authorization import (
+    CentralToolAuthorizationService,
+    ToolPolicyRegistry,
+)
 from app.database.repositories.tool_call_audit_repository import ToolCallAuditRepository
 from app.database.session import get_session_factory
 from app.providers.ollama_qwen import (
@@ -129,6 +138,13 @@ def build_model_tool_loop(
         continuation_adapter_registry=continuation_adapters,
         audit_repository=ToolCallAuditRepository(session_factory),
         audit_payload_max_bytes=app_settings.audit_payload_max_bytes,
+        authorization_service=OwnershipAuthorizationService(
+            SQLAlchemyBusinessResourceOwnershipResolver(session_factory)
+        ),
+        role_policy_service=CapabilityRolePolicyService(),
+        tool_authorization_service=CentralToolAuthorizationService(
+            ToolPolicyRegistry.for_runtime(tool_registry)
+        ),
     )
 
     provider_registry = ProviderRegistry()

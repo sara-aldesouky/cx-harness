@@ -1,9 +1,10 @@
 """Environment-backed application settings."""
 
 from pathlib import Path
+from typing import Optional
 from urllib.parse import urlparse
 
-from pydantic import Field, field_validator
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,6 +17,8 @@ class Settings(BaseSettings):
     database_url: str = ""
     active_model: str = "gemini"
     environment: str = "development"
+    authentication_hmac_secret: Optional[SecretStr] = None
+    security_audit_pseudonym_key: Optional[SecretStr] = None
     audit_payload_max_bytes: int = Field(default=16_384, gt=0)
     tool_call_retention_days: int = Field(default=90, gt=0)
     tool_call_stale_after_seconds: int = Field(default=300, gt=0)

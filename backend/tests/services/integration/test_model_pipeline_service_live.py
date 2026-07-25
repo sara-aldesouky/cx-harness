@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import os
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from sqlalchemy import func, select
 
 from app.config.settings import Settings
+from app.authentication import TrustedCustomerIdentity
 from app.database.models import Conversation, Customer, ModelRun
 from app.harness import build_model_pipeline
 from app.services import ModelPipelineService, ModelPipelineServiceResult
@@ -77,6 +79,12 @@ def test_real_application_service_persists_exactly_one_model_run(
             system_instructions=(
                 "Reply in one short sentence and explain that no order data "
                 "was supplied."
+            ),
+            trusted_identity=TrustedCustomerIdentity(
+                customer_id=customer_id,
+                authenticated_at=datetime.now(timezone.utc),
+                expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
+                authentication_method="live_test",
             ),
         )
 

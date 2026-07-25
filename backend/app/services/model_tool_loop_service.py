@@ -40,6 +40,21 @@ from app.harness.context_builder import ContextBuilder, MessageInput
 from app.providers.base import ModelResponse, ModelToolLoopTurnResponse
 from app.providers.registry import ProviderRegistry
 from app.tools.context import ExecutionContext
+from app.authentication import TrustedCustomerIdentity
+from app.authorization import AuthorizationError, AuthorizationFailureCode
+from app.role_policy import RolePolicyError, RolePolicyFailureCode
+from app.tool_authorization import (
+    ToolAuthorizationFailureCode,
+    ToolAuthorizationPolicyError,
+)
+from app.data_protection import DataProtectionService, privacy_service
+from app.security_audit import (
+    AuditCategory,
+    AuditResult,
+    AuditSeverity,
+    SecurityEventType,
+    security_audit_recorder,
+)
 from app.tools.continuation_adapter import ProviderContinuationPayload
 from app.tools.continuation_cycle import ToolContinuationCycle
 from app.tools.selection import ToolSelectionResolver
@@ -137,22 +152,20 @@ class ModelToolLoopApplicationService:
         self,
         *,
         loop_factory: Optional[Callable[[], BoundedModelToolLoopService]] = None,
-        customer_identity_resolver: Optional[
-            Callable[[UUID], Optional[UUID]]
-        ] = None,
         provider_name: str = "ollama",
         model_name: str = settings.ollama_model_name,
         runtime_gate: OrchestrationRuntimeGate = orchestration_runtime_gate,
+        data_protection: DataProtectionService = privacy_service,
     ) -> None:
         self._loop_factory = loop_factory
-        self._customer_identity_resolver = (
-            customer_identity_resolver or _resolve_conversation_customer_id
-        )
         self._provider_name = provider_name
         self._model_name = model_name
         if not isinstance(runtime_gate, OrchestrationRuntimeGate):
             raise TypeError("runtime_gate must be an OrchestrationRuntimeGate")
         self._runtime_gate = runtime_gate
+        if not isinstance(data_protection, DataProtectionService):
+            raise TypeError("data_protection must be a DataProtectionService")
+        self._data_protection = data_protection
 
     def invoke(
         self,
@@ -161,6 +174,7 @@ class ModelToolLoopApplicationService:
         current_user_message: str,
         conversation_history: Iterable[MessageInput] = (),
         system_instructions: str,
+        trusted_identity: TrustedCustomerIdentity,
     ):
         from app.harness.tool_loop_runtime import build_model_tool_loop
         from app.services.model_pipeline_service import (
@@ -172,13 +186,43 @@ class ModelToolLoopApplicationService:
             raise ModelPipelineServiceInputError(
                 "conversation_id must be a valid UUID"
             )
+        if not isinstance(trusted_identity, TrustedCustomerIdentity):
+            raise ModelPipelineServiceInputError(
+                "trusted_identity must be authenticated"
+            )
+        protected_current = self._data_protection.protect_text(current_user_message)
         current = ConversationMessage(
             role=ConversationRole.USER,
-            content=current_user_message,
+            content=protected_current,
         )
+        history_inputs = tuple(conversation_history)
+        protected_history = tuple(
+            self._data_protection.protect_message_input(message)
+            for message in history_inputs
+        )
+        protected_instructions = self._data_protection.protect_text(
+            system_instructions
+        )
+        if (
+            protected_current != current_user_message
+            or protected_instructions != system_instructions.strip()
+            or any(
+                protected != original
+                for protected, original in zip(protected_history, history_inputs)
+            )
+        ):
+            security_audit_recorder.record(
+                SecurityEventType.PROMPT_SANITIZED,
+                severity=AuditSeverity.INFO,
+                result=AuditResult.SUCCESS,
+                category=AuditCategory.PRIVACY,
+                role=trusted_identity.role,
+                correlation_id=conversation_id,
+                customer_id=trusted_identity.customer_id,
+            )
         context = ContextBuilder.build(
-            system_instructions=system_instructions,
-            messages=chain(conversation_history, (current,)),
+            system_instructions=protected_instructions,
+            messages=chain(protected_history, (current,)),
             provider_name=self._provider_name,
             model_name=self._model_name,
         )
@@ -188,7 +232,6 @@ class ModelToolLoopApplicationService:
         with self._runtime_gate.execution(trace_id) as cancellation_token:
             try:
                 loop = factory()
-                customer_id = self._customer_identity_resolver(conversation_id)
                 result = loop.run(
                     provider_name=self._provider_name,
                     model_name=self._model_name,
@@ -197,7 +240,8 @@ class ModelToolLoopApplicationService:
                         trace_id=trace_id,
                         execution_id=uuid4(),
                         conversation_id=conversation_id,
-                        customer_id=customer_id,
+                        customer_id=trusted_identity.customer_id,
+                        principal_role=trusted_identity.role.value,
                         model_name=self._model_name,
                     ),
                     cancellation_token=cancellation_token,
@@ -206,26 +250,59 @@ class ModelToolLoopApplicationService:
                 close = getattr(loop, "close", None)
                 if callable(close):
                     close()
+        try:
+            authorization_code = AuthorizationFailureCode(
+                getattr(result, "error_code", None)
+            )
+        except (TypeError, ValueError):
+            authorization_code = None
+        if authorization_code is not None:
+            raise AuthorizationError(
+                authorization_code,
+                result.error_message or "You do not have access to that resource.",
+            )
+        try:
+            role_policy_code = RolePolicyFailureCode(
+                getattr(result, "error_code", None)
+            )
+        except (TypeError, ValueError):
+            role_policy_code = None
+        if role_policy_code is not None:
+            raise RolePolicyError(
+                role_policy_code,
+                result.error_message or "Your role does not permit this operation.",
+            )
+        try:
+            tool_authorization_code = ToolAuthorizationFailureCode(
+                getattr(result, "error_code", None)
+            )
+        except (TypeError, ValueError):
+            tool_authorization_code = None
+        if tool_authorization_code is not None:
+            raise ToolAuthorizationPolicyError(
+                tool_authorization_code,
+                result.error_message or "This tool is not available to your role.",
+            )
         if result.final_response is None:
             raise ModelToolLoopApplicationError(result)
+        safe_content = self._data_protection.protect_text(
+            result.final_response.content
+        )
+        if safe_content != result.final_response.content:
+            security_audit_recorder.record(
+                SecurityEventType.UNSAFE_OUTPUT_BLOCKED,
+                severity=AuditSeverity.WARNING,
+                result=AuditResult.SUCCESS,
+                category=AuditCategory.PRIVACY,
+                role=trusted_identity.role,
+                correlation_id=conversation_id,
+                customer_id=trusted_identity.customer_id,
+            )
         return ModelPipelineServiceResult(
-            content=result.final_response.content,
+            content=safe_content,
             provider_name=result.provider_name,
             model_name=result.model_name,
         )
-
-
-def _resolve_conversation_customer_id(conversation_id: UUID) -> Optional[UUID]:
-    """Resolve trusted identity through the existing read-only repository."""
-
-    from app.database.repositories import ConversationRepository
-    from app.database.session import get_session_factory
-
-    with get_session_factory()() as session:
-        conversation = ConversationRepository(session).get_by_id(conversation_id)
-    return None if conversation is None else conversation.customer_id
-
-
 class BoundedModelToolLoopService:
     """Own a finite model/tool loop while delegating every specialist operation."""
 

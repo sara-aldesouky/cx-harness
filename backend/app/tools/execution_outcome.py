@@ -17,6 +17,14 @@ from pydantic_core import PydanticSerializationError
 from app.tools.execution_request import ToolExecutionRequest
 from app.tools.immutable_json import freeze_json, json_copy
 from app.tools.result import ToolError, ToolResult, ToolStatus
+from app.data_protection import DataProtectionService, privacy_service
+from app.security_audit import (
+    AuditCategory,
+    AuditResult,
+    AuditSeverity,
+    SecurityEventType,
+    security_audit_recorder,
+)
 
 
 class ToolExecutionOutcomeError(ValueError):
@@ -123,12 +131,27 @@ class ToolExecutionOutcomeFactory:
                 raise NonSerializableToolOutputError(
                     "successful tool output is not JSON serializable"
                 ) from error
+            protected_output = self._data_protection.protect_mapping(output)
+            if protected_output != output:
+                security_audit_recorder.record(
+                    SecurityEventType.DATA_REDACTION_PERFORMED,
+                    severity=AuditSeverity.INFO,
+                    result=AuditResult.SUCCESS,
+                    category=AuditCategory.PRIVACY,
+                    role=request.context.principal_role,
+                    tool_name=request.tool_name,
+                    tool_version=request.tool_version,
+                    correlation_id=request.context.trace_id,
+                    request_id=request.context.execution_id,
+                    customer_id=request.context.customer_id,
+                    session_id=request.context.conversation_id,
+                )
             return ToolExecutionOutcome(
                 call_id=request.call_id,
                 tool_name=request.tool_name,
                 tool_version=request.tool_version,
                 status=result.status,
-                output=output,
+                output=protected_output,
                 error=None,
             )
 
@@ -165,3 +188,9 @@ class ToolExecutionOutcomeFactory:
             raise ToolExecutionOutcomeIdentityMismatchError(
                 "tool result version does not match the execution request"
             )
+    def __init__(
+        self, data_protection: DataProtectionService = privacy_service
+    ) -> None:
+        if not isinstance(data_protection, DataProtectionService):
+            raise TypeError("data_protection must be a DataProtectionService")
+        self._data_protection = data_protection

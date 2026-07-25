@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from app.tools.continuation_adapter_registry import (
     ProviderContinuationAdapterRegistry,
@@ -18,6 +18,11 @@ from app.tools.execution_outcome import ToolExecutionOutcomeFactory
 from app.tools.execution_request import ToolExecutionRequestFactory
 from app.tools.executor import ToolExecutor
 from app.tools.registry import ToolRegistry
+
+if TYPE_CHECKING:
+    from app.authorization import ToolAuthorizationService
+    from app.role_policy import ToolRolePolicyService
+    from app.tool_authorization import RequestedToolAuthorizationService
 
 
 class ToolContinuationRuntimeCompositionError(RuntimeError):
@@ -49,6 +54,9 @@ def build_tool_continuation_runtime(
     continuation_adapter_registry: ProviderContinuationAdapterRegistry,
     audit_repository: Any,
     audit_payload_max_bytes: int = 16_384,
+    authorization_service: ToolAuthorizationService | None = None,
+    role_policy_service: ToolRolePolicyService | None = None,
+    tool_authorization_service: RequestedToolAuthorizationService | None = None,
 ) -> ToolContinuationRuntime:
     """Compose one ready runtime without lookup, execution, registration, or I/O."""
 
@@ -88,7 +96,13 @@ def build_tool_continuation_runtime(
         ) from error
 
     try:
-        execution_gateway = SingleToolExecutionGateway(tool_registry, executor)
+        execution_gateway = SingleToolExecutionGateway(
+            tool_registry,
+            executor,
+            authorization_service=authorization_service,
+            role_policy_service=role_policy_service,
+            tool_authorization_service=tool_authorization_service,
+        )
     except Exception as error:
         raise ToolContinuationRuntimeConstructionError(
             "failed to construct execution_gateway"

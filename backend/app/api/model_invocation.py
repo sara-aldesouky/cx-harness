@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from app.authentication import TrustedCustomerIdentity
 from app.harness.context import ConversationMessage
 from app.schemas.model_invocation import (
     ModelInvocationRequest,
@@ -12,6 +13,7 @@ from app.schemas.model_invocation import (
 from app.services.model_pipeline_service import (
     ModelPipelineServiceResult,
 )
+from app.data_protection import privacy_service
 
 
 class ModelInvocationService(Protocol):
@@ -37,11 +39,17 @@ class ModelInvocationMapper:
         self._service = service
         self._default_system_instructions = normalized_default
 
-    def invoke(self, request: ModelInvocationRequest) -> ModelInvocationResponse:
+    def invoke(
+        self,
+        request: ModelInvocationRequest,
+        identity: TrustedCustomerIdentity,
+    ) -> ModelInvocationResponse:
         """Invoke exactly once while preserving application-service exceptions."""
 
         if not isinstance(request, ModelInvocationRequest):
             raise TypeError("request must be a ModelInvocationRequest")
+        if not isinstance(identity, TrustedCustomerIdentity):
+            raise TypeError("identity must be a TrustedCustomerIdentity")
         validated_request = ModelInvocationRequest.model_validate(
             request.model_dump(mode="python")
         )
@@ -60,6 +68,7 @@ class ModelInvocationMapper:
                 validated_request.system_instructions
                 or self._default_system_instructions
             ),
+            trusted_identity=identity,
         )
         return self.to_response(result)
 
@@ -75,7 +84,7 @@ class ModelInvocationMapper:
             result.model_dump(mode="python")
         )
         return ModelInvocationResponse(
-            content=validated_result.content,
+            content=privacy_service.protect_text(validated_result.content),
             provider_name=validated_result.provider_name,
             model_name=validated_result.model_name,
         )

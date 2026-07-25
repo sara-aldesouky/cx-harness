@@ -2,6 +2,8 @@
 
 import os
 from collections.abc import Generator
+from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
@@ -21,7 +23,11 @@ from tests.repositories.conftest import table_counts
 RENDER_SENTINEL = "postgresql://blocked:blocked@127.0.0.1:1/render_must_not_be_used"
 os.environ["DATABASE_URL"] = RENDER_SENTINEL
 
-from app.api.dependencies import get_db_session  # noqa: E402
+from app.api.dependencies import (  # noqa: E402
+    get_authenticated_customer_identity,
+    get_db_session,
+)
+from app.authentication import TrustedCustomerIdentity  # noqa: E402
 from app.config.settings import settings  # noqa: E402
 from app.main import app  # noqa: E402
 
@@ -66,6 +72,14 @@ def api_client(api_session: Session) -> Generator[TestClient, None, None]:
         yield api_session
 
     app.dependency_overrides[get_db_session] = override_database_session
+    app.dependency_overrides[get_authenticated_customer_identity] = lambda: (
+        TrustedCustomerIdentity(
+            customer_id=uuid4(),
+            authenticated_at=datetime.now(timezone.utc),
+            expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
+            authentication_method="test",
+        )
+    )
     with TestClient(app) as client:
         yield client
     app.dependency_overrides.clear()
