@@ -281,6 +281,831 @@ flowchart TB
 ```
 
 
+## Architecture Component Guide
+
+This guide explains the diagram for readers who are new to the project. A
+**provider** is an adapter to a model service such as Ollama. An
+**orchestrator** coordinates model turns, tool use, limits, and cleanup without
+containing provider-specific or business logic. A **model turn** is one request
+to a model and its response. A **tool call** is a structured request from the
+model to run an approved business capability. A **conversation execution** is
+the full lifecycle of one customer request, including all model turns and tool
+calls.
+
+The diagram contains two related paths. Live traffic enters through the FastAPI
+model-invocation route and joins the runtime described in Stages 2–7. Stage 1
+and Stages 8–11 are benchmark and reporting workflows. They execute or ingest
+measured conversations, but they do not participate in model reasoning during a
+normal customer request.
+
+### Stage 1 — Dataset and Campaign
+
+**Purpose:**
+This benchmark-only stage converts the fixed dataset into isolated cases that
+can be run consistently. It exists so every model sees the same questions,
+languages, categories, and expected behavior.
+
+**Input:**
+The approved benchmark dataset, selected models, repetitions, and campaign
+settings.
+
+**Output:**
+One validated Single Benchmark Case ready for the harness.
+
+#### Benchmark Dataset
+
+- **What it is and does:** The source file containing the 100 approved customer
+  cases.
+- **Why it is needed:** Keeping it unchanged makes model comparisons
+  reproducible.
+- **Receives:** Curated IDs, messages, languages, categories, and expectations.
+- **Returns:** The complete case collection for Dataset Validation.
+
+#### Dataset Validation
+
+- **What it is and does:** Checks required fields, unique IDs, languages, and
+  categories before execution.
+- **Why it is needed:** Bad source data must not create misleading benchmark
+  results.
+- **Receives:** The Benchmark Dataset.
+- **Returns:** A valid immutable case collection or a clear validation error.
+
+#### Campaign Runner
+
+- **What it is and does:** Coordinates benchmark models, cases, repetitions,
+  concurrency, and continuation.
+- **Why it is needed:** It runs campaigns consistently and continues recording
+  failed cases. It is not the live customer orchestrator.
+- **Receives:** Validated cases and campaign configuration.
+- **Returns:** Ordered case executions and their completion records.
+
+#### Case Loader
+
+- **What it is and does:** Converts one source row into the benchmark execution
+  format.
+- **Why it is needed:** Spreadsheet details remain outside the runtime.
+- **Receives:** Case ID, language, category, and customer message.
+- **Returns:** One normalized case definition.
+
+#### Single Benchmark Case
+
+- **What it is and does:** Represents one isolated customer execution.
+- **Why it is needed:** State, failures, and timings from one case must not leak
+  into another.
+- **Receives:** A normalized case definition.
+- **Returns:** A message and benchmark identity for Stage 2.
+
+**Connection to Stage 2:**
+The benchmark case enters the same provider-independent harness used for model
+execution. Live traffic instead enters through POST /api/v1/model/invoke and
+ModelPipelineService before joining that runtime.
+
+### Stage 2 — Provider-Independent CX Harness
+
+**Purpose:**
+This stage establishes trusted context and runs the bounded orchestration
+service. **Runtime composition** means constructing registries, providers,
+security services, repositories, and orchestration objects and injecting them
+into each other. build_model_tool_loop performs this composition without making
+a network request during construction.
+
+**Input:**
+A customer message, conversation ID, application-authenticated identity,
+history, system instructions, and provider/model configuration.
+
+**Output:**
+A ModelToolLoopTurnRequest for the selected provider.
+
+#### API or Request Entry Point
+
+- **What it is and does:** The live entry is POST /api/v1/model/invoke. Its
+  FastAPI route validates ModelInvocationRequest and maps safe errors to HTTP.
+- **Why it is needed:** Transport validation stays separate from runtime logic.
+- **Receives:** A public request and TrustedCustomerIdentity supplied by an
+  application authentication dependency.
+- **Returns:** One ModelPipelineService invocation.
+
+#### ModelPipelineService
+
+- **What it is and does:** The application boundary that protects text, builds
+  context, obtains the configured pipeline lazily, invokes it once, and maps the
+  result.
+- **Why it is needed:** API, CLI, tests, and future entry points can share one
+  safe application contract.
+- **Receives:** Conversation ID, message, history, system instructions, and
+  TrustedCustomerIdentity.
+- **Returns:** Safe content, provider name, and model name.
+
+#### ExecutionContext
+
+- **What it is and does:** An **execution context** is immutable metadata for
+  one run: trace, execution, and conversation IDs plus trusted customer ID,
+  role, and model.
+- **Why it is needed:** Downstream code must not trust identity generated by the
+  model.
+- **Receives:** Values established by the application and authentication layer.
+- **Returns:** Trusted correlation and identity data for authorization, tools,
+  persistence, and tracing.
+
+#### Identity & Security Boundary
+
+- **What it is and does:** Applies authentication, role policy, tool
+  authorization, ownership checks, privacy protection, and security auditing.
+- **Why it is needed:** A **trusted identity** must come from the application,
+  never from a prompt or provider argument.
+- **Receives:** Authenticated identity, requested capability/resource, and data.
+- **Returns:** Permission and protected data, or a safe structured failure.
+
+#### ConversationContext + ContextBuilder
+
+- **What it is and does:** ConversationContext is the immutable ordered
+  conversation; ContextBuilder validates and normalizes it.
+- **Why it is needed:** All providers receive the same stable conversation
+  meaning without mutating caller-owned input.
+- **Receives:** Protected instructions, history, current message, provider, and
+  model.
+- **Returns:** A valid ConversationContext.
+
+#### ProductionSystemPromptBuilder
+
+- **What it is and does:** Builds centralized, versioned customer-support
+  instructions.
+- **Why it is needed:** Every request uses the same language, safety, grounding,
+  and tool-use guidance.
+- **Receives:** Protected supplemental system instructions.
+- **Returns:** Final instructions for PromptManager.
+
+#### PromptManager → PromptPackage
+
+- **What it is and does:** Converts ConversationContext into the
+  provider-neutral PromptPackage.
+- **Why it is needed:** Conversation meaning remains independent of Ollama
+  formatting.
+- **Receives:** Valid ConversationContext.
+- **Returns:** Immutable ordered prompt messages and instructions.
+
+#### PromptAdapterRegistry
+
+- **What it is and does:** Selects the registered prompt translator for a
+  provider.
+- **Why it is needed:** The harness avoids provider-specific branches.
+- **Receives:** Provider name and PromptPackage.
+- **Returns:** A translated provider request representation.
+
+#### ProviderRegistry / ModelProvider
+
+- **What it is and does:** ProviderRegistry catalogues configured ModelProvider
+  implementations; ModelProvider is their common invocation contract.
+- **Why it is needed:** Providers can be exchanged without changing the
+  orchestrator.
+- **Receives:** Explicit registrations and a normalized provider name.
+- **Returns:** The selected provider through a neutral interface.
+
+#### BoundedModelToolLoopService
+
+- **What it is and does:** The central **orchestrator** and iteration service.
+  It runs finite model turns, coordinates tools, enforces limits, propagates
+  cancellation, prevents duplicates, and cleans run-local state.
+- **Why it is needed:** Model/tool execution must be bounded and deterministic.
+- **Receives:** ConversationContext, ExecutionContext, provider/model identity,
+  optional cancellation, and trusted customer message.
+- **Returns:** ModelToolLoopResult with a final response or structured
+  termination.
+
+#### ModelToolLoopTurnRequest
+
+- **What it is and does:** The immutable input for one model turn, including
+  conversation, tool definitions, prior outcomes, call history, and turn number.
+- **Why it is needed:** Every provider consumes one stable turn contract.
+- **Receives:** Current orchestrator state.
+- **Returns:** A provider-neutral request for Stage 3.
+
+**Connection to Stage 3:**
+ProviderRegistry resolves the configured provider. Only that provider builds
+its transport payload.
+
+### Stage 3 — Providers and Model Selection
+
+**Purpose:**
+This stage isolates model transport and response parsing. Model reasoning occurs
+inside the selected model; identity, authorization, binding, persistence, and
+evaluation remain deterministic application logic.
+
+**Input:** ModelToolLoopTurnRequest and provider/model names.
+**Output:** ModelToolLoopTurnResponse containing final text or ordered tool
+calls.
+
+#### Model Selection
+
+- **What/why:** Resolves the provider/model from ProviderRegistry without
+  provider-specific branches in orchestration.
+- **Receives/returns:** Receives normalized names and returns one registered
+  provider implementation.
+
+#### Qwen 3 8B / OllamaQwenProvider
+
+- **What/why:** The local Ollama adapter for Qwen in Agent Mode. It translates
+  messages and tools, applies Ollama settings, and validates responses.
+- **Receives/returns:** Receives ModelToolLoopTurnRequest and tool definitions;
+  returns normalized text or native tool calls with preserved IDs and order.
+
+#### Fanar 9B and Fanar 9B Instruct
+
+- **What/why:** Local Ollama models represented in Chat Mode because the current
+  deployments do not provide the native tool-calling behavior used by the agent
+  loop.
+- **Receives/returns:** Receive normal chat content and return text. Tool
+  metrics are unavailable for these Chat Mode runs.
+
+#### Future Models / ModelProviderAdapter
+
+- **What/why:** The extension point for new providers using the same contract,
+  so orchestration does not change.
+- **Receives/returns:** Receives neutral requests and returns neutral responses.
+
+#### Provider Request
+
+- **What/why:** The model-specific payload built only inside the provider
+  boundary. For Ollama it targets local /api/chat with messages, tools, context
+  size, output cap, timeout, and keep-alive settings.
+- **Receives/returns:** Receives normalized turn data and returns one transport
+  request.
+
+#### ModelToolLoopTurnResponse
+
+- **What/why:** The normalized result of one **model turn**. It contains either
+  final assistant text or ordered tool calls, avoiding ambiguous state.
+- **Receives/returns:** Receives a validated provider response and returns final
+  content or selections for Stage 4.
+
+**Connection to Stage 4:**
+Provider Tool-Call Detection chooses the direct-answer path or the mandatory
+trusted tool path.
+
+### Stage 4 — Tool Selection, Trusted Binding, and Execution
+
+**Purpose:**
+This stage converts model suggestions into validated and authorized business
+operations. The model may request a tool, but deterministic code decides whether
+it is known, trusted, permitted, and executable.
+
+**Input:** ModelToolLoopTurnResponse, ExecutionContext, ConversationState, and
+ToolRegistry metadata.
+**Output:** A direct answer, safe failure, or structured ToolResult.
+
+#### Provider Tool-Call Detection and Executable tool call?
+
+- **What/why:** Detection converts native calls to ToolSelectionRequest. The
+  decision diamond separates final text from executable calls.
+- **Receives/returns:** Receives ModelToolLoopTurnResponse and returns ordered
+  selections or the No — Final Model Response path.
+
+#### No — Final Model Response
+
+- **What/why:** The provider-neutral answer used when no business tool is needed
+  and grounding rules permit a direct response.
+- **Receives/returns:** Receives final model content and returns ModelResponse to
+  Stage 7.
+
+#### ToolSelectionService
+
+- **What/why:** Coordinates provider-neutral translation through
+  ProviderToolCallAdapterRegistry while preserving IDs, versions, arguments,
+  and order.
+- **Receives/returns:** Receives provider call data and returns ordered
+  ToolSelectionRequest objects.
+
+#### ToolRegistry
+
+- **What/why:** The central catalogue of approved tools. It records metadata,
+  schema, version, capability, and enabled state and rejects duplicates or
+  unknown tools.
+- **Receives/returns:** Receives explicit startup registrations and lookup names;
+  returns immutable definitions or a registered tool class.
+
+#### TrustedSelectionPipeline
+
+- **What/why:** The mandatory boundary that performs trusted binding before
+  schema validation. Original provider identifiers are discarded after binding.
+- **Receives/returns:** Receives ToolSelectionRequest, trusted execution values,
+  conversation state, and trusted message; returns a bound validated selection
+  or fail-closed failure.
+
+#### TrustedArgumentBinder
+
+- **What/why:** **Argument binding** injects or replaces protected arguments
+  from trusted runtime values and verified entity resolution. Model-supplied
+  customer/order identity never becomes authority.
+- **Receives/returns:** Receives selection, policy, TrustedExecutionValues, and
+  verified resolution; returns BoundToolSelectionRequest or safe failure.
+
+#### OrderEntityResolver
+
+- **What/why:** The sole trusted source of resolved order identity. It verifies
+  explicit or state-derived references through a customer-scoped repository.
+- **Receives/returns:** Receives authenticated customer scope and an order
+  candidate; returns verified EntityResolutionResult or clarification,
+  forbidden, not-found, stale, or invalid outcome.
+
+#### ConversationState
+
+- **What/why:** Immutable revisioned continuity across turns. It is context, not
+  authorization, so every protected reference still requires verification.
+- **Receives/returns:** Receives verified entities/tool outcomes and returns
+  focus/candidates, never a directly executable protected ID.
+
+#### ToolSelectionResolver
+
+- **What/why:** Resolves tool version and validates bound arguments against the
+  Pydantic input schema after binding.
+- **Receives/returns:** Receives BoundToolSelectionRequest and ToolRegistry;
+  returns ValidatedToolSelection or structured validation failure.
+
+#### Authorization & Policy Checks
+
+- **What/why:** Applies role policy, tool permission, ownership, and privacy
+  checks using application identity rather than model claims.
+- **Receives/returns:** Receives trusted identity, metadata, and bound arguments;
+  returns permission or denial before execution.
+
+#### SingleToolExecutionGateway
+
+- **What/why:** The only execution path into ToolExecutor or
+  WriteFrameworkExecutor, guaranteeing one validated invocation.
+- **Receives/returns:** Receives validated, authorized, bound selection and
+  ExecutionContext; returns ToolExecutionOutcome.
+
+#### Customer
+
+- **What/why:** get_customer_profile and get_customer_summary expose minimized
+  customer-safe data.
+- **Receives/returns:** Receives trusted customer scope and returns structured
+  customer information or business failure.
+
+#### Orders
+
+- **What/why:** Status, current-order, detail, history, and item tools answer
+  transactional questions from PostgreSQL rather than model memory.
+- **Receives/returns:** Receives customer scope and verified order when needed;
+  returns customer-safe order data or failure.
+
+#### Delivery
+
+- **What/why:** Provides status, ETA, window, latest event, and history.
+- **Receives/returns:** Receives verified customer/order scope and returns
+  trusted delivery facts or availability failure.
+
+#### Payments & Refunds
+
+- **What/why:** Provides status, method, summary, history, events, and
+  eligibility without processor secrets.
+- **Receives/returns:** Receives verified scope and returns customer-safe
+  financial facts or business outcomes.
+
+#### Knowledge
+
+- **What/why:** Provides approved search, policy, FAQ, and related articles.
+  Policy evidence cannot prove customer-specific transactional state.
+- **Receives/returns:** Receives a knowledge query and returns published active
+  content.
+
+#### Controlled Writes
+
+- **What/why:** cancel_order, update_delivery_address, initiate_refund, and
+  create_support_ticket use WriteFrameworkExecutor, transactions, and
+  idempotency.
+- **Receives/returns:** Receive trusted validated authorized arguments and
+  return WriteResult; success commits and failure rolls back.
+
+**Connection to Stage 5:**
+Tools call repositories instead of raw SQL. Repositories read or change the
+trusted database inside the established transaction boundary.
+
+### Stage 5 — Repository Boundary
+
+**Purpose:**
+A **repository** hides database queries behind domain operations. This keeps
+SQLAlchemy and persistence rules out of business tools.
+
+**Input:** Validated domain queries or commands.
+**Output:** Domain records, controlled absence results, or managed updates.
+
+#### SQLAlchemy Repository Layer
+
+- **What/why:** Owns query construction and session use so tools contain no raw
+  SQL.
+- **Receives/returns:** Receives scoped parameters/changes and returns domain
+  data or controlled persistence failure.
+
+#### Business Repositories
+
+- **What/why:** CustomerRepository, OrderRepository, OrderItemRepository,
+  DeliveryRepository, PaymentRepository, RefundRepository, and
+  KnowledgeRepository implement domain persistence.
+- **Receives/returns:** Receive trusted IDs and criteria; return entities or safe
+  empty/not-found outcomes.
+
+#### Execution Repositories
+
+- **What/why:** ConversationRepository, MessageRepository,
+  ToolCallRepository/ToolCallAuditRepository,
+  ModelRunRepository/ModelRunAuditRepository, and EvaluationRepository keep
+  execution evidence separate from business records.
+- **Receives/returns:** Receive sanitized execution records and return persisted
+  records or operational read models.
+
+**Connection to Stage 6:**
+Repositories use SQLAlchemy sessions against the Alembic-managed PostgreSQL
+schema.
+
+### Stage 6 — PostgreSQL: Trusted Business and Execution Data
+
+**Purpose:**
+PostgreSQL is the durable source of truth for business state and execution
+records. Foreign keys preserve ownership and lifecycle relationships.
+
+**Input:** Repository queries and sanitized persistence records.
+**Output:** Trusted business facts and durable execution evidence.
+
+#### PostgreSQL
+
+- **What/why:** The relational store providing constraints, transactions, and
+  consistent reads through SQLAlchemy sessions.
+- **Receives/returns:** Receives repository operations and returns rows or
+  committed transaction outcomes.
+
+#### customers, orders, and order_items
+
+- **What/why:** customers stores profile/language; orders stores public number,
+  status, payment status, total, and ownership; order_items stores products,
+  quantities, and prices. Sensitive fields are minimized before exposure.
+- **Receives/returns:** Receive business records and return customer-scoped
+  profile, order, and item data.
+
+#### conversations and messages
+
+- **What/why:** conversations stores customer, status, channel, and active model;
+  messages stores ordered role/content using sequence_number.
+- **Receives/returns:** Receive sanitized lifecycle/message records and return
+  conversation scope/history.
+
+#### model_runs
+
+- **What/why:** Stores provider/model, status, timestamps, latency, and token
+  counts for each invocation.
+- **Receives/returns:** Receives model lifecycle metadata and returns auditable
+  model-run evidence.
+
+#### tool_calls
+
+- **What/why:** Stores tool/version, status, sanitized arguments/results,
+  duration, and correlation without unrestricted sensitive payloads.
+- **Receives/returns:** Receives ToolExecutor audit events and returns execution
+  evidence.
+
+#### evaluations
+
+- **What/why:** Stores pass status, intent/tool scores, overall score, and
+  grounding/hallucination evidence.
+- **Receives/returns:** Receives structured evaluation and returns durable
+  reporting evidence.
+
+#### Database relationships
+
+- **What/why:** Customers own orders/conversations; orders own items;
+  conversations own messages/model runs; model runs own tool calls/evaluations.
+  Order context in tool_calls is logical sanitized payload context, not a direct
+  order foreign key.
+- **Receives/returns:** Receives related records and returns referential
+  integrity.
+
+**Connection to Stage 7:**
+Repository data becomes ToolResult and ToolExecutionOutcome. Grounding and
+continuation decide how the model may use it.
+
+### Stage 7 — Grounded Continuation and Termination
+
+**Purpose:**
+This stage returns tool evidence to the model and ends execution predictably.
+**Grounding** means customer-specific claims are supported by verified tool
+results instead of guesses. A **termination policy** defines why the bounded
+loop stops.
+
+**Input:** Tool outcomes or direct final content plus run-local state.
+**Output:** Safe final response, structured termination, and trace.
+
+#### ToolResult → ToolExecutionOutcome
+
+- **What/why:** Normalizes tool success, business failure, and technical error
+  into one provider-independent result.
+- **Receives/returns:** Receives ToolResult or WriteResult and returns sanitized
+  ToolExecutionOutcome with call identity.
+
+#### BusinessGroundingPolicy
+
+- **What/why:** Checks capability-based transactional evidence and keeps policy
+  evidence separate, without hard-coded business tool names.
+- **Receives/returns:** Receives message classification, tool metadata, and
+  outcomes; returns permission to answer or safe grounding failure.
+
+#### ToolContinuationCycle and ProviderContinuationAdapterRegistry
+
+- **What/why:** ToolContinuationCycle connects ordered calls, outcomes, and
+  continuation payloads. The registry selects provider-specific result
+  translation without changing orchestration.
+- **Receives/returns:** Receive selections/outcomes/provider name and return
+  ProviderContinuationPayload values.
+
+#### Model Receives Tool Result and Continue Tool Loop
+
+- **What/why:** Adds tool-call and result messages to the working conversation.
+  If another tool is requested, control returns to Stage 4 with ordering and
+  duplicate protection intact.
+- **Receives/returns:** Receives continuation data and returns updated context
+  or another protected tool cycle.
+
+#### Final Model Response
+
+- **What/why:** The normalized, grounded, validated, privacy-protected customer
+  answer.
+- **Receives/returns:** Receives terminal assistant content/evidence and returns
+  safe ModelResponse.
+
+#### OrchestrationExecutionTrace
+
+- **What/why:** A **trace** is a chronological diagnostic record of provider
+  turns, tool executions, durations, failures, termination, and cleanup without
+  raw secrets.
+- **Receives/returns:** Receives loop events and returns an immutable trace and
+  diagnostic summary.
+
+#### Termination & Safety Policies
+
+- **What/why:** Defines final, maximum-turn, invalid-call, business-failure,
+  timeout, cancellation, provider-error, grounding, and cleanup outcomes.
+- **Receives/returns:** Receives state, time, turn count, errors, and grounding
+  decision; returns structured ModelToolLoopResult and termination metadata.
+
+**Connection to Stage 8:**
+Live execution returns its response here. Benchmark execution separately
+normalizes evidence into artifacts for Stage 16.2 ingestion.
+
+### Stage 8 — Normalized Benchmark Ingestion (Stage 16.2)
+
+**Purpose:**
+This benchmark-only stage validates and stores completed execution evidence. An
+**artifact** is an immutable structured record. **Ingestion** is its controlled
+validation and persistence. **Atomic persistence** commits all rows for a case
+together or rolls them all back.
+
+**Input:** Completed conversation, provider turns, tool executions,
+termination, and evaluation evidence.
+**Output:** Idempotently persisted analytics records.
+
+#### CompletedConversationExecution
+
+- **What/why:** The top-level artifact grouping one benchmark conversation and
+  all its evidence.
+- **Receives/returns:** Receives completed runtime evidence and returns one
+  immutable ingestion request.
+
+#### ProviderTurnExecution
+
+- **What/why:** Records each provider turn's ordering, response type, tokens,
+  latency, and safe failure information.
+- **Receives/returns:** Receives normalized turn evidence and returns ordered
+  turn records.
+
+#### ToolExecutionArtifact
+
+- **What/why:** Records each requested/executed tool with call ID, identity,
+  status, duration, and sanitized evidence.
+- **Receives/returns:** Receives tool outcomes and returns tool-execution
+  records.
+
+#### RuntimeTerminationArtifact
+
+- **What/why:** Captures the stable reason and completion state at execution end.
+- **Receives/returns:** Receives ModelToolLoopResult termination data and returns
+  completion/failure evidence.
+
+#### DeterministicEvaluationArtifact
+
+- **What/why:** Stores metrics and failure signals produced by deterministic
+  application rules. **Evaluation** compares expected behavior with evidence;
+  the model does not grade itself.
+- **Receives/returns:** Receives expectations and normalized execution and
+  returns metrics/failures.
+
+#### Validation & Sanitization
+
+- **What/why:** Checks immutable contracts, ordering, identities, payload
+  limits, and privacy. It also performs deterministic cost mapping from token
+  use and configured prices.
+- **Receives/returns:** Receives CompletedConversationExecution and returns
+  storage-safe artifacts or rejection without partial writes.
+
+#### BenchmarkIngestionService
+
+- **What/why:** Coordinates suite/run lifecycle, idempotency, conflict
+  detection, atomic case ingestion, and finalization.
+- **Receives/returns:** Receives valid artifacts and returns created/confirmed
+  records and run status.
+
+#### Benchmark Analytics Repositories
+
+- **What/why:** Suite, Run, ConversationResult, Turn, ToolExecution, Metric, and
+  Failure repositories isolate analytics persistence.
+- **Receives/returns:** Receive storage commands/read queries and return
+  analytics entities or snapshots.
+
+#### Persist Benchmark Result
+
+- **What/why:** The benchmark suites, runs, conversations, provider turns, tool
+  executions, metrics, and failure tables.
+- **Receives/returns:** Receives atomic repository writes and returns durable
+  evidence for Stage 9.
+
+**Connection to Stage 9:**
+Analytics reads stored metrics and failure evidence. Presentation does not
+silently recalculate them.
+
+### Stage 9 — Deterministic Evaluation and Analytics
+
+**Purpose:**
+This stage organizes evidence into comparable quality, safety, performance, and
+cost measures. It is deterministic application logic, not model reasoning.
+
+**Input:** Persisted cases, turns, tools, metrics, and failures.
+**Output:** Evaluation evidence ready for reporting.
+
+#### Evaluation Evidence
+
+- **What/why:** The stored source of truth for scores and failure signals so
+  reports remain reproducible.
+- **Receives/returns:** Receives DeterministicEvaluationArtifact records and
+  returns stable metrics.
+
+#### Intent Accuracy · Grounding · Hallucination · Tool Selection · Argument Validation · Tool Success
+
+- **What/why:** Measures understanding, supporting evidence, unsupported claims,
+  correct tool choice, valid arguments, and execution success.
+- **Receives/returns:** Receives expected behavior and execution evidence and
+  returns criterion scores/failures.
+
+#### Business/Task Completion · Authorization · Latency · Token Usage · Cost · Failure Category & Responsibility
+
+- **What/why:** Measures outcome, security, efficiency, and cost. Failure
+  classification assigns a stable cause/layer so a provider timeout is not
+  mislabeled as wrong tool selection.
+- **Receives/returns:** Receives termination, trace, token, timing, cost, and
+  task evidence; returns metrics and categorized failures.
+
+**Connection to Stage 10:**
+BenchmarkReportingRepository loads a complete analytics snapshot for
+deterministic aggregation.
+
+### Stage 10 — Reporting Engine (Stage 16.3)
+
+**Purpose:**
+This read-only stage aggregates stored evidence into run summaries and model
+comparisons. It does not execute models, tools, or evaluation.
+
+**Input:** Compatible runs and persisted metrics.
+**Output:** Reporting contracts for summaries and comparisons.
+
+#### BenchmarkReportingRepository
+
+- **What/why:** Loads a complete read-only analytics snapshot.
+- **Receives/returns:** Receives run/comparison IDs and returns cases, metrics,
+  failures, turns, and tools.
+
+#### BenchmarkReportingService
+
+- **What/why:** Applies ScoringPolicy and compatibility checks to produce
+  deterministic totals, rates, rankings, and winners.
+- **Receives/returns:** Receives repository snapshots and returns immutable
+  reporting contracts.
+
+#### Run Summary · Language Performance · Category Performance · Failure Analysis
+
+- **What/why:** Shows overall results, language/category slices, and failure
+  counts/explanations.
+- **Receives/returns:** Receives aggregated case evidence and returns summary
+  sections.
+
+#### Latency Analysis · Token Analysis · Cost Analysis · Tool Performance · Model Comparison + Winner Explanation
+
+- **What/why:** Shows speed, usage, cost, tool reliability, per-metric winners,
+  and the documented overall winner.
+- **Receives/returns:** Receives compatible reporting snapshots and returns
+  comparison evidence.
+
+**Connection to Stage 11:**
+BenchmarkPresentationService exposes reporting contracts without changing
+their calculations.
+
+### Stage 11 — Presentation and Export (Stage 16.4)
+
+**Purpose:**
+This stage makes read-only benchmark evidence usable by managers and engineers.
+It formats reporting data without changing scoring or stored facts.
+
+**Input:** Immutable Stage 16.3 reporting contracts.
+**Output:** Dashboard, HTTP responses, Excel/CSV, and manager report.
+
+#### BenchmarkPresentationService
+
+- **What/why:** The read-only facade for report discovery, run detail,
+  comparison, and case evidence.
+- **Receives/returns:** Receives IDs/filters and returns presentation models.
+
+#### FastAPI Reporting Routes
+
+- **What/why:** Endpoints for runs, details, comparisons, and downloads. They
+  are separate from the live invocation API in Stage 2.
+- **Receives/returns:** Receive validated parameters and return JSON/files.
+
+#### Next.js Benchmark Dashboard
+
+- **What/why:** Interactive KPIs, charts, filters, case evidence, detailed case
+  viewer, and comparison.
+- **Receives/returns:** Receives reporting API responses and returns browser
+  views.
+
+#### Presentation Exports
+
+- **What/why:** ExcelExporter creates workbooks with native charts and wrapped
+  evidence; CsvZipExporter creates deterministic CSV tables.
+- **Receives/returns:** Receive reporting contracts and return Excel or CSV ZIP.
+
+#### Manager-Ready Benchmark Report
+
+- **What/why:** Combines metrics, limitations, evidence, comparisons, and winner
+  explanations into a decision-ready package.
+- **Receives/returns:** Receives reporting data/exports and returns the final
+  reviewable report.
+
+**Connection after Stage 11:**
+This ends benchmark reporting. Every aggregate remains traceable to persisted
+case, turn, tool, metric, and failure evidence.
+
+## Architecture Stage Summary
+
+| Stage | Responsibility | Main Input | Main Output |
+|---|---|---|---|
+| 1 | Validate and schedule benchmark cases | Fixed 100-case dataset | Isolated benchmark case |
+| 2 | Build trusted context and orchestrate execution | Message and trusted identity | Model turn request |
+| 3 | Invoke the selected provider | Neutral turn request | Text or tool calls |
+| 4 | Bind, validate, authorize, and execute tools | Provider selection | Structured tool outcome |
+| 5 | Isolate persistence operations | Domain query/command | Domain record/update |
+| 6 | Store business and execution truth | Repository operation | Trusted rows/transaction |
+| 7 | Ground continuation and terminate safely | Tool outcome or text | Response, termination, trace |
+| 8 | Validate and atomically ingest artifacts | Completed benchmark execution | Persisted analytics |
+| 9 | Organize deterministic evaluation | Metrics, tools, turns, failures | Comparable evidence |
+| 10 | Aggregate reports and comparisons | Analytics snapshot | Reporting contracts |
+| 11 | Present and export results | Reporting contracts | Dashboard and exports |
+
+## Example: How a Customer Request Moves Through the Harness
+
+Consider: **“Where is my order?”**
+
+1. The client sends ModelInvocationRequest to POST /api/v1/model/invoke.
+   FastAPI validates the public request.
+2. The authentication dependency supplies TrustedCustomerIdentity. The model
+   cannot choose or override customer_id, conversation_id, or role.
+3. ModelPipelineService protects message/history; ProductionSystemPromptBuilder
+   and ContextBuilder produce immutable ConversationContext.
+4. build_model_tool_loop composes registries, TrustedSelectionPipeline,
+   security services, repositories, OllamaQwenProvider, and the orchestrator.
+   This is dependency construction, not model reasoning.
+5. BoundedModelToolLoopService creates provider turn 1 and sends
+   ModelToolLoopTurnRequest with context and approved tool definitions.
+6. Qwen requests list_current_orders or get_order_status instead of guessing.
+   Tool-call detection preserves the call ID and arguments.
+7. ToolRegistry confirms the tool. TrustedArgumentBinder takes identity only
+   from ExecutionContext. OrderEntityResolver verifies any order in the
+   authenticated customer's repository scope; ConversationState cannot
+   authorize or directly inject it.
+8. ToolSelectionResolver validates bound arguments. Role, tool, ownership, and
+   privacy checks approve or stop execution.
+9. SingleToolExecutionGateway invokes the tool exactly once. The tool reads
+   PostgreSQL through OrderRepository and never treats model identity as
+   authority.
+10. Repository data becomes ToolResult and ToolExecutionOutcome.
+    BusinessGroundingPolicy recognizes verified transactional evidence.
+11. ToolContinuationCycle formats the result for Ollama. Qwen now explains
+    verified status instead of inventing it.
+12. The response is validated and privacy-protected. Termination & Safety
+    Policies record the outcome and clean temporary state.
+13. OrchestrationExecutionTrace records provider turns, tool executions,
+    timing, termination, correlation, and cleanup without raw secrets.
+14. For a benchmark case only, the evidence becomes
+    CompletedConversationExecution and child artifacts.
+    BenchmarkIngestionService validates, sanitizes, cost-maps, and atomically
+    persists them. Live traffic does not require benchmark ingestion to return
+    its response.
+
 ## Backend development
 
 From the repository root:
