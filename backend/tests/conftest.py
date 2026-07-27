@@ -1,8 +1,11 @@
 """Shared pytest fixtures for isolated PostgreSQL testing."""
 
 import os
+import subprocess
+import sys
 from collections.abc import Generator
 from pathlib import Path
+from uuid import uuid4
 
 import pytest
 from dotenv import dotenv_values, load_dotenv
@@ -58,10 +61,45 @@ def get_test_database_url() -> str:
 
 
 @pytest.fixture(scope="session")
-def test_database_url() -> str:
-    """Return the explicitly configured, isolated test database URL."""
+def test_database_url() -> Generator[str, None, None]:
+    """Create one disposable migrated database for this pytest session."""
 
-    return get_test_database_url()
+    configured_url = make_url(get_test_database_url())
+    database_name = f"{configured_url.database}_pytest_{uuid4().hex[:12]}"
+    if len(database_name) > 63:
+        database_name = f"cx_test_pytest_{uuid4().hex[:12]}"
+    session_url = configured_url.set(database=database_name)
+    maintenance_url = configured_url.set(database="postgres")
+    maintenance_engine = create_engine(
+        maintenance_url,
+        isolation_level="AUTOCOMMIT",
+        pool_pre_ping=True,
+    )
+    with maintenance_engine.connect() as connection:
+        connection.exec_driver_sql(f'CREATE DATABASE "{database_name}"')
+
+    environment = {
+        **os.environ,
+        "DATABASE_URL": session_url.render_as_string(hide_password=False),
+    }
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "alembic", "-c", "alembic.ini", "upgrade", "heads"],
+            cwd=PROJECT_ROOT / "backend",
+            env=environment,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        yield session_url.render_as_string(hide_password=False)
+    finally:
+        with maintenance_engine.connect() as connection:
+            connection.exec_driver_sql(
+                "SELECT pg_terminate_backend(pid) FROM pg_stat_activity "
+                f"WHERE datname = '{database_name}' AND pid <> pg_backend_pid()"
+            )
+            connection.exec_driver_sql(f'DROP DATABASE IF EXISTS "{database_name}"')
+        maintenance_engine.dispose()
 
 
 @pytest.fixture(scope="session")

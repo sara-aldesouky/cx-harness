@@ -44,7 +44,9 @@ def test_openapi_and_docs_expose_expected_versioned_surface(api_client):
 
     assert docs.status_code == openapi.status_code == 200
     schema = openapi.json()
-    assert len(schema["paths"]) == 22
+    assert len(schema["paths"]) == 29
+    assert "/api/v1/benchmark-reporting/runs" in schema["paths"]
+    assert "/api/v1/benchmark-reporting/comparisons" in schema["paths"]
     assert {
         method
         for operations in schema["paths"].values()
@@ -66,6 +68,7 @@ def test_openapi_and_docs_expose_expected_versioned_surface(api_client):
         "Evaluations",
         "Overview",
         "Model Invocation",
+        "Benchmark Reporting",
     }
     assert "/api/v1/orders/by-number/{order_number}" in schema["paths"]
     assert "/api/v1/model/invoke" in schema["paths"]

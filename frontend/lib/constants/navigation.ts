@@ -1,5 +1,6 @@
 import {
   Boxes,
+  ChartNoAxesCombined,
   Gauge,
   MessagesSquare,
   Package,
@@ -21,6 +22,11 @@ export interface NavigationItem {
 
 export const navigationItems: NavigationItem[] = [
   { label: "Overview", href: "/", icon: Gauge },
+  {
+    label: "Benchmarks",
+    href: "/benchmark-reporting",
+    icon: ChartNoAxesCombined,
+  },
   { label: "Customers", href: "/customers", icon: Users },
   { label: "Orders", href: "/orders", icon: Package },
   {

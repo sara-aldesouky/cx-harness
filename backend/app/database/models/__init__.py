@@ -12,6 +12,15 @@ from app.database.models.order_item import OrderItem
 from app.database.models.payment import Payment, PaymentEvent
 from app.database.models.refund import Refund, RefundEligibility, RefundEvent
 from app.database.models.tool_call import ToolCall
+from app.database.models.benchmark_analytics import (
+    BenchmarkConversationResult,
+    BenchmarkFailureEvent,
+    BenchmarkMetricResult,
+    BenchmarkProviderTurn,
+    BenchmarkRun,
+    BenchmarkSuite,
+    BenchmarkToolExecution,
+)
 
 __all__ = [
     "Conversation",
@@ -31,4 +40,11 @@ __all__ = [
     "RefundEligibility",
     "RefundEvent",
     "ToolCall",
+    "BenchmarkSuite",
+    "BenchmarkRun",
+    "BenchmarkConversationResult",
+    "BenchmarkProviderTurn",
+    "BenchmarkToolExecution",
+    "BenchmarkMetricResult",
+    "BenchmarkFailureEvent",
 ]

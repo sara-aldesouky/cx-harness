@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     database_url: str = ""
     active_model: str = "gemini"
     environment: str = "development"
+    cors_allowed_origins: str = "http://localhost:3000"
     authentication_hmac_secret: Optional[SecretStr] = None
     security_audit_pseudonym_key: Optional[SecretStr] = None
     audit_payload_max_bytes: int = Field(default=16_384, gt=0)
@@ -37,6 +38,35 @@ class Settings(BaseSettings):
     max_provider_response_bytes: int = Field(
         default=1_048_576, gt=0, le=50_000_000
     )
+
+    @property
+    def allowed_cors_origins(self) -> tuple[str, ...]:
+        """Return normalized explicit origins without allowing wildcards."""
+
+        origins = tuple(
+            item.strip().rstrip("/")
+            for item in self.cors_allowed_origins.split(",")
+            if item.strip()
+        )
+        if not origins:
+            raise ValueError("CORS_ALLOWED_ORIGINS must contain at least one origin")
+        for origin in origins:
+            parsed = urlparse(origin)
+            if (
+                parsed.scheme not in {"http", "https"}
+                or not parsed.netloc
+                or parsed.path not in {"", "/"}
+                or parsed.params
+                or parsed.query
+                or parsed.fragment
+                or parsed.username
+                or parsed.password
+                or origin == "*"
+            ):
+                raise ValueError(
+                    "CORS_ALLOWED_ORIGINS must contain explicit HTTP(S) origins"
+                )
+        return tuple(dict.fromkeys(origins))
 
     @field_validator("ollama_base_url")
     @classmethod

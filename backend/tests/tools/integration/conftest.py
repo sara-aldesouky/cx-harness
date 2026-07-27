@@ -40,12 +40,12 @@ def migrated_application_test_database(
     settings.database_url = test_database_url
 
     alembic_config = Config(str(BACKEND_ROOT / "alembic.ini"))
-    command.upgrade(alembic_config, "head")
+    command.upgrade(alembic_config, "heads")
 
     scripts = ScriptDirectory.from_config(alembic_config)
     with test_engine.connect() as connection:
-        live_revision = MigrationContext.configure(connection).get_current_revision()
-    assert live_revision == scripts.get_current_head()
+        live_revisions = set(MigrationContext.configure(connection).get_current_heads())
+    assert live_revisions == set(scripts.get_heads())
 
     try:
         yield
