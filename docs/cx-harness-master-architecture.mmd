@@ -1,0 +1,228 @@
+%% CX Harness — complete master architecture flow (executive presentation edition)
+%% Rendered assets live in docs/assets/architecture/.
+%%{init: {"theme":"base","flowchart":{"curve":"stepAfter","nodeSpacing":44,"rankSpacing":72,"padding":22,"htmlLabels":true},"themeVariables":{"background":"#FAFAFA","primaryColor":"#FFFFFF","primaryTextColor":"#172033","primaryBorderColor":"#D5DAE3","lineColor":"#4F6B95","secondaryColor":"#FFFFFF","tertiaryColor":"#FFFFFF","clusterBkg":"#FAFAFA","clusterBorder":"#FAFAFA","fontFamily":"Inter, SF Pro Display, Segoe UI, Arial, sans-serif","fontSize":"17px"},"themeCSS":".node rect { rx: 14px; ry: 14px; filter: drop-shadow(0 3px 5px rgba(15,23,42,.10)); } .node polygon { filter: drop-shadow(0 3px 5px rgba(15,23,42,.10)); } .cluster rect { fill: transparent !important; stroke: transparent !important; } .cluster-label span { color: #1D4ED8 !important; font-size: 25px !important; font-weight: 750 !important; letter-spacing: .06em; } .edgeLabel { background-color: #FAFAFA !important; color: #475569 !important; font-size: 14px !important; } .flowchart-link { stroke-linecap: round; stroke-linejoin: round; }"}}%%
+flowchart TB
+
+  subgraph DATASET["1 · DATASET & CAMPAIGN"]
+    direction TB
+    DS["<b>Benchmark Dataset</b><br/>CX_Benchmark_100_Test_Cases.numbers<br/>100 customer cases"]
+    DV["<b>Dataset Validation</b><br/>immutable source · 100 unique case IDs<br/>language and category validation"]
+    CR["<b>Campaign Runner</b><br/>models × cases × repetitions<br/>concurrency and continuation policy"]
+    CL["<b>Case Loader</b><br/>Case ID · Language · Category · Customer Message"]
+    BC["<b>Single Benchmark Case</b><br/>one isolated customer execution"]
+    DS --> DV --> CR --> CL --> BC
+  end
+
+  subgraph HARNESS["2 · PROVIDER-INDEPENDENT CX HARNESS"]
+    direction TB
+    EC["<b>ExecutionContext</b><br/>trace_id · execution_id · conversation_id<br/>trusted customer_id · principal_role · model_name"]
+    SEC["<b>Identity & Security Boundary</b><br/>• Authentication + trusted identity<br/>• Role, tool, ownership + privacy policy"]
+    CB["<b>ConversationContext + ContextBuilder</b><br/>immutable ordered messages<br/>trusted conversation identity"]
+    PB["<b>ProductionSystemPromptBuilder</b><br/>Production System Prompt<br/>PromptManager → PromptPackage"]
+    PA["<b>PromptAdapterRegistry</b><br/>provider-neutral prompt adapter boundary"]
+    PR["<b>ProviderRegistry / ModelProvider</b><br/>provider-independent model contract<br/>capability metadata"]
+    LOOP["<b>BoundedModelToolLoopService</b><br/>• Finite, deterministic provider turns<br/>• Timeout, cancellation + correlation"]
+    REQ["<b>ModelToolLoopTurnRequest</b><br/>system instructions · working conversation<br/>tool definitions · prior tool outcomes"]
+    EC --> SEC --> CB --> PB --> PA --> PR --> LOOP --> REQ
+  end
+
+  subgraph PROVIDERS["3 · PROVIDERS & MODEL SELECTION"]
+    direction TB
+    MS{"<b>Model Selection</b>"}
+    QW["<b>Qwen 3 8B</b><br/>OllamaQwenProvider<br/>Agent Mode · native tool calling"]
+    F9["<b>Fanar 9B</b><br/>local Ollama deployment<br/>Chat Mode · tools unavailable"]
+    FI["<b>Fanar 9B Instruct</b><br/>local Ollama deployment<br/>Chat Mode · tools unavailable"]
+    FM["<b>Future Models</b><br/>ModelProviderAdapter<br/>registered without orchestrator branching"]
+    MRQ["<b>Provider Request</b><br/>local Ollama /api/chat<br/>configured context · output cap · timeout"]
+    MRS["<b>ModelToolLoopTurnResponse</b><br/>• Final response<br/>• Or ordered tool calls"]
+    MS --> QW --> MRQ
+    MS --> F9 --> MRQ
+    MS --> FI --> MRQ
+    MS --> FM --> MRQ
+    MRQ --> MRS
+  end
+
+  subgraph TOOLING["4 · TOOL SELECTION, TRUSTED BINDING & EXECUTION"]
+    direction TB
+    TCD["<b>Provider Tool-Call Detection</b><br/>Ollama native tool_calls → ToolSelectionRequest"]
+    NEED{"<b>Executable tool call?</b>"}
+    DIRECT["<b>No — Final Model Response</b><br/>validated provider-neutral ModelResponse"]
+    TS["<b>ToolSelectionService</b><br/>ProviderToolCallAdapterRegistry<br/>ordered neutral selections"]
+    TR["<b>ToolRegistry</b><br/>metadata · enabled tools · versions<br/>duplicate/unknown protection"]
+    BIND["<b>TrustedSelectionPipeline</b><br/>• TrustedArgumentBinder + OrderEntityResolver<br/>• Provider identifiers never become authority"]
+    SCHEMA["<b>ToolSelectionResolver</b><br/>Pydantic tool-schema validation<br/>validated bound arguments only"]
+    AUTH["<b>Authorization & Policy Checks</b><br/>• Role + tool authorization<br/>• Ownership + privacy protection"]
+    TG["<b>SingleToolExecutionGateway</b><br/>ToolExecutor / WriteFrameworkExecutor<br/>exactly one validated invocation"]
+
+    subgraph TOOLS["Registered Business Capabilities"]
+      direction LR
+      CT["<b>Customer</b><br/>get_customer_profile<br/>get_customer_summary"]
+      OT["<b>Orders</b><br/>• Status, current + detail<br/>• History + items"]
+      DT["<b>Delivery</b><br/>• Status, ETA + window<br/>• Latest event + history"]
+      PT["<b>Payments & Refunds</b><br/>• Status, method, summary + history<br/>• Refund lifecycle + eligibility"]
+      KT["<b>Knowledge</b><br/>• Search, policy + FAQ<br/>• Related approved articles"]
+      WT["<b>Controlled Writes</b><br/>• Cancel, address, refund + support<br/>• Transaction + idempotency framework"]
+    end
+
+    TCD --> NEED
+    NEED -- "No" --> DIRECT
+    NEED -- "Yes" --> TS --> TR --> BIND --> SCHEMA --> AUTH --> TG
+    TG --> CT
+    TG --> OT
+    TG --> DT
+    TG --> PT
+    TG --> KT
+    TG --> WT
+  end
+
+  subgraph REPOSITORIES["5 · REPOSITORY BOUNDARY"]
+    direction TB
+    RP["<b>SQLAlchemy Repository Layer</b><br/>business tools never issue raw SQL"]
+    R1["<b>Business Repositories</b><br/>• Customer, Order, Item + Delivery<br/>• Payment, Refund + Knowledge"]
+    R2["<b>Execution Repositories</b><br/>• Conversation, Message + ToolCall<br/>• ModelRun + Evaluation"]
+    RP --> R1
+    RP --> R2
+  end
+
+  subgraph DATABASE["6 · POSTGRESQL — TRUSTED BUSINESS & EXECUTION DATA"]
+    direction TB
+    DB[("<b>PostgreSQL</b><br/>SQLAlchemy sessions · Alembic-managed schema")]
+
+    subgraph TABLES["Core Tables & Representative Customer-Safe Fields"]
+      direction LR
+      CUST["<b>customers</b><br/>id · first_name · phone<br/>preferred_language"]
+      ORD["<b>orders</b><br/>id · order_number · status<br/>payment_status · total_amount"]
+      ITEM["<b>order_items</b><br/>order_id · product_name<br/>quantity · unit_price"]
+      CONV["<b>conversations</b><br/>customer_id · status · channel<br/>active_model"]
+      MSG["<b>messages</b><br/>role · content<br/>sequence_number"]
+      MRUN["<b>model_runs</b><br/>provider · model · status<br/>latency · prompt/completion tokens"]
+      TCALL["<b>tool_calls</b><br/>tool_name · version · status<br/>sanitized arguments/result · duration"]
+      EVAL["<b>evaluations</b><br/>passed · intent/tool scores · overall_score<br/>details_json: grounding/hallucination evidence"]
+    end
+
+    CUST -- "1 : many" --> ORD
+    CUST -- "1 : many" --> CONV
+    ORD -- "1 : many" --> ITEM
+    ORD -. "logical order context in sanitized payload; no direct FK" .-> TCALL
+    CONV -- "1 : many" --> MSG
+    CONV -- "1 : many" --> MRUN
+    MRUN -- "1 : many" --> TCALL
+    MRUN -- "1 : many" --> EVAL
+    DB --> CUST
+    DB --> ORD
+    DB --> ITEM
+    DB --> CONV
+    DB --> MSG
+    DB --> MRUN
+    DB --> TCALL
+    DB --> EVAL
+  end
+
+  subgraph CONTINUATION["7 · GROUNDED CONTINUATION & TERMINATION"]
+    direction TB
+    TRES["<b>ToolResult → ToolExecutionOutcome</b><br/>structured success or business failure<br/>sanitized customer-safe payload"]
+    GR["<b>BusinessGroundingPolicy</b><br/>capability-based transactional evidence<br/>policy evidence remains separate"]
+    TCYCLE["<b>ToolContinuationCycle</b><br/>ProviderContinuationAdapterRegistry<br/>correlated call ID · ordered results"]
+    BACK["<b>Model Receives Tool Result</b><br/>working conversation updated<br/>next bounded provider turn"]
+    REPEAT["<b>↺ Continue Tool Loop</b><br/>Additional calls return to Stage 4<br/>within the same bounded execution"]
+    FINAL["<b>Final Model Response</b><br/>grounded, validated, customer-safe"]
+    TRACE["<b>OrchestrationExecutionTrace</b><br/>provider turns · tool executions · timeline<br/>latency · diagnostic summary · correlation"]
+    TERM["<b>Termination & Safety Policies</b><br/>• Final, bounded, failure + timeout outcomes<br/>• Grounding requirement + cleanup"]
+    TRES --> GR --> TCYCLE --> BACK
+    BACK -. "additional tool call" .-> REPEAT
+    BACK -- "terminal answer" --> FINAL
+    DIRECT --> FINAL
+    FINAL --> TRACE --> TERM
+  end
+
+  subgraph INGESTION["8 · NORMALIZED BENCHMARK INGESTION — STAGE 16.2"]
+    direction TB
+    ART["<b>CompletedConversationExecution</b><br/>• Provider + tool execution artifacts<br/>• Termination + deterministic evaluation"]
+    VS["<b>Validation & Sanitization</b><br/>immutable contracts · contiguous ordering<br/>PII/secret protection · deterministic costing"]
+    BIS["<b>BenchmarkIngestionService</b><br/>create/start run · atomic case ingestion<br/>idempotency · conflict detection · finalize"]
+    BAR["<b>Benchmark Analytics Repositories</b><br/>Suite · Run · ConversationResult · Turn<br/>ToolExecution · Metric · Failure repositories"]
+    BP[("<b>Persist Benchmark Result</b><br/>• Suites, runs, conversations + turns<br/>• Tools, metrics + failure events")]
+    ART --> VS --> BIS --> BAR --> BP
+  end
+
+  subgraph EVALUATION["9 · DETERMINISTIC EVALUATION & ANALYTICS"]
+    direction TB
+    EE["<b>Evaluation Evidence</b><br/>stored deterministic metrics and failure signals<br/>no recalculation during presentation"]
+    EM1["Intent Accuracy · Grounding · Hallucination<br/>Tool Selection · Argument Validation · Tool Success"]
+    EM2["Business/Task Completion · Authorization<br/>Latency · Token Usage · Cost<br/>Failure Category & Responsibility"]
+    EE --> EM1
+    EE --> EM2
+  end
+
+  subgraph REPORTING["10 · REPORTING ENGINE — STAGE 16.3"]
+    direction TB
+    BRR["<b>BenchmarkReportingRepository</b><br/>read-only complete analytics snapshot"]
+    BRS["<b>BenchmarkReportingService</b><br/>deterministic aggregation<br/>ScoringPolicy + compatibility checks"]
+    RS1["Run Summary · Language Performance<br/>Category Performance · Failure Analysis"]
+    RS2["Latency Analysis · Token Analysis<br/>Cost Analysis · Tool Performance<br/>Model Comparison + Winner Explanation"]
+    BRR --> BRS
+    BRS --> RS1
+    BRS --> RS2
+  end
+
+  subgraph PRESENTATION["11 · PRESENTATION & EXPORT — STAGE 16.4"]
+    direction TB
+    BPS["<b>BenchmarkPresentationService</b><br/>report discovery · case evidence<br/>read-only presentation facade"]
+    API["<b>FastAPI Reporting Routes</b><br/>run list · run detail · comparison<br/>Excel and CSV download endpoints"]
+    UI["<b>Next.js Benchmark Dashboard</b><br/>• Executive KPIs, charts + comparison<br/>• Evidence table, case viewer + filters"]
+    EX["<b>Presentation Exports</b><br/>ExcelExporter · native charts · wrapped evidence<br/>CsvZipExporter · deterministic CSV tables"]
+    REPORT["<b>Manager-Ready Benchmark Report</b><br/>evidence · metrics · limitations<br/>winner explanations · downloadable artifacts"]
+    BPS --> API
+    API --> UI
+    API --> EX
+    UI --> REPORT
+    EX --> REPORT
+  end
+
+  BC --> EC
+  REQ --> MS
+  MRS --> TCD
+  CT --> RP
+  OT --> RP
+  DT --> RP
+  PT --> RP
+  KT --> RP
+  WT --> RP
+  R1 --> DB
+  R2 --> DB
+  DB --> TRES
+  TERM --> ART
+  BP --> EE
+  EM1 --> BRR
+  EM2 --> BRR
+  RS1 --> BPS
+  RS2 --> BPS
+
+  classDef core fill:#FFFFFF,stroke:#D5DAE3,color:#172033,stroke-width:1.2px;
+  classDef decision fill:#FFFFFF,stroke:#D97706,color:#172033,stroke-width:2.2px;
+  classDef provider fill:#FFFFFF,stroke:#0F9D98,color:#172033,stroke-width:1.6px;
+  classDef data fill:#FFFFFF,stroke:#16A36A,color:#172033,stroke-width:1.5px;
+  classDef output fill:#FFFFFF,stroke:#7C3AED,color:#172033,stroke-width:2px;
+  class DS,DV,CR,CL,BC,EC,SEC,CB,PB,PA,PR,LOOP,REQ,TCD,DIRECT,TS,TR,BIND,SCHEMA,AUTH,TG,RP,R1,R2,TRES,GR,TCYCLE,BACK,REPEAT,FINAL,TRACE,TERM,ART,VS,BIS,BAR,EE,EM1,EM2,BRR,BRS,RS1,RS2,BPS,API,UI,EX core;
+  class NEED,MS decision;
+  class QW,F9,FI,FM,MRQ,MRS provider;
+  class DB,CUST,ORD,ITEM,CONV,MSG,MRUN,TCALL,EVAL,BP data;
+  class REPORT output;
+
+  style DATASET fill:transparent,stroke:transparent,color:#1D4ED8
+  style HARNESS fill:transparent,stroke:transparent,color:#1D4ED8
+  style PROVIDERS fill:transparent,stroke:transparent,color:#1D4ED8
+  style TOOLING fill:transparent,stroke:transparent,color:#1D4ED8
+  style TOOLS fill:transparent,stroke:transparent,color:#64748B
+  style REPOSITORIES fill:transparent,stroke:transparent,color:#1D4ED8
+  style DATABASE fill:transparent,stroke:transparent,color:#1D4ED8
+  style TABLES fill:transparent,stroke:transparent,color:#64748B
+  style CONTINUATION fill:transparent,stroke:transparent,color:#1D4ED8
+  style INGESTION fill:transparent,stroke:transparent,color:#1D4ED8
+  style EVALUATION fill:transparent,stroke:transparent,color:#1D4ED8
+  style REPORTING fill:transparent,stroke:transparent,color:#1D4ED8
+  style PRESENTATION fill:transparent,stroke:transparent,color:#1D4ED8
+
+  %% Main execution routes use a strong blue; contextual relationships remain subtle.
+  linkStyle default stroke:#4F6B95,stroke-width:2.2px;
+  linkStyle 37 stroke:#94A3B8,stroke-width:1.2px,stroke-dasharray:5 5;
