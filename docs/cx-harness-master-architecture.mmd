@@ -1,6 +1,6 @@
-%% CX Harness — complete master architecture flow (executive presentation edition)
+%% CX Harness — complete master architecture flow (native GitHub dark mode)
 %% Rendered assets live in docs/assets/architecture/.
-%%{init: {"theme":"base","flowchart":{"curve":"stepAfter","nodeSpacing":44,"rankSpacing":72,"padding":22,"htmlLabels":true},"themeVariables":{"background":"#FAFAFA","primaryColor":"#FFFFFF","primaryTextColor":"#172033","primaryBorderColor":"#D5DAE3","lineColor":"#4F6B95","secondaryColor":"#FFFFFF","tertiaryColor":"#FFFFFF","clusterBkg":"#FAFAFA","clusterBorder":"#FAFAFA","fontFamily":"Inter, SF Pro Display, Segoe UI, Arial, sans-serif","fontSize":"17px"},"themeCSS":".node rect { rx: 14px; ry: 14px; filter: drop-shadow(0 3px 5px rgba(15,23,42,.10)); } .node polygon { filter: drop-shadow(0 3px 5px rgba(15,23,42,.10)); } .cluster rect { fill: transparent !important; stroke: transparent !important; } .cluster-label span { color: #1D4ED8 !important; font-size: 25px !important; font-weight: 750 !important; letter-spacing: .06em; } .edgeLabel { background-color: #FAFAFA !important; color: #475569 !important; font-size: 14px !important; } .flowchart-link { stroke-linecap: round; stroke-linejoin: round; }"}}%%
+%%{init: {"theme":"dark","flowchart":{"curve":"linear","nodeSpacing":45,"rankSpacing":65,"htmlLabels":true},"themeVariables":{"background":"#0d1117","primaryColor":"#222222","primaryTextColor":"#e6edf3","primaryBorderColor":"#c9d1d9","lineColor":"#c9d1d9","secondaryColor":"#222222","tertiaryColor":"#222222","clusterBkg":"#0d1117","clusterBorder":"#30363d","fontFamily":"Arial, sans-serif","fontSize":"16px"}}}%%
 flowchart TB
 
   subgraph DATASET["1 · DATASET & CAMPAIGN"]
@@ -198,31 +198,19 @@ flowchart TB
   RS1 --> BPS
   RS2 --> BPS
 
-  classDef core fill:#FFFFFF,stroke:#D5DAE3,color:#172033,stroke-width:1.2px;
-  classDef decision fill:#FFFFFF,stroke:#D97706,color:#172033,stroke-width:2.2px;
-  classDef provider fill:#FFFFFF,stroke:#0F9D98,color:#172033,stroke-width:1.6px;
-  classDef data fill:#FFFFFF,stroke:#16A36A,color:#172033,stroke-width:1.5px;
-  classDef output fill:#FFFFFF,stroke:#7C3AED,color:#172033,stroke-width:2px;
-  class DS,DV,CR,CL,BC,EC,SEC,CB,PB,PA,PR,LOOP,REQ,TCD,DIRECT,TS,TR,BIND,SCHEMA,AUTH,TG,RP,R1,R2,TRES,GR,TCYCLE,BACK,REPEAT,FINAL,TRACE,TERM,ART,VS,BIS,BAR,EE,EM1,EM2,BRR,BRS,RS1,RS2,BPS,API,UI,EX core;
-  class NEED,MS decision;
-  class QW,F9,FI,FM,MRQ,MRS provider;
-  class DB,CUST,ORD,ITEM,CONV,MSG,MRUN,TCALL,EVAL,BP data;
-  class REPORT output;
+  classDef normal fill:#222222,stroke:#c9d1d9,color:#e6edf3,stroke-width:1px;
+  class DS,DV,CR,CL,BC,EC,SEC,CB,PB,PA,PR,LOOP,REQ,TCD,DIRECT,TS,TR,BIND,SCHEMA,AUTH,TG,CT,OT,DT,PT,KT,WT,RP,R1,R2,DB,CUST,ORD,ITEM,CONV,MSG,MRUN,TCALL,EVAL,TRES,GR,TCYCLE,BACK,REPEAT,FINAL,TRACE,TERM,ART,VS,BIS,BAR,BP,EE,EM1,EM2,BRR,BRS,RS1,RS2,BPS,API,UI,EX,REPORT,NEED,MS,QW,F9,FI,FM,MRQ,MRS normal;
 
-  style DATASET fill:transparent,stroke:transparent,color:#1D4ED8
-  style HARNESS fill:transparent,stroke:transparent,color:#1D4ED8
-  style PROVIDERS fill:transparent,stroke:transparent,color:#1D4ED8
-  style TOOLING fill:transparent,stroke:transparent,color:#1D4ED8
-  style TOOLS fill:transparent,stroke:transparent,color:#64748B
-  style REPOSITORIES fill:transparent,stroke:transparent,color:#1D4ED8
-  style DATABASE fill:transparent,stroke:transparent,color:#1D4ED8
-  style TABLES fill:transparent,stroke:transparent,color:#64748B
-  style CONTINUATION fill:transparent,stroke:transparent,color:#1D4ED8
-  style INGESTION fill:transparent,stroke:transparent,color:#1D4ED8
-  style EVALUATION fill:transparent,stroke:transparent,color:#1D4ED8
-  style REPORTING fill:transparent,stroke:transparent,color:#1D4ED8
-  style PRESENTATION fill:transparent,stroke:transparent,color:#1D4ED8
-
-  %% Main execution routes use a strong blue; contextual relationships remain subtle.
-  linkStyle default stroke:#4F6B95,stroke-width:2.2px;
-  linkStyle 37 stroke:#94A3B8,stroke-width:1.2px,stroke-dasharray:5 5;
+  style DATASET fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
+  style HARNESS fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
+  style PROVIDERS fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
+  style TOOLING fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
+  style TOOLS fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
+  style REPOSITORIES fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
+  style DATABASE fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
+  style TABLES fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
+  style CONTINUATION fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
+  style INGESTION fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
+  style EVALUATION fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
+  style REPORTING fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
+  style PRESENTATION fill:#0d1117,stroke:#30363d,color:#e6edf3,stroke-width:1px
