@@ -16,8 +16,24 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: CORS_ALLOWED_ORIGINS
-        sync: false
+        value: https://cx-harness-benchmark-dashboard.onrender.com
       - key: AUTHENTICATION_HMAC_SECRET
         sync: false
       - key: SECURITY_AUDIT_PSEUDONYM_KEY
         sync: false
+
+  - type: web
+    name: cx-harness-benchmark-dashboard
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start -- --hostname 0.0.0.0 --port $PORT
+    healthCheckPath: /benchmark-reporting
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.16.0
+      - key: NEXT_PUBLIC_API_BASE_URL
+        value: https://cx-harness-benchmark-api.onrender.com/api/v1
+      - key: NEXT_PUBLIC_API_TIMEOUT_MS
+        value: 30000

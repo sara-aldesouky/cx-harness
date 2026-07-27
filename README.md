@@ -1126,7 +1126,7 @@ The local `.env` file and virtual environment are intentionally ignored by Git.
 The production layout is:
 
 ```text
-Browser → Vercel Next.js dashboard → Render FastAPI service → Render PostgreSQL
+Browser → Render Next.js dashboard → Render FastAPI service → Render PostgreSQL
 ```
 
 The dashboard is read-only with respect to benchmark reporting. It uses the
@@ -1136,25 +1136,25 @@ migrations.
 
 ### Required environment variables
 
-Configure secrets in Render or Vercel, never in Git.
+Configure secrets in Render, never in Git.
 
 | Platform | Variable | Purpose |
 |---|---|---|
 | Render | `DATABASE_URL` | Existing Render PostgreSQL connection string |
 | Render | `ENVIRONMENT=production` | Disables development debug behavior |
-| Render | `CORS_ALLOWED_ORIGINS` | Comma-separated exact frontend origins, such as `https://your-dashboard.vercel.app` |
+| Backend | `CORS_ALLOWED_ORIGINS` | Exact Render dashboard origin, normally `https://cx-harness-benchmark-dashboard.onrender.com` |
 | Render | `AUTHENTICATION_HMAC_SECRET` | Existing authentication signing secret, at least 32 random characters |
 | Render | `SECURITY_AUDIT_PSEUDONYM_KEY` | Separate security-audit pseudonym key |
-| Vercel | `NEXT_PUBLIC_API_BASE_URL` | HTTPS Render URL ending in `/api/v1` |
-| Vercel | `NEXT_PUBLIC_API_TIMEOUT_MS` | Browser API timeout; default `30000` |
+| Frontend | `NEXT_PUBLIC_API_BASE_URL` | Render backend URL: `https://cx-harness-benchmark-api.onrender.com/api/v1` |
+| Frontend | `NEXT_PUBLIC_API_TIMEOUT_MS` | Browser API timeout; default `30000` |
 
 Ollama settings are not required for read-only benchmark reporting. Do not
 expose a local Ollama endpoint publicly merely to serve the dashboard.
 
-### Deploy the FastAPI backend to Render
+### Deploy both services with one Render Blueprint
 
-The root `render.yaml` defines the service with `backend/` as its root directory.
-Its commands are:
+The root `render.yaml` defines both web services. The backend uses `backend/` as
+its root directory and runs:
 
 ```bash
 # Build
@@ -1174,21 +1174,20 @@ pre-deploy command, run the same benchmark-only Alembic upgrade command once fro
 Shell before starting the new version. Never run downgrade, reset, drop, or
 seed commands against production.
 
-### Deploy the Next.js dashboard to Vercel
-
-Import the same GitHub repository in Vercel and set the project root directory
-to `frontend`. Configure `NEXT_PUBLIC_API_BASE_URL` with the Render HTTPS URL,
-for example `https://cx-harness-benchmark-api.onrender.com/api/v1`, then deploy
-with:
+The frontend is a second Render Web Service rooted at `frontend/` and runs:
 
 ```bash
-npm ci
-npm run build
+# Build
+npm ci && npm run build
+
+# Start (Render supplies PORT)
+npm run start -- --hostname 0.0.0.0 --port $PORT
 ```
 
-After Vercel assigns the final domain, add that exact HTTPS origin to the Render
-`CORS_ALLOWED_ORIGINS` value and redeploy the backend. Keep
-`http://localhost:3000` only when local development access is required.
+The Blueprint supplies the expected Render service URLs. If Render adds a suffix
+because either service name is already taken, update `NEXT_PUBLIC_API_BASE_URL`
+and `CORS_ALLOWED_ORIGINS` to the exact generated HTTPS origins, then redeploy
+both services. Do not use localhost in production.
 
 ### Verify the deployment
 
@@ -1197,10 +1196,10 @@ After Vercel assigns the final domain, add that exact HTTPS origin to the Render
 2. Open `https://<render-service>/api/v1/benchmark-reporting/runs` and confirm
    stored benchmark runs are returned, or an explicit empty list if the
    database has no runs.
-3. Open `https://<vercel-project>/benchmark-reporting` and verify run listing,
+3. Open `https://<render-dashboard>/benchmark-reporting` and verify run listing,
    run detail, comparison, and Excel/CSV downloads.
 4. Confirm browser requests use HTTPS and the Render API returns the exact
-   Vercel origin in `Access-Control-Allow-Origin`.
+   Render dashboard origin in `Access-Control-Allow-Origin`.
 
 Future updates deploy automatically from the connected Git branch. Apply only
 forward, reviewed Alembic migrations and retain the existing PostgreSQL backup
