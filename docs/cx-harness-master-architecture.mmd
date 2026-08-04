@@ -3,10 +3,10 @@
 %%{init: {"theme":"dark","flowchart":{"curve":"linear","nodeSpacing":38,"rankSpacing":54,"htmlLabels":true},"themeVariables":{"background":"#0d1117","primaryColor":"#21262d","primaryTextColor":"#e6edf3","primaryBorderColor":"#8b949e","lineColor":"#8b949e","secondaryColor":"#161b22","tertiaryColor":"#161b22","clusterBkg":"#0d1117","clusterBorder":"#30363d","fontFamily":"Arial, sans-serif","fontSize":"15px"}}}%%
 flowchart TB
 
-  subgraph RUNTIME["CX HARNESS · PRODUCTION RUNTIME"]
+  subgraph RUNTIME["CX HARNESS RUNTIME ───"]
     direction TB
 
-    subgraph ENTRY["PHASE 1 · REQUEST ENTRY"]
+    subgraph ENTRY["PHASE 1 · REQUEST ───"]
       direction LR
       CUSTOMER["<b>Customer Application</b><br/>Sends the customer message"]
       API["<b>FastAPI Endpoint</b><br/>Validates the HTTP request"]
@@ -17,7 +17,7 @@ flowchart TB
       CUSTOMER --> API --> AUTHN --> IDENTITY --> MAPPER --> SERVICE
     end
 
-    subgraph INVOCATION["PHASE 2 · MODEL INVOCATION"]
+    subgraph INVOCATION["PHASE 2 · MODEL ───"]
       direction LR
       PRIVIN["<b>Data Protection</b><br/>Minimizes sensitive input"]
       CONTEXT["<b>Context Builder</b><br/>Adds prompt and ordered history"]
@@ -28,9 +28,9 @@ flowchart TB
 
     TOOLQ{"<b>Tool requested?</b>"}
 
-    subgraph SECURE["PHASE 3 · SECURE TOOL EXECUTION"]
+    subgraph SECURE["PHASE 3 · SECURE TOOLS ───"]
       direction TB
-      subgraph TRUST["3A · SELECTION & TRUST"]
+      subgraph TRUST["3A · TRUSTED SELECTION ───"]
         direction LR
         SELECTION["<b>ToolSelection</b><br/>Normalizes the model request"]
         REGISTRY["<b>ToolRegistry</b><br/>Allows registered, enabled tools"]
@@ -40,14 +40,14 @@ flowchart TB
         SCHEMA["<b>Schema Validation</b><br/>Validates the bound arguments"]
         SELECTION --> REGISTRY --> RESOLVER --> BINDER --> SCHEMA
       end
-      subgraph ACCESS["3B · ACCESS CONTROL"]
+      subgraph ACCESS["3B · ACCESS ───"]
         direction LR
         ROLE["<b>Role Policy</b><br/>Checks capability access by role"]
         TOOLA["<b>Tool Authorization</b><br/>Checks permission for this tool"]
         OWNER["<b>Ownership Authorization</b><br/>Checks access to this resource"]
         ROLE --> TOOLA --> OWNER
       end
-      subgraph BUSINESS["3C · BUSINESS & DATA"]
+      subgraph BUSINESS["3C · BUSINESS DATA ───"]
         direction LR
         CAPABILITY["<b>Business Capability</b><br/>Runs customer-support logic"]
         REPOSITORY["<b>Repository</b><br/>Encapsulates database access"]
@@ -61,7 +61,7 @@ flowchart TB
       STATE -. "verified context" .-> RESOLVER
     end
 
-    subgraph RESPONSE["PHASE 4 · RESPONSE GENERATION"]
+    subgraph RESPONSE["PHASE 4 · RESPONSE ───"]
       direction LR
       RESULT["<b>ToolResult</b><br/>Returns safe structured evidence"]
       GROUND["<b>Grounding Policy</b><br/>Requires trusted business evidence"]
@@ -73,7 +73,7 @@ flowchart TB
       RESULT --> GROUND --> CONTINUE --> PROVIDER2 --> QWEN2 --> PRIVOUT --> FINAL
     end
 
-    subgraph INFRA["PHASE 5 · RUNTIME INFRASTRUCTURE · ACTIVE THROUGHOUT"]
+    subgraph INFRA["PHASE 5 · RUNTIME CONTROLS ───"]
       direction LR
       ORCH["<b>Orchestration</b><br/>Controls bounded turns and tool cycles"]
       EXECSTATE["<b>Execution State</b><br/>Tracks turns and completed work"]
@@ -92,9 +92,9 @@ flowchart TB
     FINAL ~~~ ORCH
   end
 
-  subgraph BENCHMARK["BENCHMARK & EVALUATION PIPELINE · CONTROLLED, SEPARATE SUBSYSTEM"]
+  subgraph BENCHMARK["BENCHMARK PIPELINE · SEPARATE FROM RUNTIME ───"]
     direction TB
-    subgraph CAMPAIGN["CONTROLLED CAMPAIGN"]
+    subgraph CAMPAIGN["CAMPAIGN ───"]
       direction LR
       RUNNER["<b>Benchmark Runner</b><br/>Coordinates controlled campaigns"]
       CASE["<b>Benchmark Case</b><br/>One versioned customer scenario"]
@@ -102,7 +102,7 @@ flowchart TB
       EXECUTION["<b>Conversation Execution</b><br/>Captures the measured outcome"]
       RUNNER --> CASE --> REAL --> EXECUTION
     end
-    subgraph INGEST["EVIDENCE INGESTION"]
+    subgraph INGEST["INGESTION ───"]
       direction LR
       ARTIFACT["<b>Artifact Creation</b><br/>Normalizes provider-neutral evidence"]
       VALIDATE["<b>Validation</b><br/>Checks evidence consistency"]
@@ -111,7 +111,7 @@ flowchart TB
       STORE[("<b>Atomic PostgreSQL Storage</b><br/>Saves complete benchmark evidence")]
       ARTIFACT --> VALIDATE --> SANITIZE --> COST --> STORE
     end
-    subgraph ANALYTICS["EVALUATION & PRESENTATION"]
+    subgraph ANALYTICS["EVALUATION & REPORTING ───"]
       direction LR
       EVALUATE["<b>Evaluation</b><br/>Measures quality and failures"]
       REPORTING["<b>Reporting Service</b><br/>Aggregates runs and comparisons"]
