@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+import logging
+from time import monotonic
 from typing import TYPE_CHECKING, Any, Optional
 from urllib.parse import urlparse
 
@@ -27,6 +30,25 @@ from app.tools.selection import ToolSelectionRequest
 if TYPE_CHECKING:
     from app.harness.prompt_adapter import ProviderRequest
     from app.services.model_tool_loop_service import ModelToolLoopTurnRequest
+
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class OllamaInvocationMetadata:
+    """Safe operational measurements for one local provider request."""
+
+    thinking_enabled: bool
+    context_size: int
+    output_token_cap: int
+    timeout_seconds: float
+    keep_alive: str
+    cache_state: str
+    prompt_tokens: Optional[int]
+    output_tokens: Optional[int]
+    total_latency_ms: float
+    outcome: str
 
 
 class OllamaProviderError(RuntimeError):
@@ -97,6 +119,10 @@ class OllamaQwenProvider(ModelProvider):
         client: Optional[httpx.Client] = None,
         tool_definitions: Sequence[Mapping[str, Any]] = (),
         max_response_bytes: int = 1_048_576,
+        context_size: int = 8_192,
+        max_output_tokens: int = 256,
+        keep_alive: str = "15m",
+        tool_thinking_enabled: bool = False,
     ) -> None:
         self._base_url = self._validate_local_base_url(base_url)
         normalized_model = model_name.strip()
@@ -120,6 +146,24 @@ class OllamaQwenProvider(ModelProvider):
         )
         self._client = client
         self._max_response_bytes = max_response_bytes
+        if isinstance(context_size, bool) or not 4_096 <= context_size <= 131_072:
+            raise ValueError("context_size must be between 4096 and 131072")
+        if (
+            isinstance(max_output_tokens, bool)
+            or not 1 <= max_output_tokens <= 8_192
+        ):
+            raise ValueError("max_output_tokens must be between 1 and 8192")
+        normalized_keep_alive = keep_alive.strip().lower()
+        if not normalized_keep_alive:
+            raise ValueError("keep_alive must not be blank")
+        if not isinstance(tool_thinking_enabled, bool):
+            raise TypeError("tool_thinking_enabled must be a boolean")
+        self._context_size = context_size
+        self._max_output_tokens = max_output_tokens
+        self._keep_alive = normalized_keep_alive
+        self._tool_thinking_enabled = tool_thinking_enabled
+        self._read_timeout_seconds = float(read_timeout_seconds)
+        self._last_invocation_metadata: Optional[OllamaInvocationMetadata] = None
         self._tools = self._translate_tool_definitions(tool_definitions)
 
     @property
@@ -133,6 +177,45 @@ class OllamaQwenProvider(ModelProvider):
     @property
     def capabilities(self) -> ProviderCapabilities:
         return self._capabilities
+
+    @property
+    def last_invocation_metadata(self) -> Optional[OllamaInvocationMetadata]:
+        """Return safe measurements without request content or identity data."""
+
+        return self._last_invocation_metadata
+
+    def prewarm(self) -> OllamaInvocationMetadata:
+        """Load and validate the production prompt/tool payload without execution."""
+
+        from app.harness.production_prompt import PRODUCTION_SYSTEM_PROMPT
+
+        body = self._request_chat(
+            [
+                {"role": "system", "content": PRODUCTION_SYSTEM_PROMPT},
+                {
+                    "role": "user",
+                    "content": (
+                        "Internal readiness check only. Return a concise response "
+                        "or one valid tool-call structure; do not use customer data."
+                    ),
+                },
+            ],
+            tools=self._tools,
+        )
+        message = self._extract_assistant_message(body)
+        native_calls = message.get("tool_calls") or []
+        content = message.get("content")
+        if native_calls:
+            if not isinstance(native_calls, list):
+                raise InvalidOllamaResponseError("Ollama tool_calls must be an array")
+            self._parse_tool_calls(native_calls, 1)
+        elif not isinstance(content, str) or not content.strip():
+            raise EmptyModelResponseError(
+                "local Ollama prewarm returned no usable response"
+            )
+        if self._last_invocation_metadata is None:
+            raise InvalidOllamaResponseError("Ollama prewarm metadata is unavailable")
+        return self._last_invocation_metadata
 
     def close(self) -> None:
         """Close an injected HTTP client; per-request clients close automatically."""
@@ -242,9 +325,16 @@ class OllamaQwenProvider(ModelProvider):
             "model": self.model_name,
             "messages": messages,
             "stream": False,
+            "keep_alive": self._keep_alive,
+            "options": {
+                "num_ctx": self._context_size,
+                "num_predict": self._max_output_tokens,
+            },
         }
         if tools:
             payload["tools"] = list(tools)
+            payload["think"] = self._tool_thinking_enabled
+        started = monotonic()
         try:
             if self._client is not None:
                 response = self._client.post(
@@ -259,12 +349,30 @@ class OllamaQwenProvider(ModelProvider):
                     )
             response.raise_for_status()
         except httpx.TimeoutException as exc:
+            self._record_invocation_metadata(
+                body=None,
+                started=started,
+                tools_enabled=bool(tools),
+                outcome="timeout",
+            )
             raise OllamaRequestTimeoutError("local Ollama request timed out") from exc
         except httpx.RequestError as exc:
+            self._record_invocation_metadata(
+                body=None,
+                started=started,
+                tools_enabled=bool(tools),
+                outcome="unavailable",
+            )
             raise OllamaUnavailableError(
                 "local Ollama service is unavailable"
             ) from exc
         except httpx.HTTPStatusError as exc:
+            self._record_invocation_metadata(
+                body=None,
+                started=started,
+                tools_enabled=bool(tools),
+                outcome="http_error",
+            )
             raise OllamaUnavailableError(
                 f"local Ollama returned HTTP {exc.response.status_code}"
             ) from exc
@@ -283,7 +391,60 @@ class OllamaQwenProvider(ModelProvider):
             raise InvalidOllamaResponseError(
                 "local Ollama response must be a JSON object"
             )
+        self._record_invocation_metadata(
+            body=body,
+            started=started,
+            tools_enabled=bool(tools),
+            outcome="completed",
+        )
         return body
+
+    def _record_invocation_metadata(
+        self,
+        *,
+        body: Optional[Mapping[str, Any]],
+        started: float,
+        tools_enabled: bool,
+        outcome: str,
+    ) -> None:
+        load_duration = body.get("load_duration") if body is not None else None
+        if isinstance(load_duration, (int, float)):
+            cache_state = "cold" if load_duration >= 1_000_000_000 else "warm"
+        else:
+            cache_state = "unknown"
+        prompt_tokens = body.get("prompt_eval_count") if body is not None else None
+        output_tokens = body.get("eval_count") if body is not None else None
+        metadata = OllamaInvocationMetadata(
+            thinking_enabled=(
+                self._tool_thinking_enabled if tools_enabled else True
+            ),
+            context_size=self._context_size,
+            output_token_cap=self._max_output_tokens,
+            timeout_seconds=self._read_timeout_seconds,
+            keep_alive=self._keep_alive,
+            cache_state=cache_state,
+            prompt_tokens=(prompt_tokens if isinstance(prompt_tokens, int) else None),
+            output_tokens=(output_tokens if isinstance(output_tokens, int) else None),
+            total_latency_ms=max(0.0, (monotonic() - started) * 1000),
+            outcome=outcome,
+        )
+        self._last_invocation_metadata = metadata
+        logger.info(
+            "ollama_invocation thinking_enabled=%s context_size=%s "
+            "output_token_cap=%s timeout_seconds=%s keep_alive=%s "
+            "cache_state=%s prompt_tokens=%s output_tokens=%s "
+            "total_latency_ms=%.3f outcome=%s",
+            metadata.thinking_enabled,
+            metadata.context_size,
+            metadata.output_token_cap,
+            metadata.timeout_seconds,
+            metadata.keep_alive,
+            metadata.cache_state,
+            metadata.prompt_tokens,
+            metadata.output_tokens,
+            metadata.total_latency_ms,
+            metadata.outcome,
+        )
 
     @staticmethod
     def _extract_assistant_message(body: Mapping[str, Any]) -> dict[str, Any]:

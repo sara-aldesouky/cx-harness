@@ -389,6 +389,90 @@ uvicorn app.main:app --reload
 
 The local `.env` file and virtual environment are intentionally ignored by Git.
 
+## Benchmark Dashboard Deployment
+
+The production layout is:
+
+```text
+Browser → Render Next.js dashboard → Render FastAPI service → Render PostgreSQL
+```
+
+The dashboard is read-only with respect to benchmark reporting. It uses the
+existing Stage 16 reporting endpoints and never fabricates benchmark data.
+The Render backend uses the existing SQLAlchemy session layer and Alembic
+migrations.
+
+### Required environment variables
+
+Configure secrets in Render, never in Git.
+
+| Platform | Variable | Purpose |
+|---|---|---|
+| Render | `DATABASE_URL` | Existing Render PostgreSQL connection string |
+| Render | `ENVIRONMENT=production` | Disables development debug behavior |
+| Backend | `CORS_ALLOWED_ORIGINS` | Exact Render dashboard origin, normally `https://cx-harness-benchmark-dashboard.onrender.com` |
+| Render | `AUTHENTICATION_HMAC_SECRET` | Existing authentication signing secret, at least 32 random characters |
+| Render | `SECURITY_AUDIT_PSEUDONYM_KEY` | Separate security-audit pseudonym key |
+| Frontend | `NEXT_PUBLIC_API_BASE_URL` | Render backend URL: `https://cx-harness-benchmark-api.onrender.com/api/v1` |
+| Frontend | `NEXT_PUBLIC_API_TIMEOUT_MS` | Browser API timeout; default `30000` |
+
+Ollama settings are not required for read-only benchmark reporting. Do not
+expose a local Ollama endpoint publicly merely to serve the dashboard.
+
+### Deploy both services with one Render Blueprint
+
+The root `render.yaml` defines both web services. The backend uses `backend/` as
+its root directory and runs:
+
+```bash
+# Build
+pip install -r requirements.txt
+
+# Non-destructive benchmark-only migration
+python -m alembic -c alembic.ini upgrade b2aa96d282d0
+
+# Start (Render supplies PORT)
+python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+In Render, create a Blueprint from this repository, set the required secret
+variables, and point `DATABASE_URL` at the existing PostgreSQL database. The
+health-check path is `/health`. If the selected Render plan does not support a
+pre-deploy command, run the same benchmark-only Alembic upgrade command once from a Render
+Shell before starting the new version. Never run downgrade, reset, drop, or
+seed commands against production.
+
+The frontend is a second Render Web Service rooted at `frontend/` and runs:
+
+```bash
+# Build
+npm ci && npm run build
+
+# Start (Render supplies PORT)
+npm run start -- --hostname 0.0.0.0 --port $PORT
+```
+
+The Blueprint supplies the expected Render service URLs. If Render adds a suffix
+because either service name is already taken, update `NEXT_PUBLIC_API_BASE_URL`
+and `CORS_ALLOWED_ORIGINS` to the exact generated HTTPS origins, then redeploy
+both services. Do not use localhost in production.
+
+### Verify the deployment
+
+1. Open `https://<render-service>/health` and confirm the response is
+   `{"status":"ok","service":"cx-harness-api"}`.
+2. Open `https://<render-service>/api/v1/benchmark-reporting/runs` and confirm
+   stored benchmark runs are returned, or an explicit empty list if the
+   database has no runs.
+3. Open `https://<render-dashboard>/benchmark-reporting` and verify run listing,
+   run detail, comparison, and Excel/CSV downloads.
+4. Confirm browser requests use HTTPS and the Render API returns the exact
+   Render dashboard origin in `Access-Control-Allow-Origin`.
+
+Future updates deploy automatically from the connected Git branch. Apply only
+forward, reviewed Alembic migrations and retain the existing PostgreSQL backup
+and recovery policy.
+
 ## PostgreSQL tool integration tests
 
 Start the isolated local test database and configure its dedicated URL:

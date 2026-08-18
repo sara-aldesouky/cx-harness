@@ -14,6 +14,10 @@ from app.config.settings import settings
 from app.harness.context import ConversationMessage, ConversationRole
 from app.harness.context_builder import ContextBuilder, MessageInput
 from app.harness.model_pipeline import ModelPipelineCoordinator
+from app.harness.production_prompt import (
+    ProductionSystemPromptBuilder,
+    production_system_prompt_builder,
+)
 from app.harness.runtime import build_model_pipeline
 from app.providers.base import ModelResponse
 from app.data_protection import DataProtectionService, privacy_service
@@ -83,6 +87,9 @@ class ModelPipelineService:
         provider_name: str = "ollama",
         model_name: str = settings.ollama_model_name,
         data_protection: DataProtectionService = privacy_service,
+        prompt_builder: ProductionSystemPromptBuilder = (
+            production_system_prompt_builder
+        ),
     ) -> None:
         self._pipeline = pipeline
         self._pipeline_factory = pipeline_factory
@@ -91,6 +98,15 @@ class ModelPipelineService:
         if not isinstance(data_protection, DataProtectionService):
             raise TypeError("data_protection must be a DataProtectionService")
         self._data_protection = data_protection
+        if not isinstance(prompt_builder, ProductionSystemPromptBuilder):
+            raise TypeError("prompt_builder must be a ProductionSystemPromptBuilder")
+        self._prompt_builder = prompt_builder
+
+    @property
+    def prompt_version(self) -> str:
+        """Expose the active immutable prompt version as runtime metadata."""
+
+        return self._prompt_builder.version
 
     def invoke(
         self,
@@ -144,8 +160,13 @@ class ModelPipelineService:
                 correlation_id=conversation_id,
                 customer_id=trusted_identity.customer_id,
             )
+        protected_supplemental = self._data_protection.protect_text(
+            system_instructions
+        )
         context = ContextBuilder.build(
-            system_instructions=self._data_protection.protect_text(system_instructions),
+            system_instructions=self._prompt_builder.build(
+                protected_supplemental
+            ),
             messages=chain(protected_history, (current_message,)),
             provider_name=self._provider_name,
             model_name=self._model_name,

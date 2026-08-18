@@ -16,9 +16,9 @@ from app.tools.context import ExecutionContext
 from app.tools.continuation_adapter_registry import ProviderContinuationAdapterRegistry
 from app.tools.ping import PingTool
 from app.tools.registry import ToolRegistry
-from app.tools.selection import ToolSelectionResolver
 from app.tools.tool_runtime import build_tool_continuation_runtime
 from tests.tools.audit_fakes import RecordingAuditRepository
+from tests.trusted_selection_fakes import trusted_selection_pipeline
 
 
 pytestmark = pytest.mark.skipif(
@@ -45,7 +45,7 @@ def test_local_qwen_executes_ping_and_returns_a_terminal_answer() -> None:
     )
     loop = BoundedModelToolLoopService(
         provider_registry=providers,
-        selection_resolver=ToolSelectionResolver(tools),
+        trusted_selection_pipeline=trusted_selection_pipeline(tools),
         tool_runtime=runtime,
         max_model_turns=3,
         timeout_seconds=120,
@@ -69,7 +69,8 @@ def test_local_qwen_executes_ping_and_returns_a_terminal_answer() -> None:
             model_name="qwen3:8b",
         ),
         execution_context=ExecutionContext(
-            trace_id=uuid4(), execution_id=uuid4(), model_name="qwen3:8b"
+            trace_id=uuid4(), execution_id=uuid4(), conversation_id=uuid4(),
+            customer_id=uuid4(), model_name="qwen3:8b"
         ),
     )
 

@@ -1,0 +1,3550 @@
+{
+  "suite_key": "cx-benchmark-100-cases",
+  "suite_version": "2026.07.27",
+  "suite_content_hash": "sha256:c21e5fd1bb14664bc961d552df328f3eb1313c7335150290bbfb6b4b91cd9d03",
+  "scoring_policy_key": "cx-deterministic-core",
+  "scoring_policy_version": "1.0.0",
+  "runs": [
+    {
+      "suite_key": "cx-benchmark-100-cases",
+      "suite_version": "2026.07.27",
+      "suite_content_hash": "sha256:c21e5fd1bb14664bc961d552df328f3eb1313c7335150290bbfb6b4b91cd9d03",
+      "run": {
+        "id": "25026935-78cb-4593-bd77-27f206d9d977",
+        "run_key": "cx-100-fanar9bi-chat-v1",
+        "benchmark_suite_id": "b2419c85-8a76-4b1d-b104-fc3fd31e9b7c",
+        "model_name": "Fanar 9B Instruct",
+        "model_version": "yasserrmd/Fanar-1-9B-Instruct:latest | Chat Mode | Tool metrics N/A",
+        "provider_name": "ollama",
+        "provider_type": "local_runtime",
+        "deployment_mode": "local",
+        "configuration_snapshot": {
+          "temperature": null,
+          "top_p": null,
+          "maximum_output_tokens": 256,
+          "context_window_limit": 8192,
+          "tool_loop_limit": null,
+          "timeout_seconds": "120",
+          "prompt_version": "production",
+          "harness_version": "stage-16.4",
+          "provider_settings": {
+            "note": "Tool calling is unavailable for this deployment. This benchmark was executed in Chat Mode. Tool-related metrics may be unavailable or marked as N/A.",
+            "tool_calling": false,
+            "tool_metrics": "not_applicable",
+            "execution_mode": "chat"
+          }
+        },
+        "pricing_snapshot": {
+          "currency_code": "USD",
+          "input_cost_per_million_tokens": null,
+          "output_cost_per_million_tokens": null,
+          "request_cost": null,
+          "hardware_hourly_cost": null,
+          "electricity_cost_per_kwh": null,
+          "hosting_overhead": null,
+          "assumptions": {
+            "cost_status": "not_configured_local_runtime"
+          }
+        },
+        "status": "completed",
+        "started_at": "2026-07-27T04:11:08.562806Z",
+        "completed_at": "2026-07-27T04:58:16.872636Z",
+        "created_at": "2026-07-27T04:11:08.561290Z",
+        "updated_at": "2026-07-27T04:58:16.872636Z"
+      },
+      "completion": {
+        "expected_test_cases": 100,
+        "stored_test_cases": 100,
+        "completed_cases": 100,
+        "passed_cases": 100,
+        "failed_cases": 0,
+        "incomplete_cases": 0,
+        "pass_rate": "1",
+        "completion_rate": "1"
+      },
+      "execution": {
+        "total_provider_turns": 100,
+        "average_provider_turns": "1",
+        "total_tool_executions": 0,
+        "successful_tool_executions": 0,
+        "failed_tool_executions": 0,
+        "tool_execution_success_rate": null,
+        "total_clarifications": 16,
+        "average_clarifications": "0.16"
+      },
+      "reliability": {
+        "conversations_with_model_failures": 0,
+        "conversations_with_business_data_failures": 0,
+        "conversations_with_provider_failures": 0,
+        "conversations_with_harness_failures": 0,
+        "conversations_with_infrastructure_failures": 0,
+        "conversations_with_security_failures": 0,
+        "conversations_with_evaluation_pipeline_failures": 0
+      },
+      "outcomes": {
+        "counts": {
+          "passed": 100
+        },
+        "rates": {
+          "passed": "1"
+        }
+      },
+      "grounding": {
+        "evaluated_conversations": 0,
+        "enforcement_pass_count": 0,
+        "enforcement_failure_count": 0,
+        "grounding_pass_rate": null,
+        "grounding_failure_rate": null
+      },
+      "hallucination": {
+        "conversations_with_stored_signal": 0,
+        "hallucination_rate": "0"
+      },
+      "quality_metrics": [
+        {
+          "metric_key": "argument_validation_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {
+            "not_applicable": 100
+          }
+        },
+        {
+          "metric_key": "authorization_pass_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {
+            "not_applicable": 100
+          }
+        },
+        {
+          "metric_key": "clarification_count",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "0.16000000",
+          "median": "0E-8",
+          "minimum": "0E-8",
+          "maximum": "1.00000000",
+          "standard_deviation": "0.3666060555964672",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "context_utilization_ratio",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "0.08349609",
+          "median": "0.08337402",
+          "minimum": "0.08312988",
+          "maximum": "0.08386230",
+          "standard_deviation": "0.0003136035081755305",
+          "normalized_average": "0.08349609374",
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "conversation_completion",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": "1.0000000000",
+          "true_count": 100,
+          "false_count": 0,
+          "true_rate": "1",
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "grounding_enforcement_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {
+            "not_applicable": 100
+          }
+        },
+        {
+          "metric_key": "input_token_count",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "684.00000000",
+          "median": "683.00000000",
+          "minimum": "681.00000000",
+          "maximum": "687.00000000",
+          "standard_deviation": "2.569046515733026",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "latency_ms",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "28054.61302000",
+          "median": "33758.96050000",
+          "minimum": "11432.21600000",
+          "maximum": "35279.45000000",
+          "standard_deviation": "7988.597035664984",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "output_token_count",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "208.16000000",
+          "median": "255.50000000",
+          "minimum": "79.00000000",
+          "maximum": "256.00000000",
+          "standard_deviation": "62.16537943260702",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "provider_response_validity_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "1.00000000",
+          "median": "1.00000000",
+          "minimum": "1.00000000",
+          "maximum": "1.00000000",
+          "standard_deviation": "0.0",
+          "normalized_average": "1.0000000000",
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "tool_execution_success_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {
+            "not_applicable": 100
+          }
+        },
+        {
+          "metric_key": "tool_selection_match_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {
+            "not_applicable": 100
+          }
+        },
+        {
+          "metric_key": "total_token_count",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "892.16000000",
+          "median": "937.00000000",
+          "minimum": "766.00000000",
+          "maximum": "943.00000000",
+          "standard_deviation": "61.55627019240201",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        }
+      ],
+      "languages": [
+        {
+          "segment": "Egyptian Arabic",
+          "case_count": 40,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "876",
+          "average_latency_ms": "25686.88035",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "English + Arabic",
+          "case_count": 30,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.2666666666666666666666666667",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "899.5",
+          "average_latency_ms": "29035.9213",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Franco Arabic",
+          "case_count": 30,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1333333333333333333333333333",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "906.3666666666666666666666667",
+          "average_latency_ms": "30230.28163333333333333333333",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        }
+      ],
+      "categories": [
+        {
+          "segment": "Account",
+          "case_count": 6,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1666666666666666666666666667",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "870",
+          "average_latency_ms": "25094.31533333333333333333333",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Address",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1428571428571428571428571429",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "898.2857142857142857142857143",
+          "average_latency_ms": "28724.40414285714285714285714",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Angry Customer",
+          "case_count": 6,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "904.1666666666666666666666667",
+          "average_latency_ms": "29548.32016666666666666666667",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Cancellation",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1428571428571428571428571429",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "879.8571428571428571428571429",
+          "average_latency_ms": "26584.52057142857142857142857",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Coupon",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1428571428571428571428571429",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "889.7142857142857142857142857",
+          "average_latency_ms": "27594.58371428571428571428571",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Delivery",
+          "case_count": 6,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "904.8333333333333333333333333",
+          "average_latency_ms": "29926.82883333333333333333333",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "FAQ",
+          "case_count": 6,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1666666666666666666666666667",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "919.6666666666666666666666667",
+          "average_latency_ms": "31643.51233333333333333333333",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Late Delivery",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1428571428571428571428571429",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "861.8571428571428571428571429",
+          "average_latency_ms": "24245.594",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Missing Items",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.2857142857142857142857142857",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "900.8571428571428571428571429",
+          "average_latency_ms": "29049.59242857142857142857143",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Multi Intent",
+          "case_count": 6,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.3333333333333333333333333333",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "897.6666666666666666666666667",
+          "average_latency_ms": "28972.80683333333333333333333",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Order Tracking",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1428571428571428571428571429",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "909.2857142857142857142857143",
+          "average_latency_ms": "30332.18242857142857142857143",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Payment",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.2857142857142857142857142857",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "895",
+          "average_latency_ms": "28515.67471428571428571428571",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Product Availability",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.2857142857142857142857142857",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "900.1428571428571428571428571",
+          "average_latency_ms": "28995.09285714285714285714286",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Refund",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "887.8571428571428571428571429",
+          "average_latency_ms": "27458.95385714285714285714286",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Wrong Items",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1428571428571428571428571429",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "868.2857142857142857142857143",
+          "average_latency_ms": "24834.630",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        }
+      ],
+      "tools": [],
+      "failure_categories": [],
+      "failure_responsibilities": [],
+      "tokens": {
+        "total_input_tokens": 68400,
+        "total_output_tokens": 20816,
+        "total_tokens": 89216,
+        "average_tokens_per_conversation": "892.16",
+        "median_tokens_per_conversation": "937.0",
+        "minimum_tokens": 766,
+        "maximum_tokens": 943,
+        "standard_deviation": "61.55627019240201",
+        "input_to_output_ratio": "3.285933897002305918524212145",
+        "tokens_per_successful_conversation": "892.16",
+        "tokens_per_passed_case": "892.16"
+      },
+      "latency": {
+        "wall_clock_duration_ms": "2810059.938",
+        "accumulated_provider_latency_ms": "2805461.302",
+        "accumulated_tool_latency_ms": "0",
+        "accumulated_conversation_latency_ms": "2805461.302",
+        "average_conversation_latency_ms": "28054.61302",
+        "median_conversation_latency_ms": "33758.9605",
+        "minimum_conversation_latency_ms": "11432.216",
+        "maximum_conversation_latency_ms": "35279.450",
+        "standard_deviation_ms": "7988.597035664984",
+        "p50_ms": "33758.9605",
+        "p75_ms": "34095.35675",
+        "p90_ms": "34331.40510000000009452093",
+        "p95_ms": "34785.72504999999940319956",
+        "p99_ms": "35262.372500000000088251000",
+        "average_provider_turn_latency_ms": "28054.61302",
+        "average_tool_latency_ms": null
+      },
+      "context": {
+        "total_context_tokens": 68400,
+        "average_context_tokens_per_turn": "684",
+        "maximum_context_tokens": 687,
+        "average_utilization_ratio": "0.083496",
+        "maximum_utilization_ratio": "0.083862",
+        "conversations_above_threshold": 0,
+        "threshold": "0.9",
+        "buckets": [
+          {
+            "bucket": "0-25%",
+            "conversation_count": 100,
+            "pass_rate": "1",
+            "average_latency_ms": "28054.61302",
+            "average_output_tokens": "208.16",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          },
+          {
+            "bucket": "25-50%",
+            "conversation_count": 0,
+            "pass_rate": "0",
+            "average_latency_ms": "0",
+            "average_output_tokens": "0",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          },
+          {
+            "bucket": "50-75%",
+            "conversation_count": 0,
+            "pass_rate": "0",
+            "average_latency_ms": "0",
+            "average_output_tokens": "0",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          },
+          {
+            "bucket": "75-90%",
+            "conversation_count": 0,
+            "pass_rate": "0",
+            "average_latency_ms": "0",
+            "average_output_tokens": "0",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          },
+          {
+            "bucket": "90-100%",
+            "conversation_count": 0,
+            "pass_rate": "0",
+            "average_latency_ms": "0",
+            "average_output_tokens": "0",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          }
+        ]
+      },
+      "cost": {
+        "available": false,
+        "currency_code": null,
+        "total_estimated_cost": null,
+        "average_cost_per_conversation": null,
+        "median_cost": null,
+        "minimum_cost": null,
+        "maximum_cost": null,
+        "cost_per_passed_conversation": null,
+        "cost_per_completed_task": null,
+        "projected_cost_per_thousand_conversations": null,
+        "input_token_cost_contribution": null,
+        "output_token_cost_contribution": null,
+        "request_charge_contribution": null,
+        "missing_components": [
+          "complete_comparable_cost"
+        ]
+      },
+      "complexity": [
+        {
+          "segment": "single_turn",
+          "case_count": 100,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.16",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "892.16",
+          "average_latency_ms": "28054.61302",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        }
+      ],
+      "pressure": [
+        {
+          "segment": "standard",
+          "case_count": 100,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.16",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "892.16",
+          "average_latency_ms": "28054.61302",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        }
+      ],
+      "intent": {
+        "evaluated_count": 100,
+        "exact_match_count": 0,
+        "exact_match_accuracy": "0",
+        "missed_intent_count": 0,
+        "unsupported_intent_count": 100,
+        "per_intent_accuracy": {
+          "Account": "0",
+          "Address": "0",
+          "Angry Customer": "0",
+          "Cancellation": "0",
+          "Coupon": "0",
+          "Delivery": "0",
+          "FAQ": "0",
+          "Late Delivery": "0",
+          "Missing Items": "0",
+          "Multi Intent": "0",
+          "Order Tracking": "0",
+          "Payment": "0",
+          "Product Availability": "0",
+          "Refund": "0",
+          "Wrong Items": "0"
+        },
+        "confusion": [
+          {
+            "expected_intent": "Account",
+            "actual_intent": "chat_response",
+            "count": 6
+          },
+          {
+            "expected_intent": "Address",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Angry Customer",
+            "actual_intent": "chat_response",
+            "count": 6
+          },
+          {
+            "expected_intent": "Cancellation",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Coupon",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Delivery",
+            "actual_intent": "chat_response",
+            "count": 6
+          },
+          {
+            "expected_intent": "FAQ",
+            "actual_intent": "chat_response",
+            "count": 6
+          },
+          {
+            "expected_intent": "Late Delivery",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Missing Items",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Multi Intent",
+            "actual_intent": "chat_response",
+            "count": 6
+          },
+          {
+            "expected_intent": "Order Tracking",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Payment",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Product Availability",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Refund",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Wrong Items",
+            "actual_intent": "chat_response",
+            "count": 7
+          }
+        ]
+      },
+      "customer_turn_buckets": [
+        {
+          "bucket": "1-2 turns",
+          "conversation_count": 100,
+          "pass_rate": "1",
+          "grounding_pass_rate": "1",
+          "context_retention_rate": null,
+          "average_tokens": "892.16",
+          "average_latency_ms": "28054.61302",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "3-4 turns",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "5-6 turns",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "7+ turns",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        }
+      ],
+      "tool_depth_buckets": [
+        {
+          "bucket": "0 tools",
+          "conversation_count": 100,
+          "pass_rate": "1",
+          "grounding_pass_rate": "1",
+          "context_retention_rate": null,
+          "average_tokens": "892.16",
+          "average_latency_ms": "28054.61302",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "1 tool",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "2 tools",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "3-4 tools",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "5+ tools",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        }
+      ],
+      "performance": {
+        "benchmark_run_id": "25026935-78cb-4593-bd77-27f206d9d977",
+        "run_key": "cx-100-fanar9bi-chat-v1",
+        "model_name": "Fanar 9B Instruct",
+        "provider_name": "ollama",
+        "overall_score": "1.0000000000",
+        "score_coverage": "0.30",
+        "available_dimensions": [
+          "conversation_completion"
+        ],
+        "missing_dimensions": [
+          "tool_selection_match_rate",
+          "argument_validation_rate",
+          "grounding_enforcement_rate",
+          "continuity_resolution_rate"
+        ],
+        "weighted_components": [
+          {
+            "dimension": "conversation_completion",
+            "score": "1.0000000000",
+            "configured_weight": "0.30",
+            "effective_weight": "1",
+            "weighted_score": "1.0000000000"
+          }
+        ]
+      },
+      "generated_at": "2026-07-27T04:59:45.528313Z"
+    },
+    {
+      "suite_key": "cx-benchmark-100-cases",
+      "suite_version": "2026.07.27",
+      "suite_content_hash": "sha256:c21e5fd1bb14664bc961d552df328f3eb1313c7335150290bbfb6b4b91cd9d03",
+      "run": {
+        "id": "54def13a-74e4-461f-9d01-2c2437783a82",
+        "run_key": "cx-100-fanar9b-chat-v1",
+        "benchmark_suite_id": "b2419c85-8a76-4b1d-b104-fc3fd31e9b7c",
+        "model_name": "Fanar 9B",
+        "model_version": "hf.co/mradermacher/Fanar-1-9B-GGUF:Q4_K_M | Chat Mode | Tool metrics N/A",
+        "provider_name": "ollama",
+        "provider_type": "local_runtime",
+        "deployment_mode": "local",
+        "configuration_snapshot": {
+          "temperature": null,
+          "top_p": null,
+          "maximum_output_tokens": 256,
+          "context_window_limit": 8192,
+          "tool_loop_limit": null,
+          "timeout_seconds": "120",
+          "prompt_version": "production",
+          "harness_version": "stage-16.4",
+          "provider_settings": {
+            "note": "Tool calling is unavailable for this deployment. This benchmark was executed in Chat Mode. Tool-related metrics may be unavailable or marked as N/A.",
+            "tool_calling": false,
+            "tool_metrics": "not_applicable",
+            "execution_mode": "chat"
+          }
+        },
+        "pricing_snapshot": {
+          "currency_code": "USD",
+          "input_cost_per_million_tokens": null,
+          "output_cost_per_million_tokens": null,
+          "request_cost": null,
+          "hardware_hourly_cost": null,
+          "electricity_cost_per_kwh": null,
+          "hosting_overhead": null,
+          "assumptions": {
+            "cost_status": "not_configured_local_runtime"
+          }
+        },
+        "status": "completed",
+        "started_at": "2026-07-27T03:01:26.339744Z",
+        "completed_at": "2026-07-27T04:11:07.585245Z",
+        "created_at": "2026-07-27T03:01:26.337679Z",
+        "updated_at": "2026-07-27T04:11:07.585245Z"
+      },
+      "completion": {
+        "expected_test_cases": 100,
+        "stored_test_cases": 100,
+        "completed_cases": 100,
+        "passed_cases": 100,
+        "failed_cases": 0,
+        "incomplete_cases": 0,
+        "pass_rate": "1",
+        "completion_rate": "1"
+      },
+      "execution": {
+        "total_provider_turns": 100,
+        "average_provider_turns": "1",
+        "total_tool_executions": 0,
+        "successful_tool_executions": 0,
+        "failed_tool_executions": 0,
+        "tool_execution_success_rate": null,
+        "total_clarifications": 35,
+        "average_clarifications": "0.35"
+      },
+      "reliability": {
+        "conversations_with_model_failures": 0,
+        "conversations_with_business_data_failures": 0,
+        "conversations_with_provider_failures": 0,
+        "conversations_with_harness_failures": 0,
+        "conversations_with_infrastructure_failures": 0,
+        "conversations_with_security_failures": 0,
+        "conversations_with_evaluation_pipeline_failures": 0
+      },
+      "outcomes": {
+        "counts": {
+          "passed": 100
+        },
+        "rates": {
+          "passed": "1"
+        }
+      },
+      "grounding": {
+        "evaluated_conversations": 0,
+        "enforcement_pass_count": 0,
+        "enforcement_failure_count": 0,
+        "grounding_pass_rate": null,
+        "grounding_failure_rate": null
+      },
+      "hallucination": {
+        "conversations_with_stored_signal": 0,
+        "hallucination_rate": "0"
+      },
+      "quality_metrics": [
+        {
+          "metric_key": "argument_validation_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {
+            "not_applicable": 100
+          }
+        },
+        {
+          "metric_key": "authorization_pass_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {
+            "not_applicable": 100
+          }
+        },
+        {
+          "metric_key": "clarification_count",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "0.35000000",
+          "median": "0E-8",
+          "minimum": "0E-8",
+          "maximum": "1.00000000",
+          "standard_deviation": "0.47696960070847283",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "context_utilization_ratio",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "0.08691406",
+          "median": "0.08679199",
+          "minimum": "0.08654785",
+          "maximum": "0.08728027",
+          "standard_deviation": "0.0003136035081755305",
+          "normalized_average": "0.0869140625",
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "conversation_completion",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": "1.0000000000",
+          "true_count": 100,
+          "false_count": 0,
+          "true_rate": "1",
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "grounding_enforcement_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {
+            "not_applicable": 100
+          }
+        },
+        {
+          "metric_key": "input_token_count",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "712.00000000",
+          "median": "711.00000000",
+          "minimum": "709.00000000",
+          "maximum": "715.00000000",
+          "standard_deviation": "2.569046515733026",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "latency_ms",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "41480.05075000",
+          "median": "41214.00100000",
+          "minimum": "40750.09700000",
+          "maximum": "49592.90700000",
+          "standard_deviation": "962.2221168592039",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "output_token_count",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "256.00000000",
+          "median": "256.00000000",
+          "minimum": "256.00000000",
+          "maximum": "256.00000000",
+          "standard_deviation": "0.0",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "provider_response_validity_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "1.00000000",
+          "median": "1.00000000",
+          "minimum": "1.00000000",
+          "maximum": "1.00000000",
+          "standard_deviation": "0.0",
+          "normalized_average": "1.0000000000",
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "tool_execution_success_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {
+            "not_applicable": 100
+          }
+        },
+        {
+          "metric_key": "tool_selection_match_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {
+            "not_applicable": 100
+          }
+        },
+        {
+          "metric_key": "total_token_count",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "968.00000000",
+          "median": "967.00000000",
+          "minimum": "965.00000000",
+          "maximum": "971.00000000",
+          "standard_deviation": "2.569046515733026",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        }
+      ],
+      "languages": [
+        {
+          "segment": "Egyptian Arabic",
+          "case_count": 40,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.125",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "971",
+          "average_latency_ms": "41775.75955",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "English + Arabic",
+          "case_count": 30,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.6666666666666666666666666667",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "967",
+          "average_latency_ms": "41225.3923",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Franco Arabic",
+          "case_count": 30,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.3333333333333333333333333333",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "965",
+          "average_latency_ms": "41340.4308",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        }
+      ],
+      "categories": [
+        {
+          "segment": "Account",
+          "case_count": 6,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1666666666666666666666666667",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "967.6666666666666666666666667",
+          "average_latency_ms": "41538.06333333333333333333333",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Address",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.4285714285714285714285714286",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "968.1428571428571428571428571",
+          "average_latency_ms": "41468.47614285714285714285714",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Angry Customer",
+          "case_count": 6,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.5",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "967.6666666666666666666666667",
+          "average_latency_ms": "41898.20016666666666666666667",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Cancellation",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "968.1428571428571428571428571",
+          "average_latency_ms": "42307.70685714285714285714286",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Coupon",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.4285714285714285714285714286",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "968.1428571428571428571428571",
+          "average_latency_ms": "41209.18071428571428571428571",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Delivery",
+          "case_count": 6,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.3333333333333333333333333333",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "967.6666666666666666666666667",
+          "average_latency_ms": "41351.87216666666666666666667",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "FAQ",
+          "case_count": 6,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.5",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "967.6666666666666666666666667",
+          "average_latency_ms": "41502.68316666666666666666667",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Late Delivery",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.7142857142857142857142857143",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "968.1428571428571428571428571",
+          "average_latency_ms": "41198.494",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Missing Items",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.4285714285714285714285714286",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "968.1428571428571428571428571",
+          "average_latency_ms": "41340.52771428571428571428571",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Multi Intent",
+          "case_count": 6,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.3333333333333333333333333333",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "967.6666666666666666666666667",
+          "average_latency_ms": "41804.0335",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Order Tracking",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.2857142857142857142857142857",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "968.1428571428571428571428571",
+          "average_latency_ms": "41574.16957142857142857142857",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Payment",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.4285714285714285714285714286",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "968.1428571428571428571428571",
+          "average_latency_ms": "41352.05271428571428571428571",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Product Availability",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.4285714285714285714285714286",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "968.1428571428571428571428571",
+          "average_latency_ms": "41313.788",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Refund",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1428571428571428571428571429",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "968.1428571428571428571428571",
+          "average_latency_ms": "41340.96285714285714285714286",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Wrong Items",
+          "case_count": 7,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.1428571428571428571428571429",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "968.1428571428571428571428571",
+          "average_latency_ms": "41099.77871428571428571428571",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        }
+      ],
+      "tools": [],
+      "failure_categories": [],
+      "failure_responsibilities": [],
+      "tokens": {
+        "total_input_tokens": 71200,
+        "total_output_tokens": 25600,
+        "total_tokens": 96800,
+        "average_tokens_per_conversation": "968",
+        "median_tokens_per_conversation": "967.0",
+        "minimum_tokens": 965,
+        "maximum_tokens": 971,
+        "standard_deviation": "2.569046515733026",
+        "input_to_output_ratio": "2.78125",
+        "tokens_per_successful_conversation": "968",
+        "tokens_per_passed_case": "968"
+      },
+      "latency": {
+        "wall_clock_duration_ms": "4153542.488",
+        "accumulated_provider_latency_ms": "4148005.075",
+        "accumulated_tool_latency_ms": "0",
+        "accumulated_conversation_latency_ms": "4148005.075",
+        "average_conversation_latency_ms": "41480.05075",
+        "median_conversation_latency_ms": "41214.001",
+        "minimum_conversation_latency_ms": "40750.097",
+        "maximum_conversation_latency_ms": "49592.907",
+        "standard_deviation_ms": "962.2221168592039",
+        "p50_ms": "41214.0010",
+        "p75_ms": "41545.36950",
+        "p90_ms": "42325.34630000000028057729",
+        "p95_ms": "42645.92184999999995911252",
+        "p99_ms": "42875.031330000034715810028",
+        "average_provider_turn_latency_ms": "41480.05075",
+        "average_tool_latency_ms": null
+      },
+      "context": {
+        "total_context_tokens": 71200,
+        "average_context_tokens_per_turn": "712",
+        "maximum_context_tokens": 715,
+        "average_utilization_ratio": "0.086914",
+        "maximum_utilization_ratio": "0.087280",
+        "conversations_above_threshold": 0,
+        "threshold": "0.9",
+        "buckets": [
+          {
+            "bucket": "0-25%",
+            "conversation_count": 100,
+            "pass_rate": "1",
+            "average_latency_ms": "41480.05075",
+            "average_output_tokens": "256",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          },
+          {
+            "bucket": "25-50%",
+            "conversation_count": 0,
+            "pass_rate": "0",
+            "average_latency_ms": "0",
+            "average_output_tokens": "0",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          },
+          {
+            "bucket": "50-75%",
+            "conversation_count": 0,
+            "pass_rate": "0",
+            "average_latency_ms": "0",
+            "average_output_tokens": "0",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          },
+          {
+            "bucket": "75-90%",
+            "conversation_count": 0,
+            "pass_rate": "0",
+            "average_latency_ms": "0",
+            "average_output_tokens": "0",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          },
+          {
+            "bucket": "90-100%",
+            "conversation_count": 0,
+            "pass_rate": "0",
+            "average_latency_ms": "0",
+            "average_output_tokens": "0",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          }
+        ]
+      },
+      "cost": {
+        "available": false,
+        "currency_code": null,
+        "total_estimated_cost": null,
+        "average_cost_per_conversation": null,
+        "median_cost": null,
+        "minimum_cost": null,
+        "maximum_cost": null,
+        "cost_per_passed_conversation": null,
+        "cost_per_completed_task": null,
+        "projected_cost_per_thousand_conversations": null,
+        "input_token_cost_contribution": null,
+        "output_token_cost_contribution": null,
+        "request_charge_contribution": null,
+        "missing_components": [
+          "complete_comparable_cost"
+        ]
+      },
+      "complexity": [
+        {
+          "segment": "single_turn",
+          "case_count": 100,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.35",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "968",
+          "average_latency_ms": "41480.05075",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        }
+      ],
+      "pressure": [
+        {
+          "segment": "standard",
+          "case_count": 100,
+          "pass_rate": "1",
+          "task_completion_rate": "1.0000000000",
+          "tool_selection_accuracy": null,
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0.35",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "968",
+          "average_latency_ms": "41480.05075",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        }
+      ],
+      "intent": {
+        "evaluated_count": 100,
+        "exact_match_count": 0,
+        "exact_match_accuracy": "0",
+        "missed_intent_count": 0,
+        "unsupported_intent_count": 100,
+        "per_intent_accuracy": {
+          "Account": "0",
+          "Address": "0",
+          "Angry Customer": "0",
+          "Cancellation": "0",
+          "Coupon": "0",
+          "Delivery": "0",
+          "FAQ": "0",
+          "Late Delivery": "0",
+          "Missing Items": "0",
+          "Multi Intent": "0",
+          "Order Tracking": "0",
+          "Payment": "0",
+          "Product Availability": "0",
+          "Refund": "0",
+          "Wrong Items": "0"
+        },
+        "confusion": [
+          {
+            "expected_intent": "Account",
+            "actual_intent": "chat_response",
+            "count": 6
+          },
+          {
+            "expected_intent": "Address",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Angry Customer",
+            "actual_intent": "chat_response",
+            "count": 6
+          },
+          {
+            "expected_intent": "Cancellation",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Coupon",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Delivery",
+            "actual_intent": "chat_response",
+            "count": 6
+          },
+          {
+            "expected_intent": "FAQ",
+            "actual_intent": "chat_response",
+            "count": 6
+          },
+          {
+            "expected_intent": "Late Delivery",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Missing Items",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Multi Intent",
+            "actual_intent": "chat_response",
+            "count": 6
+          },
+          {
+            "expected_intent": "Order Tracking",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Payment",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Product Availability",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Refund",
+            "actual_intent": "chat_response",
+            "count": 7
+          },
+          {
+            "expected_intent": "Wrong Items",
+            "actual_intent": "chat_response",
+            "count": 7
+          }
+        ]
+      },
+      "customer_turn_buckets": [
+        {
+          "bucket": "1-2 turns",
+          "conversation_count": 100,
+          "pass_rate": "1",
+          "grounding_pass_rate": "1",
+          "context_retention_rate": null,
+          "average_tokens": "968",
+          "average_latency_ms": "41480.05075",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "3-4 turns",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "5-6 turns",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "7+ turns",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        }
+      ],
+      "tool_depth_buckets": [
+        {
+          "bucket": "0 tools",
+          "conversation_count": 100,
+          "pass_rate": "1",
+          "grounding_pass_rate": "1",
+          "context_retention_rate": null,
+          "average_tokens": "968",
+          "average_latency_ms": "41480.05075",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "1 tool",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "2 tools",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "3-4 tools",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "5+ tools",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        }
+      ],
+      "performance": {
+        "benchmark_run_id": "54def13a-74e4-461f-9d01-2c2437783a82",
+        "run_key": "cx-100-fanar9b-chat-v1",
+        "model_name": "Fanar 9B",
+        "provider_name": "ollama",
+        "overall_score": "1.0000000000",
+        "score_coverage": "0.30",
+        "available_dimensions": [
+          "conversation_completion"
+        ],
+        "missing_dimensions": [
+          "tool_selection_match_rate",
+          "argument_validation_rate",
+          "grounding_enforcement_rate",
+          "continuity_resolution_rate"
+        ],
+        "weighted_components": [
+          {
+            "dimension": "conversation_completion",
+            "score": "1.0000000000",
+            "configured_weight": "0.30",
+            "effective_weight": "1",
+            "weighted_score": "1.0000000000"
+          }
+        ]
+      },
+      "generated_at": "2026-07-27T04:59:45.874004Z"
+    },
+    {
+      "suite_key": "cx-benchmark-100-cases",
+      "suite_version": "2026.07.27",
+      "suite_content_hash": "sha256:c21e5fd1bb14664bc961d552df328f3eb1313c7335150290bbfb6b4b91cd9d03",
+      "run": {
+        "id": "d1dd46b1-4e54-429e-a807-0042e9983f91",
+        "run_key": "cx-100-qwen-agent-v1",
+        "benchmark_suite_id": "b2419c85-8a76-4b1d-b104-fc3fd31e9b7c",
+        "model_name": "Qwen 3 8B",
+        "model_version": "qwen3:8b | Agent Mode",
+        "provider_name": "ollama",
+        "provider_type": "local_runtime",
+        "deployment_mode": "local",
+        "configuration_snapshot": {
+          "temperature": null,
+          "top_p": null,
+          "maximum_output_tokens": 256,
+          "context_window_limit": 8192,
+          "tool_loop_limit": 5,
+          "timeout_seconds": "120",
+          "prompt_version": "production",
+          "harness_version": "stage-16.4",
+          "provider_settings": {
+            "note": "Native agent execution",
+            "tool_calling": true,
+            "tool_metrics": "available",
+            "execution_mode": "agent"
+          }
+        },
+        "pricing_snapshot": {
+          "currency_code": "USD",
+          "input_cost_per_million_tokens": null,
+          "output_cost_per_million_tokens": null,
+          "request_cost": null,
+          "hardware_hourly_cost": null,
+          "electricity_cost_per_kwh": null,
+          "hosting_overhead": null,
+          "assumptions": {
+            "cost_status": "not_configured_local_runtime"
+          }
+        },
+        "status": "completed",
+        "started_at": "2026-07-27T02:48:42.958511Z",
+        "completed_at": "2026-07-27T03:01:25.388288Z",
+        "created_at": "2026-07-27T02:48:42.955055Z",
+        "updated_at": "2026-07-27T03:01:25.388288Z"
+      },
+      "completion": {
+        "expected_test_cases": 100,
+        "stored_test_cases": 100,
+        "completed_cases": 100,
+        "passed_cases": 3,
+        "failed_cases": 97,
+        "incomplete_cases": 0,
+        "pass_rate": "0.03",
+        "completion_rate": "1"
+      },
+      "execution": {
+        "total_provider_turns": 103,
+        "average_provider_turns": "1.03",
+        "total_tool_executions": 3,
+        "successful_tool_executions": 3,
+        "failed_tool_executions": 0,
+        "tool_execution_success_rate": "1",
+        "total_clarifications": 0,
+        "average_clarifications": "0"
+      },
+      "reliability": {
+        "conversations_with_model_failures": 0,
+        "conversations_with_business_data_failures": 0,
+        "conversations_with_provider_failures": 0,
+        "conversations_with_harness_failures": 97,
+        "conversations_with_infrastructure_failures": 97,
+        "conversations_with_security_failures": 0,
+        "conversations_with_evaluation_pipeline_failures": 0
+      },
+      "outcomes": {
+        "counts": {
+          "infrastructure_failure": 97,
+          "passed": 3
+        },
+        "rates": {
+          "infrastructure_failure": "0.97",
+          "passed": "0.03"
+        }
+      },
+      "grounding": {
+        "evaluated_conversations": 94,
+        "enforcement_pass_count": 3,
+        "enforcement_failure_count": 91,
+        "grounding_pass_rate": "0.03191489361702127659574468085",
+        "grounding_failure_rate": "0.9680851063829787234042553191"
+      },
+      "hallucination": {
+        "conversations_with_stored_signal": 0,
+        "hallucination_rate": "0"
+      },
+      "quality_metrics": [
+        {
+          "metric_key": "argument_validation_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "1.00000000",
+          "median": "1.00000000",
+          "minimum": "1.00000000",
+          "maximum": "1.00000000",
+          "standard_deviation": "0.0",
+          "normalized_average": "1.0000000000",
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "authorization_pass_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "1.00000000",
+          "median": "1.00000000",
+          "minimum": "1.00000000",
+          "maximum": "1.00000000",
+          "standard_deviation": "0.0",
+          "normalized_average": "1.0000000000",
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "clarification_count",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "0E-8",
+          "median": "0E-8",
+          "minimum": "0E-8",
+          "maximum": "0E-8",
+          "standard_deviation": "0.0",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "context_utilization_ratio",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "0.5097448711",
+          "median": "0.50817871",
+          "minimum": "0.50805664",
+          "maximum": "0.54687500",
+          "standard_deviation": "0.006546886247209111",
+          "normalized_average": "0.509744873049",
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "conversation_completion",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": "0.0300000000",
+          "true_count": 3,
+          "false_count": 97,
+          "true_rate": "0.03",
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "grounding_enforcement_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": null,
+          "median": null,
+          "minimum": null,
+          "maximum": null,
+          "standard_deviation": null,
+          "normalized_average": "0.03191489361702127659574468085",
+          "true_count": 3,
+          "false_count": 91,
+          "true_rate": "0.03191489361702127659574468085",
+          "value_distribution": {
+            "not_applicable": 6
+          }
+        },
+        {
+          "metric_key": "input_token_count",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "4300.69000000",
+          "median": "4163.00000000",
+          "minimum": "4162.00000000",
+          "maximum": "8642.00000000",
+          "standard_deviation": "763.4315908449165",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "latency_ms",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "6808.77504000",
+          "median": "5113.19000000",
+          "minimum": "4506.48600000",
+          "maximum": "20143.85100000",
+          "standard_deviation": "3335.0481035832",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "output_token_count",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "37.11000000",
+          "median": "25.00000000",
+          "minimum": "25.00000000",
+          "maximum": "89.00000000",
+          "standard_deviation": "19.165017610218886",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "provider_response_validity_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "1.00000000",
+          "median": "1.00000000",
+          "minimum": "1.00000000",
+          "maximum": "1.00000000",
+          "standard_deviation": "0.0",
+          "normalized_average": "1.0000000000",
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "tool_execution_success_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "1.00000000",
+          "median": "1.00000000",
+          "minimum": "1.00000000",
+          "maximum": "1.00000000",
+          "standard_deviation": "0.0",
+          "normalized_average": "1.0000000000",
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "tool_selection_match_rate",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "1.00000000",
+          "median": "1.00000000",
+          "minimum": "1.00000000",
+          "maximum": "1.00000000",
+          "standard_deviation": "0.0",
+          "normalized_average": "1.0000000000",
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        },
+        {
+          "metric_key": "total_token_count",
+          "metric_version": "1.0.0",
+          "evaluation_method": "deterministic_rule",
+          "evaluator_name": "cx_harness_deterministic_ingestion",
+          "evaluator_version": "1.0.0",
+          "count": 100,
+          "mean": "4337.80000000",
+          "median": "4197.00000000",
+          "minimum": "4188.00000000",
+          "maximum": "8731.00000000",
+          "standard_deviation": "771.7541707046357",
+          "normalized_average": null,
+          "true_count": null,
+          "false_count": null,
+          "true_rate": null,
+          "value_distribution": {}
+        }
+      ],
+      "languages": [
+        {
+          "segment": "Egyptian Arabic",
+          "case_count": 40,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0.95",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4197",
+          "average_latency_ms": "4986.000575",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "English + Arabic",
+          "case_count": 30,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0.9333333333333333333333333333",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4188",
+          "average_latency_ms": "4833.567166666666666666666667",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Franco Arabic",
+          "case_count": 30,
+          "pass_rate": "0.1",
+          "task_completion_rate": "0.1000000000",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": "1",
+          "grounding_failure_rate": "0.8333333333333333333333333333",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1.1",
+          "average_tool_calls": "0.1",
+          "average_total_tokens": "4675.333333333333333333333333",
+          "average_latency_ms": "11214.34886666666666666666667",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        }
+      ],
+      "categories": [
+        {
+          "segment": "Account",
+          "case_count": 6,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "1",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4202.5",
+          "average_latency_ms": "6357.164833333333333333333333",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Address",
+          "case_count": 7,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "1",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4205.428571428571428571428571",
+          "average_latency_ms": "6827.860",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Angry Customer",
+          "case_count": 6,
+          "pass_rate": "0.1666666666666666666666666667",
+          "task_completion_rate": "0.1666666666666666666666666667",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": "1",
+          "grounding_failure_rate": "0.8333333333333333333333333333",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1.166666666666666666666666667",
+          "average_tool_calls": "0.1666666666666666666666666667",
+          "average_total_tokens": "4951.333333333333333333333333",
+          "average_latency_ms": "8096.865",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Cancellation",
+          "case_count": 7,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "1",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4202.857142857142857142857143",
+          "average_latency_ms": "6334.223714285714285714285714",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Coupon",
+          "case_count": 7,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "1",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4203.285714285714285714285714",
+          "average_latency_ms": "6448.617",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Delivery",
+          "case_count": 6,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "1",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4203.166666666666666666666667",
+          "average_latency_ms": "6596.168166666666666666666667",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "FAQ",
+          "case_count": 6,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "1",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4204.166666666666666666666667",
+          "average_latency_ms": "6583.802666666666666666666667",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Late Delivery",
+          "case_count": 7,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "1",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4203",
+          "average_latency_ms": "6708.759428571428571428571429",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Missing Items",
+          "case_count": 7,
+          "pass_rate": "0.1428571428571428571428571429",
+          "task_completion_rate": "0.1428571428571428571428571429",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": "1",
+          "grounding_failure_rate": "0.8571428571428571428571428571",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1.142857142857142857142857143",
+          "average_tool_calls": "0.1428571428571428571428571429",
+          "average_total_tokens": "4844.571428571428571428571429",
+          "average_latency_ms": "7824.716857142857142857142857",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Multi Intent",
+          "case_count": 6,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "0",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4202.666666666666666666666667",
+          "average_latency_ms": "6458.531",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Order Tracking",
+          "case_count": 7,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "1",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4200",
+          "average_latency_ms": "6181.213142857142857142857143",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Payment",
+          "case_count": 7,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "1",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4201.571428571428571428571429",
+          "average_latency_ms": "6283.080142857142857142857143",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Product Availability",
+          "case_count": 7,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "1",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4201.857142857142857142857143",
+          "average_latency_ms": "6299.899714285714285714285714",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Refund",
+          "case_count": 7,
+          "pass_rate": "0.1428571428571428571428571429",
+          "task_completion_rate": "0.1428571428571428571428571429",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": "1",
+          "grounding_failure_rate": "0.8571428571428571428571428571",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1.142857142857142857142857143",
+          "average_tool_calls": "0.1428571428571428571428571429",
+          "average_total_tokens": "4846.142857142857142857142857",
+          "average_latency_ms": "8166.130",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        },
+        {
+          "segment": "Wrong Items",
+          "case_count": 7,
+          "pass_rate": "0",
+          "task_completion_rate": "0E-10",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": null,
+          "grounding_failure_rate": "1",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1",
+          "average_tool_calls": "0",
+          "average_total_tokens": "4205.142857142857142857142857",
+          "average_latency_ms": "6971.544857142857142857142857",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        }
+      ],
+      "tools": [
+        {
+          "tool_name": "list_current_orders",
+          "expected_count": 3,
+          "selected_count": 3,
+          "correct_selection_count": 3,
+          "incorrect_selection_count": 0,
+          "selection_precision": "1",
+          "selection_recall": "1",
+          "execution_attempts": 3,
+          "valid_argument_count": 3,
+          "invalid_argument_count": 0,
+          "authorization_pass_count": 3,
+          "successful_execution_count": 3,
+          "business_failure_count": 0,
+          "runtime_failure_count": 0,
+          "average_latency_ms": "39.136",
+          "median_latency_ms": "31.310",
+          "failure_code_distribution": {}
+        }
+      ],
+      "failure_categories": [
+        {
+          "category": "runtime",
+          "event_count": 97,
+          "affected_conversation_count": 97,
+          "affected_conversation_rate": "0.97"
+        }
+      ],
+      "failure_responsibilities": [
+        {
+          "responsibility_layer": "harness",
+          "event_count": 97,
+          "affected_conversation_count": 97,
+          "affected_conversation_rate": "0.97"
+        }
+      ],
+      "tokens": {
+        "total_input_tokens": 430069,
+        "total_output_tokens": 3711,
+        "total_tokens": 433780,
+        "average_tokens_per_conversation": "4337.8",
+        "median_tokens_per_conversation": "4197.0",
+        "minimum_tokens": 4188,
+        "maximum_tokens": 8731,
+        "standard_deviation": "771.7541707046357",
+        "input_to_output_ratio": "115.8903260576663971975208839",
+        "tokens_per_successful_conversation": "144593.3333333333333333333333",
+        "tokens_per_passed_case": "144593.3333333333333333333333"
+      },
+      "latency": {
+        "wall_clock_duration_ms": "685648.042",
+        "accumulated_provider_latency_ms": "680760.096",
+        "accumulated_tool_latency_ms": "117.408",
+        "accumulated_conversation_latency_ms": "680877.504",
+        "average_conversation_latency_ms": "6808.77504",
+        "median_conversation_latency_ms": "5113.190",
+        "minimum_conversation_latency_ms": "4506.486",
+        "maximum_conversation_latency_ms": "20143.851",
+        "standard_deviation_ms": "3335.0481035832",
+        "p50_ms": "5113.1900",
+        "p75_ms": "9283.71875",
+        "p90_ms": "10796.30950000000086745835",
+        "p95_ms": "12476.52629999999417406376",
+        "p99_ms": "18434.513040000008833306064",
+        "average_provider_turn_latency_ms": "6609.321320388349514563106796",
+        "average_tool_latency_ms": "39.136"
+      },
+      "context": {
+        "total_context_tokens": 430069,
+        "average_context_tokens_per_turn": "4175.427184466019417475728155",
+        "maximum_context_tokens": 4480,
+        "average_utilization_ratio": "0.5096957572815533980582524272",
+        "maximum_utilization_ratio": "0.546875",
+        "conversations_above_threshold": 0,
+        "threshold": "0.9",
+        "buckets": [
+          {
+            "bucket": "0-25%",
+            "conversation_count": 0,
+            "pass_rate": "0",
+            "average_latency_ms": "0",
+            "average_output_tokens": "0",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          },
+          {
+            "bucket": "25-50%",
+            "conversation_count": 0,
+            "pass_rate": "0",
+            "average_latency_ms": "0",
+            "average_output_tokens": "0",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          },
+          {
+            "bucket": "50-75%",
+            "conversation_count": 100,
+            "pass_rate": "0.03",
+            "average_latency_ms": "6808.77504",
+            "average_output_tokens": "37.11",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          },
+          {
+            "bucket": "75-90%",
+            "conversation_count": 0,
+            "pass_rate": "0",
+            "average_latency_ms": "0",
+            "average_output_tokens": "0",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          },
+          {
+            "bucket": "90-100%",
+            "conversation_count": 0,
+            "pass_rate": "0",
+            "average_latency_ms": "0",
+            "average_output_tokens": "0",
+            "model_failure_rate": "0",
+            "context_loss_rate": "0"
+          }
+        ]
+      },
+      "cost": {
+        "available": false,
+        "currency_code": null,
+        "total_estimated_cost": null,
+        "average_cost_per_conversation": null,
+        "median_cost": null,
+        "minimum_cost": null,
+        "maximum_cost": null,
+        "cost_per_passed_conversation": null,
+        "cost_per_completed_task": null,
+        "projected_cost_per_thousand_conversations": null,
+        "input_token_cost_contribution": null,
+        "output_token_cost_contribution": null,
+        "request_charge_contribution": null,
+        "missing_components": [
+          "complete_comparable_cost"
+        ]
+      },
+      "complexity": [
+        {
+          "segment": "single_turn",
+          "case_count": 100,
+          "pass_rate": "0.03",
+          "task_completion_rate": "0.0300000000",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": "1",
+          "grounding_failure_rate": "0.91",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1.03",
+          "average_tool_calls": "0.03",
+          "average_total_tokens": "4337.8",
+          "average_latency_ms": "6808.77504",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        }
+      ],
+      "pressure": [
+        {
+          "segment": "standard",
+          "case_count": 100,
+          "pass_rate": "0.03",
+          "task_completion_rate": "0.0300000000",
+          "tool_selection_accuracy": "1.0000000000",
+          "tool_success_rate": "1",
+          "grounding_failure_rate": "0.91",
+          "hallucination_rate": "0",
+          "clarification_rate": "0",
+          "average_provider_turns": "1.03",
+          "average_tool_calls": "0.03",
+          "average_total_tokens": "4337.8",
+          "average_latency_ms": "6808.77504",
+          "average_estimated_cost": null,
+          "model_failure_rate": "0",
+          "business_data_failure_rate": "0",
+          "context_loss_rate": "0"
+        }
+      ],
+      "intent": {
+        "evaluated_count": 100,
+        "exact_match_count": 0,
+        "exact_match_accuracy": "0",
+        "missed_intent_count": 0,
+        "unsupported_intent_count": 100,
+        "per_intent_accuracy": {
+          "Account": "0",
+          "Address": "0",
+          "Angry Customer": "0",
+          "Cancellation": "0",
+          "Coupon": "0",
+          "Delivery": "0",
+          "FAQ": "0",
+          "Late Delivery": "0",
+          "Missing Items": "0",
+          "Multi Intent": "0",
+          "Order Tracking": "0",
+          "Payment": "0",
+          "Product Availability": "0",
+          "Refund": "0",
+          "Wrong Items": "0"
+        },
+        "confusion": [
+          {
+            "expected_intent": "Account",
+            "actual_intent": "invalid_tool_call",
+            "count": 6
+          },
+          {
+            "expected_intent": "Address",
+            "actual_intent": "invalid_tool_call",
+            "count": 7
+          },
+          {
+            "expected_intent": "Angry Customer",
+            "actual_intent": "invalid_tool_call",
+            "count": 5
+          },
+          {
+            "expected_intent": "Angry Customer",
+            "actual_intent": "list_current_orders",
+            "count": 1
+          },
+          {
+            "expected_intent": "Cancellation",
+            "actual_intent": "invalid_tool_call",
+            "count": 7
+          },
+          {
+            "expected_intent": "Coupon",
+            "actual_intent": "invalid_tool_call",
+            "count": 7
+          },
+          {
+            "expected_intent": "Delivery",
+            "actual_intent": "invalid_tool_call",
+            "count": 6
+          },
+          {
+            "expected_intent": "FAQ",
+            "actual_intent": "invalid_tool_call",
+            "count": 6
+          },
+          {
+            "expected_intent": "Late Delivery",
+            "actual_intent": "invalid_tool_call",
+            "count": 7
+          },
+          {
+            "expected_intent": "Missing Items",
+            "actual_intent": "invalid_tool_call",
+            "count": 6
+          },
+          {
+            "expected_intent": "Missing Items",
+            "actual_intent": "list_current_orders",
+            "count": 1
+          },
+          {
+            "expected_intent": "Multi Intent",
+            "actual_intent": "invalid_tool_call",
+            "count": 6
+          },
+          {
+            "expected_intent": "Order Tracking",
+            "actual_intent": "invalid_tool_call",
+            "count": 7
+          },
+          {
+            "expected_intent": "Payment",
+            "actual_intent": "invalid_tool_call",
+            "count": 7
+          },
+          {
+            "expected_intent": "Product Availability",
+            "actual_intent": "invalid_tool_call",
+            "count": 7
+          },
+          {
+            "expected_intent": "Refund",
+            "actual_intent": "invalid_tool_call",
+            "count": 6
+          },
+          {
+            "expected_intent": "Refund",
+            "actual_intent": "list_current_orders",
+            "count": 1
+          },
+          {
+            "expected_intent": "Wrong Items",
+            "actual_intent": "invalid_tool_call",
+            "count": 7
+          }
+        ]
+      },
+      "customer_turn_buckets": [
+        {
+          "bucket": "1-2 turns",
+          "conversation_count": 100,
+          "pass_rate": "0.03",
+          "grounding_pass_rate": "0.09",
+          "context_retention_rate": null,
+          "average_tokens": "4337.8",
+          "average_latency_ms": "6808.77504",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "3-4 turns",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "5-6 turns",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "7+ turns",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        }
+      ],
+      "tool_depth_buckets": [
+        {
+          "bucket": "0 tools",
+          "conversation_count": 97,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0.06185567010309278350515463918",
+          "context_retention_rate": null,
+          "average_tokens": "4202.103092783505154639175258",
+          "average_latency_ms": "6433.420030927835051546391753",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "1 tool",
+          "conversation_count": 3,
+          "pass_rate": "1",
+          "grounding_pass_rate": "1",
+          "context_retention_rate": null,
+          "average_tokens": "8725.333333333333333333333333",
+          "average_latency_ms": "18945.25366666666666666666667",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "2 tools",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "3-4 tools",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        },
+        {
+          "bucket": "5+ tools",
+          "conversation_count": 0,
+          "pass_rate": "0",
+          "grounding_pass_rate": "0",
+          "context_retention_rate": null,
+          "average_tokens": "0",
+          "average_latency_ms": "0",
+          "hallucination_rate": "0",
+          "model_failure_rate": "0"
+        }
+      ],
+      "performance": {
+        "benchmark_run_id": "d1dd46b1-4e54-429e-a807-0042e9983f91",
+        "run_key": "cx-100-qwen-agent-v1",
+        "model_name": "Qwen 3 8B",
+        "provider_name": "ollama",
+        "overall_score": "0.4615366430260047281323877069",
+        "score_coverage": "0.90",
+        "available_dimensions": [
+          "conversation_completion",
+          "tool_selection_match_rate",
+          "argument_validation_rate",
+          "grounding_enforcement_rate"
+        ],
+        "missing_dimensions": [
+          "continuity_resolution_rate"
+        ],
+        "weighted_components": [
+          {
+            "dimension": "conversation_completion",
+            "score": "0.0300000000",
+            "configured_weight": "0.30",
+            "effective_weight": "0.3333333333333333333333333333",
+            "weighted_score": "0.009999999999999999999999999999"
+          },
+          {
+            "dimension": "tool_selection_match_rate",
+            "score": "1.0000000000",
+            "configured_weight": "0.25",
+            "effective_weight": "0.2777777777777777777777777778",
+            "weighted_score": "0.2777777777777777777777777778"
+          },
+          {
+            "dimension": "argument_validation_rate",
+            "score": "1.0000000000",
+            "configured_weight": "0.15",
+            "effective_weight": "0.1666666666666666666666666667",
+            "weighted_score": "0.1666666666666666666666666667"
+          },
+          {
+            "dimension": "grounding_enforcement_rate",
+            "score": "0.03191489361702127659574468085",
+            "configured_weight": "0.20",
+            "effective_weight": "0.2222222222222222222222222222",
+            "weighted_score": "0.007092198581560283687943262410"
+          }
+        ]
+      },
+      "generated_at": "2026-07-27T04:59:46.236824Z"
+    }
+  ],
+  "metric_rows": [
+    {
+      "dimension": "overall_quality",
+      "values_by_run": {
+        "cx-100-fanar9bi-chat-v1": "1.0000000000",
+        "cx-100-fanar9b-chat-v1": "1.0000000000",
+        "cx-100-qwen-agent-v1": "0.4615366430260047281323877069"
+      },
+      "comparable": true,
+      "reason": null
+    },
+    {
+      "dimension": "pass_rate",
+      "values_by_run": {
+        "cx-100-fanar9bi-chat-v1": "1",
+        "cx-100-fanar9b-chat-v1": "1",
+        "cx-100-qwen-agent-v1": "0.03"
+      },
+      "comparable": true,
+      "reason": null
+    },
+    {
+      "dimension": "task_completion",
+      "values_by_run": {
+        "cx-100-fanar9bi-chat-v1": "1.0000000000",
+        "cx-100-fanar9b-chat-v1": "1.0000000000",
+        "cx-100-qwen-agent-v1": "0.0300000000"
+      },
+      "comparable": true,
+      "reason": null
+    },
+    {
+      "dimension": "tool_selection",
+      "values_by_run": {
+        "cx-100-fanar9bi-chat-v1": null,
+        "cx-100-fanar9b-chat-v1": null,
+        "cx-100-qwen-agent-v1": "1.0000000000"
+      },
+      "comparable": false,
+      "reason": "evidence unavailable or incompatible"
+    },
+    {
+      "dimension": "lowest_latency",
+      "values_by_run": {
+        "cx-100-fanar9bi-chat-v1": "28054.61302",
+        "cx-100-fanar9b-chat-v1": "41480.05075",
+        "cx-100-qwen-agent-v1": "6808.77504"
+      },
+      "comparable": true,
+      "reason": null
+    },
+    {
+      "dimension": "lowest_hallucination",
+      "values_by_run": {
+        "cx-100-fanar9bi-chat-v1": "0",
+        "cx-100-fanar9b-chat-v1": "0",
+        "cx-100-qwen-agent-v1": "0"
+      },
+      "comparable": true,
+      "reason": null
+    },
+    {
+      "dimension": "egyptian_arabic",
+      "values_by_run": {
+        "cx-100-fanar9bi-chat-v1": null,
+        "cx-100-fanar9b-chat-v1": null,
+        "cx-100-qwen-agent-v1": null
+      },
+      "comparable": false,
+      "reason": "evidence unavailable or incompatible"
+    },
+    {
+      "dimension": "franco_arabic",
+      "values_by_run": {
+        "cx-100-fanar9bi-chat-v1": null,
+        "cx-100-fanar9b-chat-v1": null,
+        "cx-100-qwen-agent-v1": null
+      },
+      "comparable": false,
+      "reason": "evidence unavailable or incompatible"
+    },
+    {
+      "dimension": "high_complexity",
+      "values_by_run": {
+        "cx-100-fanar9bi-chat-v1": null,
+        "cx-100-fanar9b-chat-v1": null,
+        "cx-100-qwen-agent-v1": null
+      },
+      "comparable": false,
+      "reason": "evidence unavailable or incompatible"
+    },
+    {
+      "dimension": "lowest_cost",
+      "values_by_run": {
+        "cx-100-fanar9bi-chat-v1": null,
+        "cx-100-fanar9b-chat-v1": null,
+        "cx-100-qwen-agent-v1": null
+      },
+      "comparable": false,
+      "reason": "evidence unavailable or incompatible"
+    },
+    {
+      "dimension": "quality_to_cost",
+      "values_by_run": {
+        "cx-100-fanar9bi-chat-v1": null,
+        "cx-100-fanar9b-chat-v1": null,
+        "cx-100-qwen-agent-v1": null
+      },
+      "comparable": false,
+      "reason": "evidence unavailable or incompatible"
+    }
+  ],
+  "winners": [
+    {
+      "dimension": "overall_quality",
+      "available": true,
+      "winning_run_key": "cx-100-fanar9bi-chat-v1",
+      "value": "1.0000000000",
+      "runner_up_run_key": "cx-100-fanar9b-chat-v1",
+      "difference": "0E-10",
+      "tie": true,
+      "eligibility_conditions": [
+        "compatible benchmark identity",
+        "compatible metric evidence"
+      ],
+      "explanation": "Tie on this dimension."
+    },
+    {
+      "dimension": "pass_rate",
+      "available": true,
+      "winning_run_key": "cx-100-fanar9bi-chat-v1",
+      "value": "1",
+      "runner_up_run_key": "cx-100-fanar9b-chat-v1",
+      "difference": "0",
+      "tie": true,
+      "eligibility_conditions": [
+        "compatible benchmark identity",
+        "compatible metric evidence"
+      ],
+      "explanation": "Tie on this dimension."
+    },
+    {
+      "dimension": "task_completion",
+      "available": true,
+      "winning_run_key": "cx-100-fanar9bi-chat-v1",
+      "value": "1.0000000000",
+      "runner_up_run_key": "cx-100-fanar9b-chat-v1",
+      "difference": "0E-10",
+      "tie": true,
+      "eligibility_conditions": [
+        "compatible benchmark identity",
+        "compatible metric evidence"
+      ],
+      "explanation": "Tie on this dimension."
+    },
+    {
+      "dimension": "tool_selection",
+      "available": false,
+      "winning_run_key": null,
+      "value": null,
+      "runner_up_run_key": null,
+      "difference": null,
+      "tie": false,
+      "eligibility_conditions": [
+        "compatible benchmark identity",
+        "compatible metric evidence"
+      ],
+      "explanation": "Winner unavailable because evidence is missing or incompatible."
+    },
+    {
+      "dimension": "lowest_latency",
+      "available": true,
+      "winning_run_key": "cx-100-qwen-agent-v1",
+      "value": "6808.77504",
+      "runner_up_run_key": "cx-100-fanar9bi-chat-v1",
+      "difference": "21245.83798",
+      "tie": false,
+      "eligibility_conditions": [
+        "compatible benchmark identity",
+        "compatible metric evidence"
+      ],
+      "explanation": "Winner selected only for this compatible reporting dimension."
+    },
+    {
+      "dimension": "lowest_hallucination",
+      "available": true,
+      "winning_run_key": "cx-100-fanar9bi-chat-v1",
+      "value": "0",
+      "runner_up_run_key": "cx-100-fanar9b-chat-v1",
+      "difference": "0",
+      "tie": true,
+      "eligibility_conditions": [
+        "compatible benchmark identity",
+        "compatible metric evidence"
+      ],
+      "explanation": "Tie on this dimension."
+    },
+    {
+      "dimension": "egyptian_arabic",
+      "available": false,
+      "winning_run_key": null,
+      "value": null,
+      "runner_up_run_key": null,
+      "difference": null,
+      "tie": false,
+      "eligibility_conditions": [
+        "compatible benchmark identity",
+        "compatible metric evidence"
+      ],
+      "explanation": "Winner unavailable because evidence is missing or incompatible."
+    },
+    {
+      "dimension": "franco_arabic",
+      "available": false,
+      "winning_run_key": null,
+      "value": null,
+      "runner_up_run_key": null,
+      "difference": null,
+      "tie": false,
+      "eligibility_conditions": [
+        "compatible benchmark identity",
+        "compatible metric evidence"
+      ],
+      "explanation": "Winner unavailable because evidence is missing or incompatible."
+    },
+    {
+      "dimension": "high_complexity",
+      "available": false,
+      "winning_run_key": null,
+      "value": null,
+      "runner_up_run_key": null,
+      "difference": null,
+      "tie": false,
+      "eligibility_conditions": [
+        "compatible benchmark identity",
+        "compatible metric evidence"
+      ],
+      "explanation": "Winner unavailable because evidence is missing or incompatible."
+    },
+    {
+      "dimension": "lowest_cost",
+      "available": false,
+      "winning_run_key": null,
+      "value": null,
+      "runner_up_run_key": null,
+      "difference": null,
+      "tie": false,
+      "eligibility_conditions": [
+        "compatible benchmark identity",
+        "compatible metric evidence"
+      ],
+      "explanation": "Winner unavailable because evidence is missing or incompatible."
+    },
+    {
+      "dimension": "quality_to_cost",
+      "available": false,
+      "winning_run_key": null,
+      "value": null,
+      "runner_up_run_key": null,
+      "difference": null,
+      "tie": false,
+      "eligibility_conditions": [
+        "compatible benchmark identity",
+        "compatible metric evidence"
+      ],
+      "explanation": "Winner unavailable because evidence is missing or incompatible."
+    }
+  ],
+  "cost_ranking_available": false,
+  "generated_at": "2026-07-27T04:59:46.238158Z"
+}

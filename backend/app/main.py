@@ -55,12 +55,19 @@ app = FastAPI(
 )
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=list(settings.allowed_cors_origins),
     allow_credentials=False,
     allow_methods=["GET", "POST"],
     allow_headers=["Accept", "Authorization", "Content-Type"],
 )
 app.include_router(api_router)
+
+
+@app.get("/health", include_in_schema=False)
+def health_check() -> dict[str, str]:
+    """Return a dependency-free liveness response for the hosting platform."""
+
+    return {"status": "ok", "service": "cx-harness-api"}
 
 
 @app.exception_handler(AuthenticationError)

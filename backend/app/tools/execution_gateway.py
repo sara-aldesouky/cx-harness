@@ -12,6 +12,10 @@ from app.tools.immutable_json import json_copy
 from app.tools.registry import ToolNotFoundError, ToolRegistry
 from app.tools.result import ToolResult
 from app.tools.result import ToolError, ToolStatus
+from app.tools.security_approval import (
+    ToolExecutionSecurityApproval,
+    approved_tool_execution,
+)
 from app.security_audit import (
     AuditCategory,
     AuditResult,
@@ -122,6 +126,7 @@ class SingleToolExecutionGateway:
                 f"{request.tool_version!r} is disabled"
             )
 
+        role_policy_allowed = False
         if self._role_policy_service is not None:
             try:
                 role_decision = self._role_policy_service.evaluate(
@@ -163,7 +168,9 @@ class SingleToolExecutionGateway:
                         public_message=role_decision.public_message,
                     ),
                 )
+            role_policy_allowed = True
 
+        tool_authorized = False
         if self._tool_authorization_service is not None:
             try:
                 tool_decision = self._tool_authorization_service.authorize_tool(
@@ -207,7 +214,9 @@ class SingleToolExecutionGateway:
                         public_message=tool_decision.public_message,
                     ),
                 )
+            tool_authorized = True
 
+        ownership_authorized = False
         if self._authorization_service is not None:
             try:
                 decision = self._authorization_service.authorize(
@@ -259,6 +268,7 @@ class SingleToolExecutionGateway:
                         public_message=public_message,
                     ),
                 )
+            ownership_authorized = True
 
         try:
             input_model = tool_class.input_schema.model_validate(
@@ -270,12 +280,19 @@ class SingleToolExecutionGateway:
                 "could not be rehydrated"
             ) from error
 
-        return self._executor.execute(
-            request.tool_name,
-            request.tool_version,
-            request.context,
-            input_model,
+        approval = ToolExecutionSecurityApproval(
+            authenticated=request.context.customer_id is not None,
+            role_policy_allowed=role_policy_allowed,
+            tool_authorized=tool_authorized,
+            ownership_authorized=ownership_authorized,
         )
+        with approved_tool_execution(approval):
+            return self._executor.execute(
+                request.tool_name,
+                request.tool_version,
+                request.context,
+                input_model,
+            )
 
     def _audit_denial(
         self,

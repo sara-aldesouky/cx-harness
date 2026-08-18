@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from app.api.routes import (
+    benchmark_reporting,
     conversations,
     customers,
     evaluations,
@@ -17,6 +18,7 @@ from app.api.routes import (
 
 
 api_router = APIRouter(prefix="/api/v1")
+api_router.include_router(benchmark_reporting.router)
 api_router.include_router(customers.router)
 api_router.include_router(orders.router)
 api_router.include_router(order_items.router)

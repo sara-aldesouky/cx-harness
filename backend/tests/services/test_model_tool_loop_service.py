@@ -28,9 +28,10 @@ from app.tools.contracts import BaseTool, ToolCategory, ToolMetadata
 from app.tools.ping import PingTool
 from app.tools.registry import ToolRegistry
 from app.tools.result import ToolError, ToolResult, ToolStatus
-from app.tools.selection import ToolSelectionRequest, ToolSelectionResolver
+from app.tools.selection import ToolSelectionRequest
 from app.tools.tool_runtime import build_tool_continuation_runtime
 from tests.tools.audit_fakes import RecordingAuditRepository
+from tests.trusted_selection_fakes import trusted_selection_pipeline
 
 
 def call(call_id: str, *, name: str = "ping", arguments=None):  # type: ignore[no-untyped-def]
@@ -138,7 +139,7 @@ def build(turns, *, max_turns=5, timeout=None, clock=None):  # type: ignore[no-u
         kwargs["clock"] = clock
     service = BoundedModelToolLoopService(
         provider_registry=providers,
-        selection_resolver=ToolSelectionResolver(tool_registry),
+        trusted_selection_pipeline=trusted_selection_pipeline(tool_registry),
         tool_runtime=runtime,
         max_model_turns=max_turns,
         timeout_seconds=timeout,
@@ -159,7 +160,10 @@ def context() -> ConversationContext:
 
 @pytest.fixture
 def execution_context() -> ExecutionContext:
-    return ExecutionContext(trace_id=uuid4(), execution_id=uuid4(), model_name="mock-model")
+    return ExecutionContext(
+        trace_id=uuid4(), execution_id=uuid4(), conversation_id=uuid4(),
+        customer_id=uuid4(), model_name="mock-model"
+    )
 
 
 def run(service, context, execution_context):  # type: ignore[no-untyped-def]
@@ -220,8 +224,8 @@ def test_unknown_tool_is_rejected_without_execution(context, execution_context) 
     assert result.termination_reason is ModelToolLoopTermination.INVALID_TOOL_CALL
     assert result.tools_executed == 0 and not audit.started
     assert result.final_response is not None
-    assert "couldn’t validate" in result.final_response.content
-    assert result.error_code == "invalid_tool_call"
+    assert result.error_code == "invalid_tool"
+    assert result.final_response.content == "The requested tool is unavailable."
 
 
 def test_invalid_arguments_are_rejected_without_execution(context, execution_context) -> None:
@@ -230,8 +234,8 @@ def test_invalid_arguments_are_rejected_without_execution(context, execution_con
     assert result.termination_reason is ModelToolLoopTermination.INVALID_TOOL_CALL
     assert result.tools_executed == 0 and not audit.started
     assert result.final_response is not None
-    assert "couldn’t validate" in result.final_response.content
-    assert result.error_code == "invalid_tool_call"
+    assert result.error_code == "unexpected_argument"
+    assert result.final_response.content == "The requested arguments are not supported."
 
 
 def test_business_failure_is_returned_to_model(context, execution_context) -> None:

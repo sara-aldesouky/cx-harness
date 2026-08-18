@@ -88,6 +88,8 @@ def test_successful_full_pipeline_and_exact_ollama_payload() -> None:
             {"role": "user", "content": "third"},
         ],
         "stream": False,
+        "keep_alive": "15m",
+        "options": {"num_ctx": 8192, "num_predict": 256},
     }
 
 

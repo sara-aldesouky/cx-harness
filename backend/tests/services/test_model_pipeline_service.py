@@ -11,6 +11,7 @@ from pydantic import ValidationError
 
 from app.authentication import TrustedCustomerIdentity
 from app.harness import ConversationMessage
+from app.harness.production_prompt import PRODUCTION_SYSTEM_PROMPT
 from app.providers import ModelResponse
 from app.services import (
     ModelPipelineService,
@@ -105,7 +106,9 @@ def test_conversation_identity_and_context_inputs_are_propagated() -> None:
 
     call = pipeline.calls[0]
     assert call["conversation_id"] == conversation_id
-    assert call["system_instructions"] == "instructions"
+    assert call["system_instructions"].startswith(PRODUCTION_SYSTEM_PROMPT)
+    assert call["system_instructions"].endswith("instructions")
+    assert call["system_instructions"].count(PRODUCTION_SYSTEM_PROMPT) == 1
     assert call["provider_name"] == "ollama"
     assert call["model_name"] == "qwen3:8b"
     messages = call["messages"]

@@ -59,6 +59,10 @@ def build_model_pipeline(
                 app_settings.ollama_connect_timeout_seconds
             ),
             read_timeout_seconds=app_settings.ollama_read_timeout_seconds,
+            context_size=app_settings.ollama_context_size,
+            max_output_tokens=app_settings.ollama_max_output_tokens,
+            keep_alive=app_settings.ollama_keep_alive,
+            tool_thinking_enabled=app_settings.ollama_tool_thinking_enabled,
         )
         default_adapter = OllamaPromptAdapter(
             model_name=app_settings.ollama_model_name

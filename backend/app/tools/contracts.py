@@ -33,6 +33,7 @@ class GroundingCapability(str, Enum):
     PAYMENT = "payment"
     REFUND = "refund"
     KNOWLEDGE = "knowledge"
+    SUPPORT = "support"
 
 
 _SEMANTIC_VERSION_PATTERN = re.compile(
@@ -165,6 +166,28 @@ class BaseTool(ABC, Generic[InputModelT, OutputModelT]):
         raise NotImplementedError
 
     @classmethod
+    def model_description(cls) -> str:
+        """Return concise actionable guidance for provider tool discovery."""
+
+        metadata = cls.metadata
+        use_cases = "; ".join(metadata.supported_use_cases[:3])
+        guidance = [
+            metadata.description,
+            f"Use when the customer intent matches: {use_cases}.",
+            "Recognize Egyptian Arabic, Franco-Arabic, and mixed Arabic-English phrasing.",
+            "Supply only declared schema arguments; customer identity and security approval come from trusted runtime context.",
+        ]
+        if metadata.requires_order_ownership:
+            guidance.append(
+                "If the order reference is unknown, discover the authenticated customer's active or recent order first."
+            )
+        if not metadata.is_read_only:
+            guidance.append(
+                "Do not claim the operation succeeded until this tool returns confirmed success."
+            )
+        return " ".join(guidance)
+
+    @classmethod
     def definition(cls) -> dict[str, Any]:
         """Return a deterministic, provider-neutral, JSON-serializable definition."""
 
@@ -172,7 +195,7 @@ class BaseTool(ABC, Generic[InputModelT, OutputModelT]):
         return {
             "name": metadata["name"],
             "version": metadata["version"],
-            "description": metadata["description"],
+            "description": cls.model_description(),
             "category": metadata["category"],
             "supported_use_cases": metadata["supported_use_cases"],
             "grounding_capabilities": metadata["grounding_capabilities"],

@@ -10,6 +10,7 @@ import httpx
 import pytest
 
 from app.harness.context import ConversationContext, ConversationMessage, ConversationRole
+from app.harness.production_prompt import PRODUCTION_SYSTEM_PROMPT
 from app.api.dependencies import get_model_invocation_mapper
 from app.providers.ollama_qwen import (
     OllamaProviderContinuationAdapter,
@@ -25,9 +26,9 @@ from app.tools.context import ExecutionContext
 from app.tools.continuation_adapter_registry import ProviderContinuationAdapterRegistry
 from app.tools.ping import PingTool
 from app.tools.registry import ToolRegistry
-from app.tools.selection import ToolSelectionResolver
 from app.tools.tool_runtime import build_tool_continuation_runtime
 from tests.tools.audit_fakes import RecordingAuditRepository
+from tests.trusted_selection_fakes import trusted_selection_pipeline
 
 
 def response(*, content="", tool_calls=None):  # type: ignore[no-untyped-def]
@@ -78,7 +79,7 @@ def build_loop(responses):  # type: ignore[no-untyped-def]
     )
     loop = BoundedModelToolLoopService(
         provider_registry=providers,
-        selection_resolver=ToolSelectionResolver(tools),
+        trusted_selection_pipeline=trusted_selection_pipeline(tools),
         tool_runtime=runtime,
     )
     return loop, requests, audit
@@ -89,7 +90,7 @@ def run(loop):  # type: ignore[no-untyped-def]
         provider_name="ollama",
         model_name="qwen3:8b",
         context=ConversationContext(
-            system_instructions="Use approved tools when needed.",
+            system_instructions=PRODUCTION_SYSTEM_PROMPT,
             messages=(
                 ConversationMessage(
                     role=ConversationRole.USER,
@@ -100,7 +101,8 @@ def run(loop):  # type: ignore[no-untyped-def]
             model_name="qwen3:8b",
         ),
         execution_context=ExecutionContext(
-            trace_id=uuid4(), execution_id=uuid4(), model_name="qwen3:8b"
+            trace_id=uuid4(), execution_id=uuid4(), conversation_id=uuid4(),
+            customer_id=uuid4(), model_name="qwen3:8b"
         ),
     )
 
@@ -130,6 +132,14 @@ def test_one_native_tool_call_continues_with_assistant_call_and_result() -> None
     assert result.tool_cycles[0].selection.call_id == "native-1"
     assert len(audit.started) == len(audit.finalized) == 1
     continuation_messages = requests[1]["messages"]
+    for request in requests:
+        system_messages = [
+            message for message in request["messages"] if message["role"] == "system"
+        ]
+        assert system_messages == [
+            {"role": "system", "content": PRODUCTION_SYSTEM_PROMPT}
+        ]
+        assert request["messages"][0] == system_messages[0]
     assistant = next(message for message in continuation_messages if message["role"] == "assistant")
     tool = next(message for message in continuation_messages if message["role"] == "tool")
     assert assistant["tool_calls"][0]["id"] == "native-1"
