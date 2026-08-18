@@ -169,6 +169,18 @@ class BenchmarkProviderTurnRepository:
         rows = [BenchmarkProviderTurn(**_payload(record)) for record in records]; self._session.add_all(rows); self._session.flush(); return tuple(_turn(row) for row in rows)
     def list_in_order(self, conversation_result_id):
         rows = self._session.scalars(select(BenchmarkProviderTurn).where(BenchmarkProviderTurn.conversation_result_id == conversation_result_id).order_by(BenchmarkProviderTurn.turn_number, BenchmarkProviderTurn.id)).all(); return tuple(_turn(row) for row in rows)
+    def list_by_run(self, run_id):
+        rows = self._session.scalars(
+            select(BenchmarkProviderTurn)
+            .join(BenchmarkConversationResult)
+            .where(BenchmarkConversationResult.benchmark_run_id == run_id)
+            .order_by(
+                BenchmarkConversationResult.test_case_key,
+                BenchmarkProviderTurn.turn_number,
+                BenchmarkProviderTurn.id,
+            )
+        ).all()
+        return tuple(_turn(row) for row in rows)
 
 
 class BenchmarkToolExecutionRepository:
@@ -178,6 +190,18 @@ class BenchmarkToolExecutionRepository:
         rows = [BenchmarkToolExecution(**_payload(record)) for record in records]; self._session.add_all(rows); self._session.flush(); return tuple(_tool(row) for row in rows)
     def list_by_conversation(self, conversation_result_id):
         rows = self._session.scalars(select(BenchmarkToolExecution).where(BenchmarkToolExecution.conversation_result_id == conversation_result_id).order_by(BenchmarkToolExecution.execution_order, BenchmarkToolExecution.id)).all(); return tuple(_tool(row) for row in rows)
+    def list_by_run(self, run_id):
+        rows = self._session.scalars(
+            select(BenchmarkToolExecution)
+            .join(BenchmarkConversationResult)
+            .where(BenchmarkConversationResult.benchmark_run_id == run_id)
+            .order_by(
+                BenchmarkConversationResult.test_case_key,
+                BenchmarkToolExecution.execution_order,
+                BenchmarkToolExecution.id,
+            )
+        ).all()
+        return tuple(_tool(row) for row in rows)
     def aggregate_by_tool_name(self, run_id):
         rows = self._session.execute(select(BenchmarkToolExecution.tool_name, func.count()).join(BenchmarkConversationResult).where(BenchmarkConversationResult.benchmark_run_id == run_id).group_by(BenchmarkToolExecution.tool_name).order_by(BenchmarkToolExecution.tool_name)).all(); return {name: count for name, count in rows}
     def aggregate_success_failure(self, run_id):
@@ -191,6 +215,19 @@ class BenchmarkMetricRepository:
         rows = [BenchmarkMetricResult(**_payload(record)) for record in records]; self._session.add_all(rows); self._session.flush(); return tuple(_metric(row) for row in rows)
     def list_by_conversation(self, conversation_result_id):
         rows = self._session.scalars(select(BenchmarkMetricResult).where(BenchmarkMetricResult.conversation_result_id == conversation_result_id).order_by(BenchmarkMetricResult.metric_key, BenchmarkMetricResult.metric_version, BenchmarkMetricResult.id)).all(); return tuple(_metric(row) for row in rows)
+    def list_by_run(self, run_id):
+        rows = self._session.scalars(
+            select(BenchmarkMetricResult)
+            .join(BenchmarkConversationResult)
+            .where(BenchmarkConversationResult.benchmark_run_id == run_id)
+            .order_by(
+                BenchmarkConversationResult.test_case_key,
+                BenchmarkMetricResult.metric_key,
+                BenchmarkMetricResult.metric_version,
+                BenchmarkMetricResult.id,
+            )
+        ).all()
+        return tuple(_metric(row) for row in rows)
     def aggregate_by_metric_key(self, conversation_result_id): return self._aggregate(BenchmarkMetricResult.conversation_result_id == conversation_result_id)
     def aggregate_by_model_run(self, run_id): return self._aggregate(BenchmarkConversationResult.benchmark_run_id == run_id, join=True)
     def _aggregate(self, criterion, join=False):
@@ -207,6 +244,19 @@ class BenchmarkFailureRepository:
         rows = [BenchmarkFailureEvent(**_payload(record)) for record in records]; self._session.add_all(rows); self._session.flush(); return tuple(_failure(row) for row in rows)
     def list_by_conversation(self, conversation_result_id):
         rows = self._session.scalars(select(BenchmarkFailureEvent).where(BenchmarkFailureEvent.conversation_result_id == conversation_result_id).order_by(BenchmarkFailureEvent.is_primary.desc(), BenchmarkFailureEvent.created_at, BenchmarkFailureEvent.id)).all(); return tuple(_failure(row) for row in rows)
+    def list_by_run(self, run_id):
+        rows = self._session.scalars(
+            select(BenchmarkFailureEvent)
+            .join(BenchmarkConversationResult)
+            .where(BenchmarkConversationResult.benchmark_run_id == run_id)
+            .order_by(
+                BenchmarkConversationResult.test_case_key,
+                BenchmarkFailureEvent.is_primary.desc(),
+                BenchmarkFailureEvent.created_at,
+                BenchmarkFailureEvent.id,
+            )
+        ).all()
+        return tuple(_failure(row) for row in rows)
     def aggregate_by_category(self, run_id): return self._aggregate(run_id, BenchmarkFailureEvent.failure_category)
     def aggregate_by_responsibility_layer(self, run_id): return self._aggregate(run_id, BenchmarkFailureEvent.responsibility_layer)
     def _aggregate(self, run_id, column):

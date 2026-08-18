@@ -38,9 +38,14 @@ export async function downloadExport(
   url: string,
   body?: { run_ids: string[] },
 ) {
+  // Report generation can legitimately take longer than interactive API reads,
+  // especially when a workbook contains evidence for a full benchmark campaign.
+  // Keep this timeout local to exports so ordinary dashboard requests retain the
+  // stricter client timeout.
+  const exportRequest = { responseType: "blob" as const, timeout: 180_000 };
   const response = body
-    ? await apiClient.post<Blob>(url, body, { responseType: "blob" })
-    : await apiClient.get<Blob>(url, { responseType: "blob" });
+    ? await apiClient.post<Blob>(url, body, exportRequest)
+    : await apiClient.get<Blob>(url, exportRequest);
   const disposition = response.headers["content-disposition"] as
     string | undefined;
   const filename =
@@ -49,6 +54,8 @@ export async function downloadExport(
   const anchor = document.createElement("a");
   anchor.href = objectUrl;
   anchor.download = filename;
+  document.body.appendChild(anchor);
   anchor.click();
-  URL.revokeObjectURL(objectUrl);
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1_000);
 }

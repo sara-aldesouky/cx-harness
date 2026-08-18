@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from concurrent.futures import CancelledError as FutureCancelledError
+from typing import Callable, Optional
 
 from app.tools.context import ExecutionContext
 from app.tools.continuation_cycle import (
@@ -61,6 +62,7 @@ class SingleToolContinuationCycleService:
         execution_outcome_factory: ToolExecutionOutcomeFactory,
         continuation_service: ProviderContinuationService,
         cycle_factory: ToolContinuationCycleFactory,
+        completion_observer: Optional[Callable[..., None]] = None,
     ) -> None:
         dependencies = (
             (
@@ -90,12 +92,17 @@ class SingleToolContinuationCycleService:
         self._execution_outcome_factory = execution_outcome_factory
         self._continuation_service = continuation_service
         self._cycle_factory = cycle_factory
+        if completion_observer is not None and not callable(completion_observer):
+            raise TypeError("completion_observer must be callable")
+        self._completion_observer = completion_observer
 
     def run(
         self,
         provider_name: str,
         selection: ValidatedToolSelection,
         context: ExecutionContext,
+        *,
+        source_turn: int = 1,
     ) -> ToolContinuationCycle:
         """Process one selection in lifecycle order and return one complete cycle."""
 
@@ -110,6 +117,10 @@ class SingleToolContinuationCycleService:
         if not isinstance(context, ExecutionContext):
             raise InvalidToolContinuationCycleServiceInputError(
                 "context must be a trusted ExecutionContext"
+            )
+        if isinstance(source_turn, bool) or source_turn < 1:
+            raise InvalidToolContinuationCycleServiceInputError(
+                "source_turn must be positive"
             )
 
         safe_context = (
@@ -149,7 +160,7 @@ class SingleToolContinuationCycleService:
             ) from error
 
         try:
-            return self._cycle_factory.create(
+            cycle = self._cycle_factory.create(
                 provider_name,
                 selection,
                 request,
@@ -160,3 +171,11 @@ class SingleToolContinuationCycleService:
             raise ToolContinuationCycleCreationError(
                 f"continuation-cycle creation failed for {safe_context}"
             ) from error
+        if self._completion_observer is not None:
+            try:
+                self._completion_observer(request, result, source_turn)
+            except Exception as error:
+                raise ToolContinuationCycleCreationError(
+                    f"trusted completion recording failed for {safe_context}"
+                ) from error
+        return cycle

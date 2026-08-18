@@ -22,11 +22,8 @@ class BenchmarkReportingRepository:
         suite=self._suites.get_by_id(run.benchmark_suite_id)
         if suite is None: raise RunNotFoundError("benchmark suite not found")
         conversations=self._conversations.list_by_run(run_id)
-        turns=[]; tools=[]; metrics=[]; failures=[]
-        for conversation in conversations:
-            turns.extend(self._turns.list_in_order(conversation.id))
-            tools.extend(self._tools.list_by_conversation(conversation.id))
-            metrics.extend(self._metrics.list_by_conversation(conversation.id))
-            failures.extend(self._failures.list_by_conversation(conversation.id))
         return RunAnalyticsSnapshot(suite=suite,run=run,conversations=conversations,
-            provider_turns=tuple(turns),tool_executions=tuple(tools),metrics=tuple(metrics),failures=tuple(failures))
+            provider_turns=self._turns.list_by_run(run_id),
+            tool_executions=self._tools.list_by_run(run_id),
+            metrics=self._metrics.list_by_run(run_id),
+            failures=self._failures.list_by_run(run_id))

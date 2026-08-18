@@ -131,14 +131,50 @@ class BenchmarkPresentationService:
             .order_by(BenchmarkConversationResult.test_case_key, BenchmarkConversationResult.id)
         ).all()
         model_name = self._session.scalar(select(BenchmarkRun.model_name).where(BenchmarkRun.id == run_id)) or "Unavailable"
+        result_ids = tuple(result.id for result in conversations)
+        conversation_ids = tuple(
+            {result.source_conversation_id for result in conversations if result.source_conversation_id is not None}
+        )
+        messages_by_conversation: dict[UUID, list[Message]] = {}
+        if conversation_ids:
+            for message in self._session.scalars(
+                select(Message)
+                .where(Message.conversation_id.in_(conversation_ids))
+                .order_by(Message.conversation_id, Message.sequence_number)
+            ).all():
+                messages_by_conversation.setdefault(message.conversation_id, []).append(message)
+        tools_by_result: dict[UUID, list[BenchmarkToolExecution]] = {}
+        metrics_by_result: dict[UUID, list[BenchmarkMetricResult]] = {}
+        failures_by_result: dict[UUID, list[BenchmarkFailureEvent]] = {}
+        if result_ids:
+            for tool in self._session.scalars(
+                select(BenchmarkToolExecution)
+                .where(BenchmarkToolExecution.conversation_result_id.in_(result_ids))
+                .order_by(BenchmarkToolExecution.conversation_result_id, BenchmarkToolExecution.execution_order)
+            ).all():
+                tools_by_result.setdefault(tool.conversation_result_id, []).append(tool)
+            for metric in self._session.scalars(
+                select(BenchmarkMetricResult)
+                .where(BenchmarkMetricResult.conversation_result_id.in_(result_ids))
+                .order_by(BenchmarkMetricResult.conversation_result_id, BenchmarkMetricResult.metric_key)
+            ).all():
+                metrics_by_result.setdefault(metric.conversation_result_id, []).append(metric)
+            for failure in self._session.scalars(
+                select(BenchmarkFailureEvent)
+                .where(BenchmarkFailureEvent.conversation_result_id.in_(result_ids))
+                .order_by(
+                    BenchmarkFailureEvent.conversation_result_id,
+                    BenchmarkFailureEvent.is_primary.desc(),
+                    BenchmarkFailureEvent.created_at,
+                )
+            ).all():
+                failures_by_result.setdefault(failure.conversation_result_id, []).append(failure)
         evidence = []
         for result in conversations:
-            messages = [] if result.source_conversation_id is None else self._session.scalars(
-                select(Message).where(Message.conversation_id == result.source_conversation_id).order_by(Message.sequence_number)
-            ).all()
-            tools = self._session.scalars(select(BenchmarkToolExecution).where(BenchmarkToolExecution.conversation_result_id == result.id).order_by(BenchmarkToolExecution.execution_order)).all()
-            metrics = self._session.scalars(select(BenchmarkMetricResult).where(BenchmarkMetricResult.conversation_result_id == result.id).order_by(BenchmarkMetricResult.metric_key)).all()
-            failures = self._session.scalars(select(BenchmarkFailureEvent).where(BenchmarkFailureEvent.conversation_result_id == result.id).order_by(BenchmarkFailureEvent.is_primary.desc(), BenchmarkFailureEvent.created_at)).all()
+            messages = messages_by_conversation.get(result.source_conversation_id, [])
+            tools = tools_by_result.get(result.id, [])
+            metrics = metrics_by_result.get(result.id, [])
+            failures = failures_by_result.get(result.id, [])
             user_text = "\n\n".join(message.content for message in messages if message.role == "user")
             assistant_text = "\n\n".join(message.content for message in messages if message.role == "assistant")
             evaluation_scores = {metric.metric_key: str(metric.normalized_score if metric.normalized_score is not None else metric.value_boolean if metric.value_boolean is not None else metric.value_numeric if metric.value_numeric is not None else metric.value_text) for metric in metrics}

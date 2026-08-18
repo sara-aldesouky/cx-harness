@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, TYPE_CHECKING
+from typing import Any, Callable, TYPE_CHECKING
 
 from app.tools.continuation_adapter_registry import (
     ProviderContinuationAdapterRegistry,
@@ -57,6 +57,8 @@ def build_tool_continuation_runtime(
     authorization_service: ToolAuthorizationService | None = None,
     role_policy_service: ToolRolePolicyService | None = None,
     tool_authorization_service: RequestedToolAuthorizationService | None = None,
+    tool_factory: Callable[[type], Any] | None = None,
+    completion_observer: Callable[..., None] | None = None,
 ) -> ToolContinuationRuntime:
     """Compose one ready runtime without lookup, execution, registration, or I/O."""
 
@@ -89,6 +91,7 @@ def build_tool_continuation_runtime(
             tool_registry,
             audit_repository,
             audit_payload_max_bytes=audit_payload_max_bytes,
+            tool_factory=tool_factory,
         )
     except Exception as error:
         raise ToolContinuationRuntimeConstructionError(
@@ -124,6 +127,7 @@ def build_tool_continuation_runtime(
             ToolExecutionOutcomeFactory(),
             continuation_service,
             ToolContinuationCycleFactory(),
+            completion_observer=completion_observer,
         )
     except Exception as error:
         raise ToolContinuationRuntimeConstructionError(

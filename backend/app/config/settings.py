@@ -26,7 +26,11 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://localhost:11434"
     ollama_model_name: str = "qwen3:8b"
     ollama_connect_timeout_seconds: float = Field(default=2.0, gt=0)
-    ollama_read_timeout_seconds: float = Field(default=60.0, gt=0)
+    ollama_read_timeout_seconds: float = Field(default=120.0, gt=0)
+    ollama_context_size: int = Field(default=8_192, ge=4_096, le=131_072)
+    ollama_max_output_tokens: int = Field(default=256, gt=0, le=8_192)
+    ollama_keep_alive: str = "15m"
+    ollama_tool_thinking_enabled: bool = False
     max_model_turns: int = Field(default=5, gt=0, le=100)
     max_user_message_chars: int = Field(default=16_384, gt=0, le=1_000_000)
     max_conversation_history: int = Field(default=100, ge=0, le=10_000)
@@ -95,6 +99,25 @@ class Settings(BaseSettings):
         normalized = value.strip()
         if not normalized:
             raise ValueError("OLLAMA_MODEL_NAME must not be empty")
+        return normalized
+
+    @field_validator("ollama_keep_alive")
+    @classmethod
+    def validate_ollama_keep_alive(cls, value: str) -> str:
+        """Require one explicit Ollama duration without provider leakage."""
+
+        normalized = value.strip().lower()
+        if not normalized or len(normalized) > 32:
+            raise ValueError("OLLAMA_KEEP_ALIVE must be a valid duration")
+        if normalized in {"0", "-1"}:
+            return normalized
+        suffix = next(
+            (item for item in ("ms", "s", "m", "h") if normalized.endswith(item)),
+            None,
+        )
+        amount = normalized[: -len(suffix)] if suffix else ""
+        if suffix is None or not amount.isdigit() or int(amount) <= 0:
+            raise ValueError("OLLAMA_KEEP_ALIVE must be a valid duration")
         return normalized
 
     model_config = SettingsConfigDict(

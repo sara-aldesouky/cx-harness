@@ -1,0 +1,20 @@
+{
+  "suite_key": "cx-benchmark-100-cases",
+  "suite_version": "2026.07.27",
+  "case_count": 100,
+  "run_ids": [
+    "d1dd46b1-4e54-429e-a807-0042e9983f91",
+    "54def13a-74e4-461f-9d01-2c2437783a82",
+    "25026935-78cb-4593-bd77-27f206d9d977"
+  ],
+  "execution_modes": {
+    "Qwen 3 8B": "Agent Mode",
+    "Fanar 9B": "Chat Mode",
+    "Fanar 9B Instruct": "Chat Mode"
+  },
+  "fanar_disclosure": "Tool calling is unavailable for this deployment. This benchmark was executed in Chat Mode. Tool-related metrics are N/A.",
+  "dashboard_url": "http://127.0.0.1:3000/benchmark-reporting",
+  "comparison_url": "http://127.0.0.1:3000/benchmark-reporting/compare?runs=d1dd46b1-4e54-429e-a807-0042e9983f91,54def13a-74e4-461f-9d01-2c2437783a82,25026935-78cb-4593-bd77-27f206d9d977",
+  "measured_case_execution_ms": 7634343.881,
+  "database_target": "local PostgreSQL test database at 127.0.0.1:5433 (sanitized)"
+}

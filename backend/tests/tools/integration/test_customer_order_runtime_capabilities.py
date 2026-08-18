@@ -93,6 +93,10 @@ APPROVED_TOOL_NAMES = {
     "get_policy",
     "get_faq_answer",
     "list_related_articles",
+    "cancel_order",
+    "update_delivery_address",
+    "initiate_refund",
+    "create_support_ticket",
 }
 
 
@@ -107,6 +111,7 @@ def business_records(test_session_factory):  # type: ignore[no-untyped-def]
             last_name="Customer",
             preferred_language="ar",
         )
+        conversation = create_conversation(session, customer)
         current = create_order(
             session,
             customer,
@@ -203,6 +208,7 @@ def business_records(test_session_factory):  # type: ignore[no-untyped-def]
     try:
         yield {
             "customer_id": customer_id,
+            "conversation_id": conversation.id,
             "current_order_id": order_ids[0],
             "history_order_id": order_ids[1],
         }
@@ -213,6 +219,9 @@ def business_records(test_session_factory):  # type: ignore[no-untyped-def]
                 delete(ToolCall).where(ToolCall.customer_id == customer_id)
             )
             session.execute(delete(Order).where(Order.id.in_(order_ids)))
+            session.execute(
+                delete(Conversation).where(Conversation.id == conversation.id)
+            )
             session.execute(delete(Customer).where(Customer.id == customer_id))
 
 
@@ -498,6 +507,7 @@ def test_complete_runtime_cycle_reads_postgresql_and_continues(
             execution_context=ExecutionContext(
                 trace_id=uuid4(),
                 execution_id=uuid4(),
+                conversation_id=business_records["conversation_id"],
                 customer_id=business_records["customer_id"],
                 model_name="qwen3:8b",
             ),
@@ -634,6 +644,7 @@ def test_cross_domain_customer_journeys_are_grounded_and_deterministic(
             ),
             execution_context=ExecutionContext(
                 trace_id=uuid4(), execution_id=uuid4(),
+                conversation_id=business_records["conversation_id"],
                 customer_id=business_records["customer_id"], model_name="qwen3:8b",
             ),
         )
@@ -716,6 +727,7 @@ def test_cross_domain_partial_failures_return_safe_grounding_termination(
             ),
             execution_context=ExecutionContext(
                 trace_id=uuid4(), execution_id=uuid4(),
+                conversation_id=business_records["conversation_id"],
                 customer_id=business_records["customer_id"], model_name="qwen3:8b",
             ),
         )
@@ -767,6 +779,7 @@ def test_unregistered_tool_never_executes(
             execution_context=ExecutionContext(
                 trace_id=uuid4(),
                 execution_id=uuid4(),
+                conversation_id=business_records["conversation_id"],
                 customer_id=business_records["customer_id"],
                 model_name="qwen3:8b",
             ),

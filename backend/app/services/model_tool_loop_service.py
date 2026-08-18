@@ -37,6 +37,10 @@ from app.services.orchestration_runtime_gate import (
 )
 from app.harness.context import ConversationContext, ConversationMessage, ConversationRole
 from app.harness.context_builder import ContextBuilder, MessageInput
+from app.harness.production_prompt import (
+    ProductionSystemPromptBuilder,
+    production_system_prompt_builder,
+)
 from app.providers.base import ModelResponse, ModelToolLoopTurnResponse
 from app.providers.registry import ProviderRegistry
 from app.tools.context import ExecutionContext
@@ -57,11 +61,16 @@ from app.security_audit import (
 )
 from app.tools.continuation_adapter import ProviderContinuationPayload
 from app.tools.continuation_cycle import ToolContinuationCycle
-from app.tools.selection import ToolSelectionResolver
 from app.tools.selection import ToolSelectionRequest
-from app.tools.selection_service import ToolSelectionResolutionError
 from app.tools.result import ToolStatus
 from app.tools.tool_runtime import ToolContinuationRuntime
+from app.services.trusted_argument_binding_runtime import (
+    TrustedArgumentBindingRejected,
+    TrustedSelectionPipeline,
+)
+from app.conversation_continuity import (
+    TrustedConversationEntityContinuityService,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -156,6 +165,12 @@ class ModelToolLoopApplicationService:
         model_name: str = settings.ollama_model_name,
         runtime_gate: OrchestrationRuntimeGate = orchestration_runtime_gate,
         data_protection: DataProtectionService = privacy_service,
+        prompt_builder: ProductionSystemPromptBuilder = (
+            production_system_prompt_builder
+        ),
+        continuity_service: Optional[
+            TrustedConversationEntityContinuityService
+        ] = None,
     ) -> None:
         self._loop_factory = loop_factory
         self._provider_name = provider_name
@@ -166,6 +181,24 @@ class ModelToolLoopApplicationService:
         if not isinstance(data_protection, DataProtectionService):
             raise TypeError("data_protection must be a DataProtectionService")
         self._data_protection = data_protection
+        if not isinstance(prompt_builder, ProductionSystemPromptBuilder):
+            raise TypeError("prompt_builder must be a ProductionSystemPromptBuilder")
+        self._prompt_builder = prompt_builder
+        if continuity_service is not None and not isinstance(
+            continuity_service, TrustedConversationEntityContinuityService
+        ):
+            raise TypeError(
+                "continuity_service must be a TrustedConversationEntityContinuityService"
+            )
+        self._continuity = (
+            continuity_service or TrustedConversationEntityContinuityService()
+        )
+
+    @property
+    def prompt_version(self) -> str:
+        """Expose the active immutable prompt version as runtime metadata."""
+
+        return self._prompt_builder.version
 
     def invoke(
         self,
@@ -200,12 +233,15 @@ class ModelToolLoopApplicationService:
             self._data_protection.protect_message_input(message)
             for message in history_inputs
         )
-        protected_instructions = self._data_protection.protect_text(
+        protected_supplemental = self._data_protection.protect_text(
             system_instructions
+        )
+        protected_instructions = self._prompt_builder.build(
+            protected_supplemental
         )
         if (
             protected_current != current_user_message
-            or protected_instructions != system_instructions.strip()
+            or protected_supplemental != system_instructions.strip()
             or any(
                 protected != original
                 for protected, original in zip(protected_history, history_inputs)
@@ -226,12 +262,18 @@ class ModelToolLoopApplicationService:
             provider_name=self._provider_name,
             model_name=self._model_name,
         )
-        factory = self._loop_factory or build_model_tool_loop
+        factory = self._loop_factory
         trace_id = uuid4()
         loop = None
         with self._runtime_gate.execution(trace_id) as cancellation_token:
             try:
-                loop = factory()
+                loop = (
+                    factory()
+                    if factory is not None
+                    else build_model_tool_loop(
+                        continuity_service=self._continuity
+                    )
+                )
                 result = loop.run(
                     provider_name=self._provider_name,
                     model_name=self._model_name,
@@ -245,6 +287,7 @@ class ModelToolLoopApplicationService:
                         model_name=self._model_name,
                     ),
                     cancellation_token=cancellation_token,
+                    trusted_customer_message=current_user_message,
                 )
             finally:
                 close = getattr(loop, "close", None)
@@ -303,6 +346,13 @@ class ModelToolLoopApplicationService:
             provider_name=result.provider_name,
             model_name=result.model_name,
         )
+
+    def clear_conversation_state(self, conversation_id: UUID) -> bool:
+        """Remove trusted continuity when the owning conversation is cleaned up."""
+
+        if not isinstance(conversation_id, UUID):
+            raise TypeError("conversation_id must be a UUID")
+        return self._continuity.clear(conversation_id)
 class BoundedModelToolLoopService:
     """Own a finite model/tool loop while delegating every specialist operation."""
 
@@ -310,7 +360,7 @@ class BoundedModelToolLoopService:
         self,
         *,
         provider_registry: ProviderRegistry,
-        selection_resolver: ToolSelectionResolver,
+        trusted_selection_pipeline: TrustedSelectionPipeline,
         tool_runtime: ToolContinuationRuntime,
         max_model_turns: int = settings.max_model_turns,
         timeout_seconds: Optional[float] = None,
@@ -326,8 +376,10 @@ class BoundedModelToolLoopService:
     ) -> None:
         if not isinstance(provider_registry, ProviderRegistry):
             raise TypeError("provider_registry must be a ProviderRegistry")
-        if not isinstance(selection_resolver, ToolSelectionResolver):
-            raise TypeError("selection_resolver must be a ToolSelectionResolver")
+        if not isinstance(trusted_selection_pipeline, TrustedSelectionPipeline):
+            raise TypeError(
+                "trusted_selection_pipeline must be a TrustedSelectionPipeline"
+            )
         if not isinstance(tool_runtime, ToolContinuationRuntime):
             raise TypeError("tool_runtime must be a ToolContinuationRuntime")
         if isinstance(max_model_turns, bool) or max_model_turns < 1:
@@ -347,7 +399,7 @@ class BoundedModelToolLoopService:
                 "boundary_validator must be an OrchestrationBoundaryValidator"
             )
         self._providers = provider_registry
-        self._resolver = selection_resolver
+        self._selection_pipeline = trusted_selection_pipeline
         self._runtime = tool_runtime
         self._max_turns = max_model_turns
         self._timeout = timeout_seconds
@@ -387,6 +439,7 @@ class BoundedModelToolLoopService:
         context: ConversationContext,
         execution_context: ExecutionContext,
         cancellation_token: Optional[OrchestrationCancellationToken] = None,
+        trusted_customer_message: Optional[str] = None,
     ) -> ModelToolLoopResult:
         """Run one isolated lifecycle and always discard its temporary state."""
 
@@ -414,6 +467,7 @@ class BoundedModelToolLoopService:
                 cancellation_token=cancellation_token,
                 state=state,
                 trace=trace,
+                trusted_customer_message=trusted_customer_message,
             )
             state.terminate(result.termination_reason.value)
             if result.termination_reason is ModelToolLoopTermination.FINAL_RESPONSE:
@@ -460,6 +514,7 @@ class BoundedModelToolLoopService:
         cancellation_token: Optional[OrchestrationCancellationToken],
         state: OrchestrationExecutionState,
         trace: OrchestrationTraceRecorder,
+        trusted_customer_message: Optional[str],
     ) -> ModelToolLoopResult:
         """Execute the established loop against one run-local state machine."""
 
@@ -723,7 +778,33 @@ class BoundedModelToolLoopService:
                 state.begin_tool(tool_call.call_id)
                 tool_call_history.append(tool_call)
                 try:
-                    selection = self._resolver.resolve(tool_call)
+                    selection = self._selection_pipeline.bind_and_validate(
+                        tool_call,
+                        execution_context,
+                        (
+                            trusted_customer_message
+                            if trusted_customer_message is not None
+                            else self._current_customer_message(messages)
+                        ),
+                        source_turn=turn_number,
+                    )
+                except TrustedArgumentBindingRejected as error:
+                    failure = error.result.failure
+                    return self._safe_failure(
+                        provider_key,
+                        model_key,
+                        turn_number,
+                        cycles,
+                        ModelToolLoopTermination.INVALID_TOOL_CALL,
+                        started,
+                        failure.code if failure is not None else "binding_failed",
+                        (
+                            failure.public_message
+                            if failure is not None
+                            else "I couldn’t safely prepare that request."
+                        ),
+                        trace_id=execution_context.trace_id,
+                    )
                 except Exception:
                     return self._safe_failure(
                         provider_key, model_key, turn_number, cycles,
@@ -744,6 +825,7 @@ class BoundedModelToolLoopService:
                         execution_context.model_copy(
                             update={"execution_id": uuid4()}
                         ),
+                        source_turn=turn_number,
                     )
                 except TimeoutError:
                     trace.tool_finished(
@@ -863,6 +945,15 @@ class BoundedModelToolLoopService:
             "I couldn’t complete the request within the safe turn limit.",
             trace_id=execution_context.trace_id,
         )
+
+    @staticmethod
+    def _current_customer_message(
+        messages: list[ConversationMessage],
+    ) -> str:
+        for message in reversed(messages):
+            if message.role is ConversationRole.USER:
+                return message.content
+        raise ValueError("the working conversation has no customer message")
 
     def _timed_out(self, started: float) -> bool:
         return self._timeout is not None and self._clock() - started >= self._timeout

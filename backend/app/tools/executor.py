@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from time import monotonic
-from typing import Optional
+from typing import Callable, Optional
 
 from pydantic import BaseModel
 
@@ -13,6 +13,7 @@ from app.database.session import get_session_factory
 from app.config.settings import settings
 from app.tools.audit_payload import sanitize_audit_payload
 from app.tools.context import ExecutionContext
+from app.tools.contracts import BaseTool
 from app.tools.registry import ToolRegistry
 from app.tools.result import ToolResult, ToolStatus
 
@@ -35,6 +36,7 @@ class ToolExecutor:
         registry: ToolRegistry,
         audit_repository: Optional[ToolCallAuditRepository] = None,
         audit_payload_max_bytes: Optional[int] = None,
+        tool_factory: Optional[Callable[[type], BaseTool]] = None,
     ) -> None:
         self._registry = registry
         self._audit_repository = (
@@ -49,6 +51,9 @@ class ToolExecutor:
         )
         if self._audit_payload_max_bytes <= 0:
             raise ValueError("audit_payload_max_bytes must be positive")
+        self._tool_factory = tool_factory or (lambda tool_class: tool_class())
+        if not callable(self._tool_factory):
+            raise TypeError("tool_factory must be callable")
 
     def execute(
         self,
@@ -85,7 +90,11 @@ class ToolExecutor:
         )
         started_monotonic = monotonic()
         try:
-            tool = tool_class()
+            tool = self._tool_factory(tool_class)
+            if not isinstance(tool, tool_class):
+                raise ToolExecutionContractError(
+                    "tool_factory must return an instance of the requested tool class"
+                )
             result = tool.execute(context, input_model)
             if not isinstance(result, ToolResult):
                 raise ToolExecutionContractError(

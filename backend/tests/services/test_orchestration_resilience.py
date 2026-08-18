@@ -35,9 +35,10 @@ from app.tools.continuation_adapter_registry import ProviderContinuationAdapterR
 from app.tools.contracts import BaseTool, ToolCategory, ToolMetadata
 from app.tools.registry import ToolRegistry
 from app.tools.result import ToolError, ToolResult, ToolStatus
-from app.tools.selection import ToolSelectionRequest, ToolSelectionResolver
+from app.tools.selection import ToolSelectionRequest
 from app.tools.tool_runtime import build_tool_continuation_runtime
 from tests.tools.audit_fakes import RecordingAuditRepository
+from tests.trusted_selection_fakes import trusted_selection_pipeline
 
 
 class ResilienceContinuationAdapter(MockProviderContinuationAdapter):
@@ -169,6 +170,7 @@ def execution_context():  # type: ignore[no-untyped-def]
         trace_id=uuid4(),
         execution_id=uuid4(),
         conversation_id=uuid4(),
+        customer_id=uuid4(),
         model_name="resilience-model",
     )
 
@@ -202,7 +204,7 @@ def build(
         service_kwargs["trace_sink"] = trace_sink
     service = BoundedModelToolLoopService(
         provider_registry=providers,
-        selection_resolver=ToolSelectionResolver(tools),
+        trusted_selection_pipeline=trusted_selection_pipeline(tools),
         tool_runtime=runtime,
         max_model_turns=4,
         timeout_seconds=30,

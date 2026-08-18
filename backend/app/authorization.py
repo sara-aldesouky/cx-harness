@@ -147,7 +147,7 @@ class OwnershipAuthorizationService:
         if metadata.category is ToolCategory.SYSTEM and not capabilities:
             return AuthorizationDecision.allow()
 
-        if not metadata.is_read_only or not metadata.requires_customer_identity:
+        if not metadata.requires_customer_identity:
             return AuthorizationDecision.deny(
                 AuthorizationFailureCode.ACCESS_DENIED
             )
